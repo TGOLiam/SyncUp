@@ -7,4 +7,22 @@
     <string name="events_placeholder">Your events will appear here.</string>
     <string name="join_event">Join Event</string>
     <string name="create_event">Create Event</string>
+    <string name="my_events">My Events</string>
+    <string name="event_techconf">TechConf Manila 2026</string>
+    <string name="event_fun_run">Barangay Fun Run</string>
+    <string name="event_homecoming">Alumni Homecoming</string>
+    <string name="event_lead">Event Lead</string>
+    <string name="event_organizer">Organizer</string>
+    <string name="event_techconf_detail">SMX Convention Center, Pasay · Nov 20</string>
+    <string name="event_fun_run_detail">Quezon Memorial Circle · Dec 3</string>
+    <string name="event_homecoming_detail">FEU Tech Gym, Manila · Oct 24 · Ended</string>
+    <string name="event_phase_active">Active phase: Registration</string>
+    <string name="event_no_phase">No phase active yet</string>
+    <string name="back">Back</string>
+    <string name="join_event_title">Join event</string>
+    <string name="enter_event_code">Enter event code</string>
+    <string name="join_code_help">Ask your Event Lead for the six-digit code.</string>
+    <string name="join_code_description">Six-digit event code</string>
+    <string name="join">Join</string>
+    <string name="join_event_placeholder">Joining an event is not available yet.</string>
 </resources>

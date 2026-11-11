@@ -2,4 +2,9 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="event_background">#F5F6F8</color>
+    <color name="event_text">#16212C</color>
+    <color name="event_muted">#5B6773</color>
+    <color name="event_navy">#1F3B5C</color>
+    <color name="event_border">#D5DAE0</color>
 </resources>

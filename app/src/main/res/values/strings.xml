@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SYNC-UP</string>
+    <string name="loading_title">SyncUp</string>
+    <string name="loading">Loading</string>
+    <string name="home_placeholder">Events</string>
+    <string name="settings">Settings</string>
+    <string name="events_placeholder">Your events will appear here.</string>
+    <string name="join_event">Join Event</string>
+    <string name="create_event">Create Event</string>
+</resources>

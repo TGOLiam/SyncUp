@@ -1,0 +1,16 @@
+# Android Studio and IntelliJ files
+*.iml
+.idea/
+
+# Gradle and Android build output
+.gradle/
+**/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Machine-specific SDK configuration
+local.properties
+
+# Operating system files
+.DS_Store

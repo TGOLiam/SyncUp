@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
+            android:name=".CreateEventActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".JoinEventActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

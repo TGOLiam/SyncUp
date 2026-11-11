@@ -25,4 +25,13 @@
     <string name="join_code_description">Six-digit event code</string>
     <string name="join">Join</string>
     <string name="join_event_placeholder">Joining an event is not available yet.</string>
+    <string name="create_step_one">Step 1 of 7</string>
+    <string name="event_details">Event Details</string>
+    <string name="create_event_name">Event name *</string>
+    <string name="create_event_venue">Venue *</string>
+    <string name="create_event_start">Start</string>
+    <string name="create_event_end">End</string>
+    <string name="date_time_hint">Date and time</string>
+    <string name="next">Next</string>
+    <string name="create_event_placeholder">Event setup is not available yet.</string>
 </resources>

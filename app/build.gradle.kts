@@ -18,6 +18,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Each feature supplies a standard Android resource directory with its own layout folder.
+    sourceSets.getByName("main").res.directories.addAll(
+        listOf(
+            "src/main/res-features/loading",
+            "src/main/res-features/event-list",
+            "src/main/res-features/join-event",
+            "src/main/res-features/create-event"
+        )
+    )
+
     buildTypes {
         release {
             optimization {

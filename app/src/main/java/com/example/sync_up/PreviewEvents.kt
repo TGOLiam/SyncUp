@@ -9,11 +9,20 @@ object PreviewEvents {
         val events = mutableListOf<EventListItem>()
         context.resources.getXml(R.xml.preview_events).use { parser ->
             while (parser.next() != XmlPullParser.END_DOCUMENT) {
-                if (parser.eventType != XmlPullParser.START_TAG || parser.name != "event") continue
+                if (parser.eventType != XmlPullParser.START_TAG || parser.name != "event") {
+                    continue
+                }
+
+                // Preview attributes can contain either string resources or literal text.
                 fun stringAttribute(name: String): String? {
                     val resource = parser.getAttributeResourceValue(null, name, 0)
-                    return if (resource != 0) context.getString(resource) else parser.getAttributeValue(null, name)
+                    return if (resource != 0) {
+                        context.getString(resource)
+                    } else {
+                        parser.getAttributeValue(null, name)
+                    }
                 }
+
                 events.add(
                     EventListItem(
                         name = requireNotNull(stringAttribute("name")),

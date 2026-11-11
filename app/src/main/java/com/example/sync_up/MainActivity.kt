@@ -1,14 +1,13 @@
 package com.example.sync_up
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.content.Intent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
@@ -31,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        // Avoid starting another activity after this activity has been destroyed.
         handler.removeCallbacks(openMainScreen)
         super.onDestroy()
     }

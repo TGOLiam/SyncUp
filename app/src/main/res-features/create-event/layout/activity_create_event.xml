@@ -46,21 +46,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/create_step_one"
-                android:textColor="@color/event_muted"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/event_details"
-                android:textColor="@color/event_text"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+            <include layout="@layout/create_event_progress" />
 
             <TextView
                 android:id="@+id/event_name_label"

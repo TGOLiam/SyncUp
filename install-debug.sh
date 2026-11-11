@@ -8,6 +8,7 @@ usage() {
 Usage: ./install-debug.sh [device-serial]
 
 Build and install the debug app on one connected Android device.
+Verify the installed APK and restart the app after installation.
 Pass a serial or set ANDROID_SERIAL when more than one device is connected.
 Run 'adb devices -l' to see available devices.
 HELP
@@ -65,6 +66,7 @@ fi
 printf 'Building debug APK for device %s...\n' "$serial"
 ./gradlew :app:assembleDebug
 apk=app/build/outputs/apk/debug/app-debug.apk
+package=com.example.sync_up
 if [[ ! -f $apk ]]; then
     echo "Error: build completed but the debug APK was not found at $apk." >&2
     exit 1
@@ -76,4 +78,27 @@ if ! "$adb_cmd" -s "$serial" install -r "$apk"; then
     echo "A signing-key conflict may require removing the existing app, which deletes its data." >&2
     exit 1
 fi
-echo "Debug app installed successfully."
+
+installed_path=$("$adb_cmd" -s "$serial" shell pm path "$package" | tr -d '\r' | sed -n 's/^package://p' | head -n 1)
+if [[ -z $installed_path ]]; then
+    echo "Error: installation reported success, but the installed APK could not be found." >&2
+    exit 1
+fi
+local_hash=$(sha256sum "$apk" | awk '{print $1}')
+if ! remote_hash=$("$adb_cmd" -s "$serial" shell sha256sum "$installed_path"); then
+    echo "Error: could not verify the installed APK on the device." >&2
+    exit 1
+fi
+remote_hash=${remote_hash%% *}
+if [[ $local_hash != "$remote_hash" ]]; then
+    echo "Error: the installed APK does not match the APK built by Gradle." >&2
+    exit 1
+fi
+echo "Installed APK verified: $local_hash"
+
+printf 'Restarting SyncUp...\n'
+if ! "$adb_cmd" -s "$serial" shell am start -S -n "$package/.MainActivity"; then
+    echo "Error: the APK was installed, but the app could not be started." >&2
+    exit 1
+fi
+echo "Debug app installed, verified, and started successfully."

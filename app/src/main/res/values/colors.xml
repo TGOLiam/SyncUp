@@ -7,4 +7,5 @@
     <color name="event_muted">#5B6773</color>
     <color name="event_navy">#1F3B5C</color>
     <color name="event_border">#D5DAE0</color>
+    <color name="venue_selected">#E6ECF3</color>
 </resources>

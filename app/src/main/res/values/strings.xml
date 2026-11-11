@@ -26,6 +26,7 @@
     <string name="join">Join</string>
     <string name="join_event_placeholder">Joining an event is not available yet.</string>
     <string name="create_step_one">Step 1 of 7</string>
+    <string name="create_progress_step">Step %1$d of %2$d</string>
     <string name="event_details">Event Details</string>
     <string name="create_event_name">Event name *</string>
     <string name="create_event_venue">Venue *</string>
@@ -34,4 +35,22 @@
     <string name="date_time_hint">Date and time</string>
     <string name="next">Next</string>
     <string name="create_event_placeholder">Event setup is not available yet.</string>
+    <string name="organizer_details">Organizer Details</string>
+    <string name="preview_event_lead">You (Liam) · Event Lead\nOverall coordination</string>
+    <string name="preview_organizer_mia">Mia Santos · Organizer\nRegistration desk</string>
+    <string name="preview_organizer_raj">Raj Patel · Organizer\nStage</string>
+    <string name="add_organizer">+ Add organizer</string>
+    <string name="organizer_lead_requirement">At least one Event Lead is required.</string>
+    <string name="organizer_add_placeholder">Adding organizers is not available yet.</string>
+    <string name="venue_layout">Venue Layout</string>
+    <string name="venue_preview_description">Example venue boundary with five vertices</string>
+    <string name="venue_boundary">Venue boundary</string>
+    <string name="venue_vertices">5 vertices</string>
+    <string name="venue_draw">Draw</string>
+    <string name="venue_edit">Edit</string>
+    <string name="venue_undo">Undo</string>
+    <string name="venue_straighten">Straighten</string>
+    <string name="venue_add_zone">Add Zone</string>
+    <string name="venue_editor_placeholder">Venue editing is not available yet.</string>
+    <string name="venue_next_placeholder">Zone setup is not available yet.</string>
 </resources>

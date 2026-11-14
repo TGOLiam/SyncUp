@@ -11,8 +11,9 @@ object EventDetailsDraft {
     const val START_TIME = "event_start_time"
     const val END_TIME = "event_end_time"
     const val PHASE_COUNT = "event_phase_count"
+    const val CHANNEL_COUNT = "event_channel_count"
 
-    private val keys = listOf(NAME, VENUE, START, END, START_TIME, END_TIME, PHASE_COUNT)
+    private val keys = listOf(NAME, VENUE, START, END, START_TIME, END_TIME, PHASE_COUNT, CHANNEL_COUNT)
 
     fun copyTo(source: Intent, destination: Intent) {
         for (key in keys) {

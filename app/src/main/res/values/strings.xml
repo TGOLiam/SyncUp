@@ -76,14 +76,11 @@
     <string name="phases_edit_placeholder">Editing phases is not available yet.</string>
     <string name="phases_next_placeholder">The next setup step is not available yet.</string>
     <string name="channels_title">Channels</string>
-    <string name="channel_global_locked">Global · always included (locked)</string>
-    <string name="channel_stage_preview">Stage Crew · 2 members</string>
-    <string name="channel_registration_preview">Registration · 1 member</string>
-    <string name="channel_food_preview">Food and Bev · 0 members</string>
-    <string name="remove_stage_channel">Remove Stage Crew channel</string>
-    <string name="remove_registration_channel">Remove Registration channel</string>
-    <string name="remove_food_channel">Remove Food and Bev channel</string>
-    <string name="add_custom_channel">+ Add custom channel</string>
+    <string name="channel_global">Global</string>
+    <string name="channel_name">Channel name</string>
+    <string name="channel_add_title">Add channel</string>
+    <string name="channel_remove">Remove %1$s channel</string>
+    <string name="add_custom_channel">+ Add channel</string>
     <string name="review">Review</string>
     <string name="channels_edit_placeholder">Editing channels is not available yet.</string>
     <string name="channels_review_placeholder">Event review is not available yet.</string>
@@ -98,7 +95,7 @@
     <string name="review_create_placeholder">Event creation is not available yet.</string>
     <string name="review_heading">Review your event</string>
     <string name="review_subtitle">Check the details before your team joins.</string>
-    <string name="review_sample_notice">Venue layout and channel summaries are examples.</string>
+    <string name="review_sample_notice">The venue layout summary is an example.</string>
     <string name="review_edit_details">Edit event details</string>
     <string name="review_sample_venue">SMX Convention Center, Pasay</string>
     <string name="review_sample_schedule">Nov 20, 2026 · 8:00 AM – 6:00 PM</string>
@@ -110,7 +107,7 @@
     <string name="review_phases_title">Event phases</string>
     <string name="review_phases_detail">%1$d phases</string>
     <string name="review_channels_title">Channels</string>
-    <string name="review_channels_detail">Global + 3 team channels</string>
+    <string name="review_channels_detail">Global + %1$d channels</string>
     <string name="review_edit_section">Edit %1$s</string>
     <string name="review_sample_ready">✓ Example status: all required details are ready.</string>
     <string name="review_join_code_note">Your join code will be available after creation.</string>

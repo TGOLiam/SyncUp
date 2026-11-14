@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/ChannelPreviewRow"
+    android:layout_marginTop="8dp">
+
+    <TextView
+        android:id="@+id/channel_name"
+        style="@style/ChannelPreviewText" />
+
+    <ImageButton
+        android:id="@+id/channel_remove_button"
+        style="@style/ChannelRemoveButton" />
+</LinearLayout>

@@ -55,6 +55,10 @@ class EventReviewActivity : AppCompatActivity() {
             R.string.review_channels_detail,
             ChannelsActivity::class.java
         )
+        val channelCount = intent.getStringExtra(EventDetailsDraft.CHANNEL_COUNT)?.toIntOrNull() ?: 0
+        findViewById<View>(R.id.review_channels_section)
+            .findViewById<TextView>(R.id.review_section_detail).text =
+            getString(R.string.review_channels_detail, channelCount)
 
         // Event creation and validation will be connected after the UI prototype.
         findViewById<View>(R.id.review_create_button).setOnClickListener {

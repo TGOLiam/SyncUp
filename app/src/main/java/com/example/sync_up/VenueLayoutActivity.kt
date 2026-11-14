@@ -18,7 +18,7 @@ class VenueLayoutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_venue_layout)
-        CreateEventProgress.show(this, 3, R.string.venue_layout)
+        CreateEventProgress.show(this, 2, R.string.venue_layout)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.venue_layout_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

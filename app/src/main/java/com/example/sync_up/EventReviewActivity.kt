@@ -14,7 +14,7 @@ class EventReviewActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_review)
-        CreateEventProgress.show(this, 6, R.string.event_review)
+        CreateEventProgress.show(this, 5, R.string.event_review)
         showEventDetails()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.event_review_root)) { view, insets ->
@@ -33,12 +33,6 @@ class EventReviewActivity : AppCompatActivity() {
             openSetupStep(CreateEventActivity::class.java)
         }
 
-        bindSection(
-            R.id.review_organizers_section,
-            R.string.review_organizers_title,
-            R.string.review_organizers_detail,
-            OrganizerDetailsActivity::class.java
-        )
         bindSection(
             R.id.review_venue_section,
             R.string.review_venue_title,

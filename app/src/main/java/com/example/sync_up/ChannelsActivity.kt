@@ -12,7 +12,7 @@ class ChannelsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_channels)
-        CreateEventProgress.show(this, 5, R.string.channels_title)
+        CreateEventProgress.show(this, 4, R.string.channels_title)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.channels_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

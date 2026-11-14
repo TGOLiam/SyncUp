@@ -29,8 +29,9 @@
     <string name="event_details">Event Details</string>
     <string name="create_event_name">Event name *</string>
     <string name="create_event_venue">Venue *</string>
-    <string name="create_event_start">Start</string>
-    <string name="create_event_end">End</string>
+    <string name="create_event_start">Start *</string>
+    <string name="create_event_end">End *</string>
+    <string name="event_details_required">This field is required.</string>
     <string name="date_hint">Select a date</string>
     <string name="next">Next</string>
     <string name="create_event_placeholder">Event setup is not available yet.</string>
@@ -84,7 +85,7 @@
     <string name="review_create_placeholder">Event creation is not available yet.</string>
     <string name="review_heading">Review your event</string>
     <string name="review_subtitle">Check the details before your team joins.</string>
-    <string name="review_sample_notice">Organizer, venue layout, phases, and channel summaries are examples.</string>
+    <string name="review_sample_notice">Venue layout, phases, and channel summaries are examples.</string>
     <string name="review_edit_details">Edit event details</string>
     <string name="review_sample_venue">SMX Convention Center, Pasay</string>
     <string name="review_sample_schedule">Nov 20, 2026 · 8:00 AM – 6:00 PM</string>

@@ -15,7 +15,7 @@ class EventPhasesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_phases)
-        CreateEventProgress.show(this, 4, R.string.event_phases)
+        CreateEventProgress.show(this, 3, R.string.event_phases)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.event_phases_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

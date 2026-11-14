@@ -40,6 +40,5 @@
         <View style="@style/CreateProgressSegment" />
         <View style="@style/CreateProgressSegment" />
         <View style="@style/CreateProgressSegment" />
-        <View style="@style/CreateProgressSegment" />
     </LinearLayout>
 </LinearLayout>

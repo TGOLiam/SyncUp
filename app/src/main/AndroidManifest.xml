@@ -24,9 +24,6 @@
             android:name=".VenueLayoutActivity"
             android:exported="false" />
         <activity
-            android:name=".OrganizerDetailsActivity"
-            android:exported="false" />
-        <activity
             android:name=".CreateEventActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

@@ -28,7 +28,10 @@ class CreateEventActivity : AppCompatActivity() {
             finish()
         }
         findViewById<View>(R.id.create_next_button).setOnClickListener {
-            val intent = Intent(this, OrganizerDetailsActivity::class.java)
+            if (!validateRequiredFields()) {
+                return@setOnClickListener
+            }
+            val intent = Intent(this, VenueLayoutActivity::class.java)
             intent.putExtra(EventDetailsDraft.NAME, fieldValue(R.id.create_event_name))
             intent.putExtra(EventDetailsDraft.VENUE, fieldValue(R.id.create_event_venue))
             intent.putExtra(EventDetailsDraft.START, fieldValue(R.id.create_event_start))
@@ -56,12 +59,33 @@ class CreateEventActivity : AppCompatActivity() {
                 { _, year, month, day ->
                     calendar.set(year, month, day)
                     field.setText(dateFormat.format(calendar.time))
+                    field.error = null
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)
             ).show()
         }
+    }
+
+    private fun validateRequiredFields(): Boolean {
+        val fieldIds = listOf(
+            R.id.create_event_name,
+            R.id.create_event_venue,
+            R.id.create_event_start,
+            R.id.create_event_end
+        )
+        var allFieldsFilled = true
+        for (fieldId in fieldIds) {
+            val field = findViewById<EditText>(fieldId)
+            if (field.text.toString().isBlank()) {
+                field.error = getString(R.string.event_details_required)
+                allFieldsFilled = false
+            } else {
+                field.error = null
+            }
+        }
+        return allFieldsFilled
     }
 
     private fun fieldValue(fieldId: Int): String {

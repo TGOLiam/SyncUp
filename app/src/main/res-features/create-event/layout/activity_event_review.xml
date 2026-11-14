@@ -141,12 +141,6 @@
                 android:paddingHorizontal="14dp">
 
                 <include
-                    android:id="@+id/review_organizers_section"
-                    layout="@layout/item_review_section" />
-
-                <View style="@style/ReviewSectionDivider" />
-
-                <include
                     android:id="@+id/review_venue_section"
                     layout="@layout/item_review_section" />
 

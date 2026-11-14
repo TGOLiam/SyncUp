@@ -106,6 +106,18 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/venue_clear_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/venue_clear"
+            android:textAllCaps="false"
+            android:textColor="@color/event_navy"
+            app:cornerRadius="10dp"
+            app:strokeColor="@color/event_navy" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/venue_add_zone_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"

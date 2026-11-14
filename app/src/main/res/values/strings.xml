@@ -107,7 +107,8 @@
     <string name="review_organizers_title">Organizers</string>
     <string name="review_organizers_detail">3 organizers · 1 event lead</string>
     <string name="review_venue_title">Venue &amp; zones</string>
-    <string name="review_venue_detail">Not available yet</string>
+    <string name="review_venue_detail">Not provided</string>
+    <string name="review_venue_draft">%1$d boundary vertices · %2$d zones</string>
     <string name="review_phases_title">Event phases</string>
     <string name="review_phases_detail">%1$d phases</string>
     <string name="review_channels_title">Channels</string>

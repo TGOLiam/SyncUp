@@ -10,7 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.text.ParseException
 import java.util.Calendar
+import java.util.Locale
 
 class CreateEventActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,8 +23,13 @@ class CreateEventActivity : AppCompatActivity() {
         bindDatePicker(R.id.create_event_start)
         bindDatePicker(R.id.create_event_end)
 
-        // Seed only new debug screens; Android restores any edits after recreation.
-        if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+        val draft = EventCreationSession.draft
+        if (savedInstanceState == null && draft.name.isNotEmpty()) {
+            findViewById<EditText>(R.id.create_event_name).setText(draft.name)
+            findViewById<EditText>(R.id.create_event_venue).setText(draft.venue)
+            findViewById<EditText>(R.id.create_event_start).setText(draft.startDate)
+            findViewById<EditText>(R.id.create_event_end).setText(draft.endDate)
+        } else if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             val today = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Calendar.getInstance().time)
             findViewById<EditText>(R.id.create_event_name).setText("Test Event")
             findViewById<EditText>(R.id.create_event_venue).setText("Test Venue")
@@ -42,11 +50,28 @@ class CreateEventActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val intent = Intent(this, VenueLayoutActivity::class.java)
-            intent.putExtra(EventDetailsDraft.NAME, fieldValue(R.id.create_event_name))
-            intent.putExtra(EventDetailsDraft.VENUE, fieldValue(R.id.create_event_venue))
-            intent.putExtra(EventDetailsDraft.START, fieldValue(R.id.create_event_start))
-            intent.putExtra(EventDetailsDraft.END, fieldValue(R.id.create_event_end))
             startActivity(intent)
+        }
+    }
+
+    override fun onPause() {
+        val draft = EventCreationSession.draft
+        draft.name = fieldValue(R.id.create_event_name)
+        draft.venue = fieldValue(R.id.create_event_venue)
+        draft.startDate = fieldValue(R.id.create_event_start)
+        draft.endDate = fieldValue(R.id.create_event_end)
+        draft.startDateIso = toIsoDate(draft.startDate)
+        draft.endDateIso = toIsoDate(draft.endDate)
+        super.onPause()
+    }
+
+    private fun toIsoDate(displayValue: String): String? {
+        if (displayValue.isBlank()) return null
+        return try {
+            val parsed = DateFormat.getDateInstance(DateFormat.MEDIUM).parse(displayValue)
+            parsed?.let { SimpleDateFormat("yyyy-MM-dd", Locale.US).format(it) }
+        } catch (_: ParseException) {
+            null
         }
     }
 

@@ -54,6 +54,7 @@
 
             <com.example.sync_up.VenueDrawingView
                 android:id="@+id/venue_drawing"
+                android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/venue_drawing_description" />

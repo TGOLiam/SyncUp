@@ -26,7 +26,8 @@ class ChannelsActivity : AppCompatActivity() {
         }
 
         // Restore entered channels when Android recreates this screen.
-        savedInstanceState?.getStringArrayList("channels")?.let { channels.addAll(it) }
+        val savedChannels = savedInstanceState?.getStringArrayList("channels")
+        channels.addAll(savedChannels ?: EventCreationSession.draft.channels)
         renderChannels()
 
         findViewById<View>(R.id.channels_back_button).setOnClickListener { finish() }
@@ -34,10 +35,15 @@ class ChannelsActivity : AppCompatActivity() {
         findViewById<View>(R.id.add_channel_button).setOnClickListener { showChannelDialog() }
         findViewById<View>(R.id.channels_review_button).setOnClickListener {
             val nextIntent = Intent(this, EventReviewActivity::class.java)
-            EventDetailsDraft.copyTo(intent, nextIntent)
-            nextIntent.putExtra(EventDetailsDraft.CHANNEL_COUNT, channels.size.toString())
             startActivity(nextIntent)
         }
+    }
+
+    override fun onPause() {
+        val draft = EventCreationSession.draft
+        draft.channels.clear()
+        draft.channels.addAll(channels)
+        super.onPause()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

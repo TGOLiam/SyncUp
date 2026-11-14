@@ -19,6 +19,7 @@ class VenueDrawingView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
+    private var layoutAspectRatio: Float? = null
     private data class Zone(val name: String, var points: MutableList<Float>)
     private val zones = mutableListOf<Zone>()
     // -1 selects the venue; non-negative values select a zone.
@@ -73,6 +74,58 @@ class VenueDrawingView @JvmOverloads constructor(
         strokeWidth = 3f * resources.displayMetrics.density
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
+    }
+
+    // Fit the saved coordinate space without stretching its geometry.
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        val aspectRatio = layoutAspectRatio ?: return
+        if (aspectRatio <= 0f || measuredWidth == 0 || measuredHeight == 0) return
+        val availableWidth = measuredWidth
+        val availableHeight = measuredHeight
+        val fittedWidth = minOf(availableWidth.toFloat(), availableHeight * aspectRatio)
+        val fittedHeight = minOf(availableHeight.toFloat(), availableWidth / aspectRatio)
+        setMeasuredDimension(fittedWidth.toInt().coerceAtLeast(1), fittedHeight.toInt().coerceAtLeast(1))
+    }
+
+    fun exportLayout(): DraftLayout? {
+        val boundary = strokes.lastOrNull() ?: return null
+        if (boundary.size < 6 || width == 0 || height == 0) return null
+        val ratio = layoutAspectRatio ?: (width.toFloat() / height).also { layoutAspectRatio = it }
+        fun vertices(points: List<Float>): List<DraftPoint> {
+            return (0 until points.size step 2).map { DraftPoint(points[it], points[it + 1]) }
+        }
+        return DraftLayout(
+            ratio,
+            vertices(boundary),
+            zones.map { DraftZone(it.name, vertices(it.points)) }
+        )
+    }
+
+    fun restoreLayout(layout: DraftLayout) {
+        fun coordinates(points: List<DraftPoint>): MutableList<Float> {
+            val values = mutableListOf<Float>()
+            for (point in points) {
+                values.add(point.x)
+                values.add(point.y)
+            }
+            return values
+        }
+        layoutAspectRatio = layout.aspectRatio
+        strokes.clear()
+        closedStrokes.clear()
+        if (layout.boundary.size >= 3) {
+            strokes.add(coordinates(layout.boundary))
+            closedStrokes.add(true)
+        }
+        zones.clear()
+        for (zone in layout.zones) {
+            if (zone.vertices.size >= 3) zones.add(Zone(zone.name, coordinates(zone.vertices)))
+        }
+        selectedZone = -1
+        editHistory.clear()
+        requestLayout()
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -686,6 +739,7 @@ class VenueDrawingView @JvmOverloads constructor(
     override fun onSaveInstanceState(): Parcelable {
         val state = Bundle()
         state.putParcelable("super_state", super.onSaveInstanceState())
+        state.putFloat("layout_aspect_ratio", layoutAspectRatio ?: 0f)
         state.putBoolean("edit_mode", editMode)
         state.putInt("selected_zone", selectedZone)
         state.putInt("zone_count", zones.size)
@@ -708,6 +762,8 @@ class VenueDrawingView @JvmOverloads constructor(
             return
         }
         super.onRestoreInstanceState(state.getParcelable("super_state"))
+        layoutAspectRatio = state.getFloat("layout_aspect_ratio").takeIf { it > 0f }
+        requestLayout()
         editMode = state.getBoolean("edit_mode")
         zones.clear()
         for (index in 0 until state.getInt("zone_count")) {

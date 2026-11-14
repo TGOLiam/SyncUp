@@ -44,41 +44,52 @@ class EventReviewActivity : AppCompatActivity() {
             R.string.review_phases_detail,
             EventPhasesActivity::class.java
         )
-        val phaseCount = intent.getStringExtra(EventDetailsDraft.PHASE_COUNT)?.toIntOrNull() ?: 0
+        val draft = EventCreationSession.draft
+        val layout = draft.layout
+        findViewById<View>(R.id.review_venue_section)
+            .findViewById<TextView>(R.id.review_section_detail).text =
+            if (layout == null) getString(R.string.review_venue_detail)
+            else getString(R.string.review_venue_draft, layout.boundary.size, layout.zones.size) +
+                if (layout.zones.isEmpty()) "" else "\n" + layout.zones.joinToString(", ") { it.name }
+        val phaseCount = draft.phases.size
         findViewById<View>(R.id.review_phases_section)
             .findViewById<TextView>(R.id.review_section_detail).text =
-            getString(R.string.review_phases_detail, phaseCount)
+            getString(R.string.review_phases_detail, phaseCount) +
+                if (draft.phases.isEmpty()) "" else "\n" + draft.phases.joinToString(", ") { it.label }
         bindSection(
             R.id.review_channels_section,
             R.string.review_channels_title,
             R.string.review_channels_detail,
             ChannelsActivity::class.java
         )
-        val channelCount = intent.getStringExtra(EventDetailsDraft.CHANNEL_COUNT)?.toIntOrNull() ?: 0
+        val channelCount = draft.channels.size
         findViewById<View>(R.id.review_channels_section)
             .findViewById<TextView>(R.id.review_section_detail).text =
-            getString(R.string.review_channels_detail, channelCount)
+            getString(R.string.review_channels_detail, channelCount) +
+                if (draft.channels.isEmpty()) "" else "\n" + draft.channels.joinToString(", ")
 
         // The code screen is a preview until event creation is implemented.
         findViewById<View>(R.id.review_create_button).setOnClickListener {
             val nextIntent = Intent(this, CodeShareActivity::class.java)
-            EventDetailsDraft.copyTo(intent, nextIntent)
             startActivity(nextIntent)
         }
     }
 
     private fun showEventDetails() {
+        val draft = EventCreationSession.draft
         val fallback = getString(R.string.review_not_provided)
-        fun draftValue(key: String): String {
-            return intent.getStringExtra(key)?.takeIf { it.isNotBlank() } ?: fallback
+        fun value(text: String): String = text.takeIf { it.isNotBlank() } ?: fallback
+        fun dateAndTime(date: String, time: String): String {
+            return listOf(date, time).filter { it.isNotBlank() }.joinToString(" · ")
+                .ifBlank { fallback }
         }
 
-        findViewById<TextView>(R.id.review_event_name).text = draftValue(EventDetailsDraft.NAME)
-        findViewById<TextView>(R.id.review_event_venue).text = draftValue(EventDetailsDraft.VENUE)
+        findViewById<TextView>(R.id.review_event_name).text = value(draft.name)
+        findViewById<TextView>(R.id.review_event_venue).text = value(draft.venue)
         findViewById<TextView>(R.id.review_event_schedule).text = getString(
             R.string.review_schedule,
-            draftValue(EventDetailsDraft.START),
-            draftValue(EventDetailsDraft.END)
+            dateAndTime(draft.startDate, draft.startTime),
+            dateAndTime(draft.endDate, draft.endTime)
         )
     }
 

@@ -15,6 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.util.Calendar
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class EventPhasesActivity : AppCompatActivity() {
     private data class Phase(val label: String, val hours: Int, val minutes: Int)
@@ -33,7 +36,7 @@ class EventPhasesActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.phases_event_date).text =
-            intent.getStringExtra(EventDetailsDraft.START)
+            EventCreationSession.draft.startDate
         bindTimePicker(R.id.phases_start_time, R.id.phases_start_time_error)
         bindTimePicker(R.id.phases_end_time, R.id.phases_end_time_error)
 
@@ -46,8 +49,14 @@ class EventPhasesActivity : AppCompatActivity() {
                 phases.add(Phase(labels[index], hours[index], minutes[index]))
             }
         }
-        // Add editable defaults only for a new debug screen, never on recreation.
-        if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+        val draft = EventCreationSession.draft
+        if (savedInstanceState == null && draft.phasesInitialized) {
+            findViewById<EditText>(R.id.phases_start_time).setText(draft.startTime)
+            findViewById<EditText>(R.id.phases_end_time).setText(draft.endTime)
+            for (phase in draft.phases) {
+                phases.add(Phase(phase.label, phase.hours, phase.minutes))
+            }
+        } else if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             val calendar = Calendar.getInstance()
             calendar.set(Calendar.HOUR_OF_DAY, 9)
             calendar.set(Calendar.MINUTE, 0)
@@ -67,11 +76,31 @@ class EventPhasesActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             val nextIntent = Intent(this, ChannelsActivity::class.java)
-            EventDetailsDraft.copyTo(intent, nextIntent)
-            nextIntent.putExtra(EventDetailsDraft.START_TIME, timeValue(R.id.phases_start_time))
-            nextIntent.putExtra(EventDetailsDraft.END_TIME, timeValue(R.id.phases_end_time))
-            nextIntent.putExtra(EventDetailsDraft.PHASE_COUNT, phases.size.toString())
             startActivity(nextIntent)
+        }
+    }
+
+    override fun onPause() {
+        val draft = EventCreationSession.draft
+        draft.startTime = timeValue(R.id.phases_start_time)
+        draft.endTime = timeValue(R.id.phases_end_time)
+        draft.startTimeIso = toIsoTime(draft.startTime)
+        draft.endTimeIso = toIsoTime(draft.endTime)
+        draft.phasesInitialized = true
+        draft.phases.clear()
+        for (phase in phases) {
+            draft.phases.add(DraftPhase(phase.label, phase.hours, phase.minutes))
+        }
+        super.onPause()
+    }
+
+    private fun toIsoTime(displayValue: String): String? {
+        if (displayValue.isBlank()) return null
+        return try {
+            val parsed = DateFormat.getTimeFormat(this).parse(displayValue)
+            parsed?.let { SimpleDateFormat("HH:mm", Locale.US).format(it) }
+        } catch (_: ParseException) {
+            null
         }
     }
 

@@ -33,6 +33,9 @@ class VenueLayoutActivity : AppCompatActivity() {
         }
 
         val drawing = findViewById<VenueDrawingView>(R.id.venue_drawing)
+        if (savedInstanceState == null) {
+            EventCreationSession.draft.layout?.let { drawing.restoreLayout(it) }
+        }
         drawing.onEditModeChanged = { editing ->
             updateDrawingMode(editing)
         }
@@ -70,9 +73,14 @@ class VenueLayoutActivity : AppCompatActivity() {
         findViewById<View>(R.id.venue_next_button).setOnClickListener {
             val nextIntent = Intent(this, EventPhasesActivity::class.java)
             // Forward the current draft without persisting or validating it yet.
-            EventDetailsDraft.copyTo(intent, nextIntent)
             startActivity(nextIntent)
         }
+    }
+
+    override fun onPause() {
+        EventCreationSession.draft.layout =
+            findViewById<VenueDrawingView>(R.id.venue_drawing).exportLayout()
+        super.onPause()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {

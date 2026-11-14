@@ -20,6 +20,7 @@ class EventListActivity : AppCompatActivity() {
             startActivity(Intent(this, JoinEventActivity::class.java))
         }
         findViewById<View>(R.id.create_event_button).setOnClickListener {
+            EventCreationSession.start()
             startActivity(Intent(this, CreateEventActivity::class.java))
         }
 

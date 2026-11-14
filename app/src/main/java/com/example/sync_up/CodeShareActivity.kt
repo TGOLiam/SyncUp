@@ -17,7 +17,7 @@ class CodeShareActivity : AppCompatActivity() {
             insets
         }
 
-        val eventName = intent.getStringExtra(EventDetailsDraft.NAME).orEmpty()
+        val eventName = EventCreationSession.draft.name
         findViewById<TextView>(R.id.code_share_event_name).text =
             getString(R.string.code_share_event_ready, eventName)
         // Actions remain disabled until event creation supplies a real join code and workspace.

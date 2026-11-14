@@ -19,4 +19,13 @@
         <item name="android:textColorHint">@color/event_muted</item>
         <item name="android:textSize">16sp</item>
     </style>
+    <style name="PhaseValidationError">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textColor">@color/phase_error</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:visibility">gone</item>
+        <item name="android:accessibilityLiveRegion">polite</item>
+    </style>
 </resources>

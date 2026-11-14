@@ -9,4 +9,5 @@
     <color name="event_border">#D5DAE0</color>
     <color name="venue_selected">#E6ECF3</color>
     <color name="review_success">#32624D</color>
+    <color name="phase_error">#B3261E</color>
 </resources>

@@ -10,22 +10,27 @@
     android:paddingStart="12dp"
     android:paddingEnd="4dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:importantForAccessibility="no"
-        android:text="@string/phase_reorder_symbol"
-        android:textColor="@color/event_muted"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/phase_name"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
         android:layout_weight="1"
-        android:textColor="@color/event_text"
-        android:textSize="16sp" />
+        android:orientation="vertical"
+        android:paddingVertical="8dp">
+
+        <TextView
+            android:id="@+id/phase_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/event_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/phase_duration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/event_muted"
+            android:textSize="14sp" />
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/phase_edit_button"

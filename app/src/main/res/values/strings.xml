@@ -108,4 +108,11 @@
     <string name="review_join_code_note">Your join code will be available after creation.</string>
     <string name="review_not_provided">Not provided</string>
     <string name="review_schedule">Start: %1$s\nEnd: %2$s</string>
+    <string name="code_share_title">Event code</string>
+    <string name="code_share_event_ready">%1$s is ready</string>
+    <string name="code_share_unavailable_message">Event creation is not available yet. A join code will appear here.</string>
+    <string name="code_share_unavailable">— — —   — — —</string>
+    <string name="code_share_unavailable_description">Code unavailable</string>
+    <string name="code_share_copy">Copy code</string>
+    <string name="code_share_open_workspace">Open workspace</string>
 </resources>

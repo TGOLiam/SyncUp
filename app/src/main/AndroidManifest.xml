@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
+            android:name=".CodeShareActivity"
+            android:exported="false" />
+        <activity
             android:name=".EventReviewActivity"
             android:exported="false" />
         <activity

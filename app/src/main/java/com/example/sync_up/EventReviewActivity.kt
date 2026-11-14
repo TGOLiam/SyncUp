@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -60,9 +59,11 @@ class EventReviewActivity : AppCompatActivity() {
             .findViewById<TextView>(R.id.review_section_detail).text =
             getString(R.string.review_channels_detail, channelCount)
 
-        // Event creation and validation will be connected after the UI prototype.
+        // The code screen is a preview until event creation is implemented.
         findViewById<View>(R.id.review_create_button).setOnClickListener {
-            Toast.makeText(this, R.string.review_create_placeholder, Toast.LENGTH_SHORT).show()
+            val nextIntent = Intent(this, CodeShareActivity::class.java)
+            EventDetailsDraft.copyTo(intent, nextIntent)
+            startActivity(nextIntent)
         }
     }
 

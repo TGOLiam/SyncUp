@@ -43,6 +43,7 @@
     <string name="organizer_lead_requirement">At least one Event Lead is required.</string>
     <string name="organizer_add_placeholder">Adding organizers is not available yet.</string>
     <string name="venue_layout">Venue Layout</string>
+    <string name="venue_drawing_description">Venue drawing canvas</string>
     <string name="venue_preview_description">Example venue boundary with five vertices</string>
     <string name="venue_boundary">Venue boundary</string>
     <string name="venue_vertices">5 vertices</string>

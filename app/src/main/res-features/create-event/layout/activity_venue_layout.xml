@@ -52,23 +52,11 @@
             android:layout_weight="1"
             android:background="@drawable/venue_canvas">
 
-            <ImageView
+            <com.example.sync_up.VenueDrawingView
+                android:id="@+id/venue_drawing"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/venue_preview_description"
-                android:padding="16dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/venue_preview" />
-
-            <TextView
-                android:id="@+id/venue_boundary_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/venue_boundary"
-                android:textColor="@color/event_text"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:contentDescription="@string/venue_drawing_description" />
 
             <EditText
                 android:id="@+id/venue_zone_name"
@@ -84,17 +72,6 @@
                 android:textColorHint="@color/event_muted"
                 android:visibility="gone" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|start"
-                android:layout_margin="12dp"
-                android:background="@drawable/event_organizer_chip"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="2dp"
-                android:text="@string/venue_vertices"
-                android:textColor="@color/event_muted"
-                android:textSize="12sp" />
         </FrameLayout>
 
         <LinearLayout
@@ -106,14 +83,14 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_draw_button"
                 style="@style/VenueToolButton"
-                android:text="@string/venue_draw" />
+                android:text="@string/venue_draw"
+                app:backgroundTint="@color/venue_selected" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_edit_button"
                 style="@style/VenueToolButton"
                 android:layout_marginStart="6dp"
-                android:text="@string/venue_edit"
-                app:backgroundTint="@color/venue_selected" />
+                android:text="@string/venue_edit" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_undo_button"

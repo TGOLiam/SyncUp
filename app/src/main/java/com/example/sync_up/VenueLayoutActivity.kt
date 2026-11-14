@@ -34,16 +34,12 @@ class VenueLayoutActivity : AppCompatActivity() {
         }
 
         val zoneInput = findViewById<EditText>(R.id.venue_zone_name)
-        val boundaryLabel = findViewById<View>(R.id.venue_boundary_label)
-
         // Restore the input's visibility after a configuration change.
         if (savedInstanceState?.getBoolean(ZONE_INPUT_VISIBLE) == true) {
             zoneInput.visibility = View.VISIBLE
-            boundaryLabel.visibility = View.GONE
         }
 
         findViewById<View>(R.id.venue_add_zone_button).setOnClickListener {
-            boundaryLabel.visibility = View.GONE
             zoneInput.visibility = View.VISIBLE
             zoneInput.requestFocus()
             WindowCompat.getInsetsController(window, zoneInput).show(WindowInsetsCompat.Type.ime())
@@ -51,7 +47,6 @@ class VenueLayoutActivity : AppCompatActivity() {
 
         // The remaining layout editor controls are visual placeholders for now.
         val editorButtonIds = listOf(
-            R.id.venue_draw_button,
             R.id.venue_edit_button,
             R.id.venue_undo_button,
             R.id.venue_straighten_button

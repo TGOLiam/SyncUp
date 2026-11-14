@@ -99,10 +99,10 @@
                 android:text="@string/venue_undo" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/venue_straighten_button"
+                android:id="@+id/venue_simplify_button"
                 style="@style/VenueToolButton"
                 android:layout_marginStart="6dp"
-                android:text="@string/venue_straighten" />
+                android:text="@string/venue_simplify" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton

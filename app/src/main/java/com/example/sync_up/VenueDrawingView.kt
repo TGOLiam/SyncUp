@@ -11,6 +11,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
 import kotlin.math.hypot
+import kotlin.math.abs
 
 /** Displays freehand strokes using points relative to the canvas size. */
 class VenueDrawingView @JvmOverloads constructor(
@@ -20,6 +21,8 @@ class VenueDrawingView @JvmOverloads constructor(
     private val strokes = mutableListOf<MutableList<Float>>()
     private var editMode = false
     private var draggedPoint = -1
+    private var dragOffsetX = 0f
+    private var dragOffsetY = 0f
     private var dragOriginal: MutableList<Float>? = null
     private var previousStroke: MutableList<Float>? = null
     private var replacementUndo: MutableList<Float>? = null
@@ -104,7 +107,7 @@ class VenueDrawingView @JvmOverloads constructor(
                         8f * resources.displayMetrics.density
                 }
                 if (moved) {
-                    val simplified = simplifyStroke(stroke, true)
+                    val simplified = simplifyStroke(stroke, true, 8f)
                     if (simplified.size >= 6) {
                         strokes[strokes.lastIndex] = simplified
                         closedStrokes[closedStrokes.lastIndex] = true
@@ -187,9 +190,126 @@ class VenueDrawingView @JvmOverloads constructor(
         return true
     }
 
-    private fun simplifyStroke(stroke: List<Float>, closed: Boolean): MutableList<Float> {
+    fun simplifyBoundary(): Boolean {
+        val stroke = strokes.lastOrNull() ?: return false
+        if (width == 0 || height == 0 || stroke.size < 6) {
+            return false
+        }
+        val simplified = simplifyStroke(stroke, true, 24f)
+        val aligned = alignEdges(simplified) ?: return false
+        if (aligned == stroke) {
+            return false
+        }
+        editHistory.add(stroke.toMutableList())
+        strokes[strokes.lastIndex] = aligned
+        invalidate()
+        return true
+    }
+
+    /** Align each edge to its nearest screen axis while sharing coordinates at corners. */
+    private fun alignEdges(stroke: List<Float>): MutableList<Float>? {
         val count = stroke.size / 2
-        val tolerance = 8f * resources.displayMetrics.density
+        if (count < 3) return null
+
+        val xParents = IntArray(count) { it }
+        val yParents = IntArray(count) { it }
+        fun root(parents: IntArray, index: Int): Int {
+            var current = index
+            while (parents[current] != current) {
+                current = parents[current]
+            }
+            return current
+        }
+        fun join(parents: IntArray, first: Int, second: Int) {
+            parents[root(parents, first)] = root(parents, second)
+        }
+        for (index in 0 until count) {
+            val next = (index + 1) % count
+            val dx = abs(stroke[next * 2] - stroke[index * 2]) * width
+            val dy = abs(stroke[next * 2 + 1] - stroke[index * 2 + 1]) * height
+            if (dx >= dy) {
+                join(yParents, index, next)
+            } else {
+                join(xParents, index, next)
+            }
+        }
+        fun average(parents: IntArray, coordinate: Int, index: Int): Float {
+            val group = root(parents, index)
+            var sum = 0f
+            var members = 0
+            for (candidate in 0 until count) {
+                if (root(parents, candidate) == group) {
+                    sum += stroke[candidate * 2 + coordinate]
+                    members++
+                }
+            }
+            return sum / members
+        }
+        val points = mutableListOf<Pair<Float, Float>>()
+        for (index in 0 until count) {
+            val point = average(xParents, 0, index) to average(yParents, 1, index)
+            if (points.lastOrNull() != point) {
+                points.add(point)
+            }
+        }
+        if (points.size > 1 && points.first() == points.last()) {
+            points.removeAt(points.lastIndex)
+        }
+        // Remove redundant points along the same horizontal or vertical edge.
+        var changed = true
+        while (changed && points.size >= 3) {
+            changed = false
+            for (index in points.indices) {
+                val previous = points[(index + points.size - 1) % points.size]
+                val current = points[index]
+                val next = points[(index + 1) % points.size]
+                if ((previous.first == current.first && current.first == next.first) ||
+                    (previous.second == current.second && current.second == next.second)) {
+                    points.removeAt(index)
+                    changed = true
+                    break
+                }
+            }
+        }
+        if (points.size < 4) return null
+        // Reject shapes whose non-adjacent edges cross or overlap after alignment.
+        for (first in points.indices) {
+            val firstEnd = (first + 1) % points.size
+            val a = points[first]
+            val b = points[firstEnd]
+            for (second in first + 1 until points.size) {
+                val secondEnd = (second + 1) % points.size
+                if (first == secondEnd || firstEnd == second) continue
+                val c = points[second]
+                val d = points[secondEnd]
+                val overlapsX = maxOf(minOf(a.first, b.first), minOf(c.first, d.first)) <=
+                    minOf(maxOf(a.first, b.first), maxOf(c.first, d.first))
+                val overlapsY = maxOf(minOf(a.second, b.second), minOf(c.second, d.second)) <=
+                    minOf(maxOf(a.second, b.second), maxOf(c.second, d.second))
+                if (overlapsX && overlapsY) return null
+            }
+        }
+        var area = 0f
+        for (index in points.indices) {
+            val next = points[(index + 1) % points.size]
+            area += points[index].first * next.second - next.first * points[index].second
+        }
+        if (abs(area) < 0.000001f) return null
+        val result = mutableListOf<Float>()
+        for ((x, y) in points) {
+            result.add(x)
+            result.add(y)
+        }
+        return result
+    }
+
+    private fun simplifyStroke(
+        stroke: List<Float>,
+        closed: Boolean,
+        toleranceDp: Float
+    ): MutableList<Float> {
+        val count = stroke.size / 2
+        val tolerance = toleranceDp * resources.displayMetrics.density
         fun distance(a: Int, b: Int): Float = hypot(
             (stroke[a * 2] - stroke[b * 2]) * width,
             (stroke[a * 2 + 1] - stroke[b * 2 + 1]) * height
@@ -269,15 +389,51 @@ class VenueDrawingView @JvmOverloads constructor(
                         draggedPoint = index
                     }
                 }
-                if (draggedPoint < 0) return false
                 dragOriginal = stroke.toMutableList()
+                if (draggedPoint < 0) {
+                    // Project the touch onto the closest edge, including the closing edge.
+                    var closestDistance = radius
+                    var insertAt = -1
+                    var projectedX = 0f
+                    var projectedY = 0f
+                    for (index in 0 until stroke.size step 2) {
+                        val next = (index + 2) % stroke.size
+                        val startX = stroke[index] * width
+                        val startY = stroke[index + 1] * height
+                        val dx = stroke[next] * width - startX
+                        val dy = stroke[next + 1] * height - startY
+                        val lengthSquared = dx * dx + dy * dy
+                        if (lengthSquared == 0f) continue
+                        val fraction = (((event.x - startX) * dx + (event.y - startY) * dy) /
+                            lengthSquared).coerceIn(0f, 1f)
+                        val x = startX + fraction * dx
+                        val y = startY + fraction * dy
+                        val distance = hypot(event.x - x, event.y - y)
+                        if (distance < closestDistance) {
+                            closestDistance = distance
+                            insertAt = index + 2
+                            projectedX = x
+                            projectedY = y
+                        }
+                    }
+                    if (insertAt < 0) {
+                        dragOriginal = null
+                        return false
+                    }
+                    stroke.add(insertAt, projectedX / width)
+                    stroke.add(insertAt + 1, projectedY / height)
+                    draggedPoint = insertAt
+                    invalidate()
+                }
+                dragOffsetX = event.x - stroke[draggedPoint] * width
+                dragOffsetY = event.y - stroke[draggedPoint + 1] * height
                 parent.requestDisallowInterceptTouchEvent(true)
                 return true
             }
             MotionEvent.ACTION_MOVE, MotionEvent.ACTION_UP -> {
                 if (draggedPoint < 0) return false
-                stroke[draggedPoint] = (event.x / width).coerceIn(0f, 1f)
-                stroke[draggedPoint + 1] = (event.y / height).coerceIn(0f, 1f)
+                stroke[draggedPoint] = ((event.x - dragOffsetX) / width).coerceIn(0f, 1f)
+                stroke[draggedPoint + 1] = ((event.y - dragOffsetY) / height).coerceIn(0f, 1f)
                 invalidate()
                 if (event.actionMasked == MotionEvent.ACTION_UP) {
                     dragOriginal?.let { if (it != stroke) editHistory.add(it) }

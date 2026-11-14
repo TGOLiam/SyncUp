@@ -68,13 +68,9 @@ class VenueLayoutActivity : AppCompatActivity() {
             drawing.clearDrawing()
         }
 
-        // The remaining layout editor controls are visual placeholders for now.
-        val editorButtonIds = listOf(
-            R.id.venue_straighten_button
-        )
-        for (buttonId in editorButtonIds) {
-            findViewById<View>(buttonId).setOnClickListener {
-                Toast.makeText(this, R.string.venue_editor_placeholder, Toast.LENGTH_SHORT).show()
+        findViewById<View>(R.id.venue_simplify_button).setOnClickListener {
+            if (!drawing.simplifyBoundary()) {
+                Toast.makeText(this, R.string.venue_simplify_unavailable, Toast.LENGTH_SHORT).show()
             }
         }
         findViewById<View>(R.id.venue_next_button).setOnClickListener {

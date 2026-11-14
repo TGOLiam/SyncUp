@@ -52,7 +52,8 @@
     <string name="venue_undo">Undo</string>
     <string name="venue_clear">Clear drawing</string>
     <string name="venue_edit_unavailable">Draw a boundary with enough detail to edit.</string>
-    <string name="venue_straighten">Straighten</string>
+    <string name="venue_simplify">Simplify</string>
+    <string name="venue_simplify_unavailable">This boundary cannot be simplified further.</string>
     <string name="venue_add_zone">Add Zone</string>
     <string name="zone_name_hint">Zone name</string>
     <string name="venue_editor_placeholder">Venue editing is not available yet.</string>

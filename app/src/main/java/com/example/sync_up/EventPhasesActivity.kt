@@ -2,6 +2,7 @@ package com.example.sync_up
 
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.LayoutInflater
@@ -44,6 +45,17 @@ class EventPhasesActivity : AppCompatActivity() {
             for (index in labels.indices) {
                 phases.add(Phase(labels[index], hours[index], minutes[index]))
             }
+        }
+        // Add editable defaults only for a new debug screen, never on recreation.
+        if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, 9)
+            calendar.set(Calendar.MINUTE, 0)
+            val timeFormat = DateFormat.getTimeFormat(this)
+            findViewById<EditText>(R.id.phases_start_time).setText(timeFormat.format(calendar.time))
+            calendar.set(Calendar.HOUR_OF_DAY, 17)
+            findViewById<EditText>(R.id.phases_end_time).setText(timeFormat.format(calendar.time))
+            phases.add(Phase("Test Phase", 1, 0))
         }
         renderPhases()
 

@@ -1,6 +1,7 @@
 package com.example.sync_up
 
 import android.content.Intent
+import android.content.pm.ApplicationInfo
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
@@ -18,6 +19,15 @@ class CreateEventActivity : AppCompatActivity() {
         CreateEventProgress.show(this, 1, R.string.event_details)
         bindDatePicker(R.id.create_event_start)
         bindDatePicker(R.id.create_event_end)
+
+        // Seed only new debug screens; Android restores any edits after recreation.
+        if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            val today = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Calendar.getInstance().time)
+            findViewById<EditText>(R.id.create_event_name).setText("Test Event")
+            findViewById<EditText>(R.id.create_event_venue).setText("Test Venue")
+            findViewById<EditText>(R.id.create_event_start).setText(today)
+            findViewById<EditText>(R.id.create_event_end).setText(today)
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.create_event_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

@@ -55,6 +55,10 @@
     <string name="venue_simplify">Simplify</string>
     <string name="venue_simplify_unavailable">This boundary cannot be simplified further.</string>
     <string name="venue_add_zone">Add Zone</string>
+    <string name="venue_add_zone_title">Add zone</string>
+    <string name="zone_name_label">Zone name</string>
+    <string name="zone_placement_unavailable">Draw a venue boundary with enough space for a zone.</string>
+    <string name="venue_select_for_clear">Select the venue before clearing the drawing.</string>
     <string name="zone_name_hint">Zone name</string>
     <string name="venue_editor_placeholder">Venue editing is not available yet.</string>
     <string name="venue_next_placeholder">Zone setup is not available yet.</string>

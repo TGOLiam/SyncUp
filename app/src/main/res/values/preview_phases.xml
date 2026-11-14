@@ -1,0 +1,9 @@
+<resources>
+    <string-array name="preview_phases">
+        <item>Load-in</item>
+        <item>Registration</item>
+        <item>Keynote</item>
+        <item>Breakouts</item>
+        <item>Teardown</item>
+    </string-array>
+</resources>

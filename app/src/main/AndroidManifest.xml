@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
+            android:name=".EventReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChannelsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EventPhasesActivity"
+            android:exported="false" />
+        <activity
             android:name=".VenueLayoutActivity"
             android:exported="false" />
         <activity

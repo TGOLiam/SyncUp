@@ -32,7 +32,10 @@ class OrganizerDetailsActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.organizer_add_placeholder, Toast.LENGTH_SHORT).show()
         }
         findViewById<View>(R.id.organizer_next_button).setOnClickListener {
-            startActivity(Intent(this, VenueLayoutActivity::class.java))
+            val nextIntent = Intent(this, VenueLayoutActivity::class.java)
+            // Forward the current draft without persisting or validating it yet.
+            EventDetailsDraft.copyTo(intent, nextIntent)
+            startActivity(nextIntent)
         }
     }
 }

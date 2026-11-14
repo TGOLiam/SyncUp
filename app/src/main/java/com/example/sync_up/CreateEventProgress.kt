@@ -6,9 +6,9 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 
-/** Binds the shared five-step indicator used by Create Event screens. */
+/** Binds the shared seven-step indicator used by Create Event screens. */
 object CreateEventProgress {
-    private const val STEP_COUNT = 5
+    private const val STEP_COUNT = 7
 
     fun show(activity: Activity, currentStep: Int, @StringRes title: Int) {
         require(currentStep in 1..STEP_COUNT)

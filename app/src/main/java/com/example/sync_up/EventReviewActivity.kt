@@ -45,6 +45,10 @@ class EventReviewActivity : AppCompatActivity() {
             R.string.review_phases_detail,
             EventPhasesActivity::class.java
         )
+        val phaseCount = intent.getStringExtra(EventDetailsDraft.PHASE_COUNT)?.toIntOrNull() ?: 0
+        findViewById<View>(R.id.review_phases_section)
+            .findViewById<TextView>(R.id.review_section_detail).text =
+            getString(R.string.review_phases_detail, phaseCount)
         bindSection(
             R.id.review_channels_section,
             R.string.review_channels_title,

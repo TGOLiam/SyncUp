@@ -10,6 +10,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class EventReviewActivity : AppCompatActivity() {
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.transition_slide_in_left, R.anim.transition_slide_out_right)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_review)
@@ -72,6 +77,7 @@ class EventReviewActivity : AppCompatActivity() {
         findViewById<View>(R.id.review_create_button).setOnClickListener {
             val nextIntent = Intent(this, CodeShareActivity::class.java)
             startActivity(nextIntent)
+            overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
         }
     }
 
@@ -115,5 +121,6 @@ class EventReviewActivity : AppCompatActivity() {
         val intent = Intent(this, destination)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         startActivity(intent)
+        overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
     }
 }

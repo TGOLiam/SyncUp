@@ -14,6 +14,11 @@ import android.content.res.ColorStateList
 import com.google.android.material.button.MaterialButton
 
 class VenueLayoutActivity : AppCompatActivity() {
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.transition_slide_in_left, R.anim.transition_slide_out_right)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_venue_layout)
@@ -74,6 +79,7 @@ class VenueLayoutActivity : AppCompatActivity() {
             val nextIntent = Intent(this, EventPhasesActivity::class.java)
             // Forward the current draft without persisting or validating it yet.
             startActivity(nextIntent)
+            overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
         }
     }
 

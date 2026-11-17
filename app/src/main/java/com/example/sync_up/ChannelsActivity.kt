@@ -12,6 +12,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class ChannelsActivity : AppCompatActivity() {
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.transition_slide_in_left, R.anim.transition_slide_out_right)
+    }
+
     private val channels = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,6 +41,7 @@ class ChannelsActivity : AppCompatActivity() {
         findViewById<View>(R.id.channels_review_button).setOnClickListener {
             val nextIntent = Intent(this, EventReviewActivity::class.java)
             startActivity(nextIntent)
+            overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
         }
     }
 

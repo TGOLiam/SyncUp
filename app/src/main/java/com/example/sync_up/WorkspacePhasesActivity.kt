@@ -17,6 +17,7 @@ class WorkspacePhasesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workspace_phases)
+        findViewById<View>(R.id.workspace_phases_back).setOnClickListener { finish() }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.workspace_phases_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
@@ -79,12 +80,14 @@ class WorkspacePhasesActivity : AppCompatActivity() {
             area.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
             area.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(area)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
         findViewById<View>(R.id.workspace_nav_comms).setOnClickListener {
             val communications = Intent(this, CommunicationsActivity::class.java)
             communications.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
             communications.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(communications)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
     }
 

@@ -47,11 +47,13 @@ class EventAreaActivity : AppCompatActivity() {
             val communicationsIntent = Intent(this, CommunicationsActivity::class.java)
             communicationsIntent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
             startActivity(communicationsIntent)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
         findViewById<View>(R.id.workspace_nav_phases).setOnClickListener {
             val phasesIntent = Intent(this, WorkspacePhasesActivity::class.java)
             phasesIntent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
             startActivity(phasesIntent)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
     }
 }

@@ -16,6 +16,11 @@ import java.util.Calendar
 import java.util.Locale
 
 class CreateEventActivity : AppCompatActivity() {
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.transition_slide_in_left, R.anim.transition_slide_out_right)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_event)
@@ -51,6 +56,7 @@ class CreateEventActivity : AppCompatActivity() {
             }
             val intent = Intent(this, VenueLayoutActivity::class.java)
             startActivity(intent)
+            overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
         }
     }
 

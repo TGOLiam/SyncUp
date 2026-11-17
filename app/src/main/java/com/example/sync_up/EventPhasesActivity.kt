@@ -20,6 +20,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class EventPhasesActivity : AppCompatActivity() {
+    override fun finish() {
+        super.finish()
+        overridePendingTransition(R.anim.transition_slide_in_left, R.anim.transition_slide_out_right)
+    }
+
     private data class Phase(val label: String, val hours: Int, val minutes: Int)
 
     private val phases = mutableListOf<Phase>()
@@ -77,6 +82,7 @@ class EventPhasesActivity : AppCompatActivity() {
             }
             val nextIntent = Intent(this, ChannelsActivity::class.java)
             startActivity(nextIntent)
+            overridePendingTransition(R.anim.transition_slide_in_right, R.anim.transition_slide_out_left)
         }
     }
 

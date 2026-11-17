@@ -36,6 +36,7 @@ class CommunicationsActivity : AppCompatActivity() {
         renderChannels()
         renderConversation()
 
+        findViewById<View>(R.id.comms_back).setOnClickListener { finish() }
         findViewById<View>(R.id.workspace_nav_area).setOnClickListener {
             val areaIntent = Intent(this, EventAreaActivity::class.java)
             areaIntent.putExtra(
@@ -44,6 +45,7 @@ class CommunicationsActivity : AppCompatActivity() {
             )
             areaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             startActivity(areaIntent)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
         findViewById<View>(R.id.workspace_nav_phases).setOnClickListener {
             val phasesIntent = Intent(this, WorkspacePhasesActivity::class.java)
@@ -52,6 +54,7 @@ class CommunicationsActivity : AppCompatActivity() {
                 intent.getIntExtra(PreviewEvents.EXTRA_EVENT_INDEX, -1)
             )
             startActivity(phasesIntent)
+            overridePendingTransition(R.anim.transition_fade_in, R.anim.transition_fade_out)
         }
         findViewById<View>(R.id.comms_send).setOnClickListener { showUnavailable() }
         findViewById<View>(R.id.comms_push_to_talk).setOnClickListener { showUnavailable() }

@@ -12,7 +12,16 @@
         android:layout_height="56dp"
         android:background="@color/white"
         android:gravity="center_vertical"
-        android:paddingHorizontal="16dp">
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp">
+        <ImageButton
+            android:id="@+id/workspace_phases_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back"
+            android:padding="12dp"
+            android:src="@drawable/ic_back" />
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"

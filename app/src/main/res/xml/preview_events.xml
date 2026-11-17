@@ -4,9 +4,57 @@
         detail="@string/event_techconf_detail" phase="@string/event_phase_active"
         activePhase="true" workspacePhase="Registration"
         phases="Load-in|Registration|Keynote|Breakouts|Teardown"
-        channels="Registration|Stage Crew|Food and Bev" />
+        channels="Registration|Stage Crew|Food and Bev">
+        <layout aspectRatio="1.3">
+            <boundary>
+                <point x="0.05" y="0.05" />
+                <point x="0.95" y="0.05" />
+                <point x="0.95" y="0.95" />
+                <point x="0.05" y="0.95" />
+            </boundary>
+            <zone name="Stage">
+                <point x="0.1" y="0.1" />
+                <point x="0.47" y="0.1" />
+                <point x="0.47" y="0.45" />
+                <point x="0.1" y="0.45" />
+            </zone>
+            <zone name="Registration">
+                <point x="0.53" y="0.1" />
+                <point x="0.9" y="0.1" />
+                <point x="0.9" y="0.45" />
+                <point x="0.53" y="0.45" />
+            </zone>
+            <zone name="Food">
+                <point x="0.1" y="0.55" />
+                <point x="0.47" y="0.55" />
+                <point x="0.47" y="0.9" />
+                <point x="0.1" y="0.9" />
+            </zone>
+        </layout>
+    </event>
     <event name="@string/event_fun_run" role="organizer"
-        detail="@string/event_fun_run_detail" phase="@string/event_no_phase" />
-    <event name="@string/event_homecoming" role="organizer"
-        detail="@string/event_homecoming_detail" />
+        detail="@string/event_fun_run_detail" phase="@string/event_no_phase"
+        phases="Setup|Registration|Run|Cleanup"
+        channels="Registration|Course Team">
+        <layout aspectRatio="1.3">
+            <boundary>
+                <point x="0.05" y="0.05" />
+                <point x="0.95" y="0.05" />
+                <point x="0.95" y="0.95" />
+                <point x="0.05" y="0.95" />
+            </boundary>
+            <zone name="Start">
+                <point x="0.1" y="0.1" />
+                <point x="0.47" y="0.1" />
+                <point x="0.47" y="0.45" />
+                <point x="0.1" y="0.45" />
+            </zone>
+            <zone name="Finish">
+                <point x="0.53" y="0.55" />
+                <point x="0.9" y="0.55" />
+                <point x="0.9" y="0.9" />
+                <point x="0.53" y="0.9" />
+            </zone>
+        </layout>
+    </event>
 </events>

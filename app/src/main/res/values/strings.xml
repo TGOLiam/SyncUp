@@ -8,8 +8,8 @@
     <string name="join_event">Join Event</string>
     <string name="create_event">Create Event</string>
     <string name="my_events">My Events</string>
-    <string name="event_techconf">TechConf Manila 2026</string>
-    <string name="event_fun_run">Barangay Fun Run</string>
+    <string name="event_techconf">TechConf Manila 2026 (Preview)</string>
+    <string name="event_fun_run">Barangay Fun Run (Preview)</string>
     <string name="event_homecoming">Alumni Homecoming</string>
     <string name="event_lead">Event Lead</string>
     <string name="event_organizer">Organizer</string>

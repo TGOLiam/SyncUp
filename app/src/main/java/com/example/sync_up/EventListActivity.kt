@@ -14,7 +14,14 @@ class EventListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_event_list)
         // Preview data is temporary; the adapter can later receive events from a repository.
         val events = PreviewEvents.load(this)
-        findViewById<ListView>(R.id.event_list).adapter = EventListAdapter(this, events)
+        findViewById<ListView>(R.id.event_list).apply {
+            adapter = EventListAdapter(this@EventListActivity, events)
+            setOnItemClickListener { _, _, position, _ ->
+                val intent = Intent(this@EventListActivity, EventAreaActivity::class.java)
+                intent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, position)
+                startActivity(intent)
+            }
+        }
 
         findViewById<View>(R.id.join_event_button).setOnClickListener {
             startActivity(Intent(this, JoinEventActivity::class.java))

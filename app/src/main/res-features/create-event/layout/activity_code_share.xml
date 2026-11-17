@@ -88,7 +88,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
                 android:layout_marginTop="8dp"
-                android:enabled="false"
                 android:text="@string/code_share_open_workspace"
                 android:textAllCaps="false"
                 app:cornerRadius="10dp" />

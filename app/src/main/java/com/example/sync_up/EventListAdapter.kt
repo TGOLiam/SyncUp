@@ -15,7 +15,9 @@ data class EventListItem(
     val detail: String,
     val isLead: Boolean,
     val phase: String? = null,
-    val activePhase: Boolean = false
+    val activePhase: Boolean = false,
+    val workspacePhase: String? = null,
+    val channels: List<String> = emptyList()
 )
 
 class EventListAdapter(context: Context, events: List<EventListItem>) :

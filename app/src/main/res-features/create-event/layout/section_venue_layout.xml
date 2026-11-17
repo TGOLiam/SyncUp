@@ -1,39 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/venue_layout_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/white"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="16dp">
-
-        <ImageButton
-            android:id="@+id/venue_back_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_event"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -42,56 +15,46 @@
         android:paddingHorizontal="16dp"
         android:paddingTop="16dp"
         android:paddingBottom="12dp">
-
         <include layout="@layout/create_event_progress" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="12dp"
             android:layout_weight="1"
             android:background="@drawable/venue_canvas">
-
             <com.example.sync_up.VenueDrawingView
                 android:id="@+id/venue_drawing"
                 android:layout_gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/venue_drawing_description" />
-
         </FrameLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:orientation="horizontal">
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_draw_button"
                 style="@style/VenueToolButton"
                 android:text="@string/venue_draw"
                 app:backgroundTint="@color/venue_selected" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_edit_button"
                 style="@style/VenueToolButton"
                 android:layout_marginStart="6dp"
                 android:text="@string/venue_edit" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_undo_button"
                 style="@style/VenueToolButton"
                 android:layout_marginStart="6dp"
                 android:text="@string/venue_undo" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/venue_simplify_button"
                 style="@style/VenueToolButton"
                 android:layout_marginStart="6dp"
                 android:text="@string/venue_simplify" />
         </LinearLayout>
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/venue_clear_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
@@ -103,7 +66,6 @@
             android:textColor="@color/event_navy"
             app:cornerRadius="10dp"
             app:strokeColor="@color/event_navy" />
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/venue_add_zone_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
@@ -116,7 +78,6 @@
             app:cornerRadius="10dp"
             app:strokeColor="@color/event_navy" />
     </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -124,7 +85,6 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/venue_footer_back_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
@@ -137,7 +97,6 @@
             android:textColor="@color/event_navy"
             app:cornerRadius="12dp"
             app:strokeColor="@color/event_navy" />
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/venue_next_button"
             android:layout_width="0dp"

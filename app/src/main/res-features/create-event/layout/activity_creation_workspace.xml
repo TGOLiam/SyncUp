@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/creation_workspace_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="16dp">
+        <ImageButton
+            android:id="@+id/creation_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/back"
+            android:padding="12dp"
+            android:src="@drawable/ic_back" />
+        <TextView
+            android:id="@+id/creation_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_event"
+            android:textColor="@color/event_text"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/white">
+        <include android:id="@+id/creation_details" layout="@layout/section_create_event" />
+        <include android:id="@+id/creation_venue" layout="@layout/section_venue_layout" />
+        <include android:id="@+id/creation_phases" layout="@layout/section_event_phases" />
+        <include android:id="@+id/creation_channels" layout="@layout/section_channels" />
+        <include android:id="@+id/creation_review" layout="@layout/section_event_review" />
+        <include android:id="@+id/creation_code" layout="@layout/section_code_share" />
+    </FrameLayout>
+</LinearLayout>

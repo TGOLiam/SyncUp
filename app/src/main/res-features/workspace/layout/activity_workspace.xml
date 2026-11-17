@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/workspace_phases_root"
+    android:id="@+id/workspace_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,10 +12,11 @@
         android:layout_height="56dp"
         android:background="@color/white"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingStart="8dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="12dp">
         <ImageButton
-            android:id="@+id/workspace_phases_back"
+            android:id="@+id/workspace_back"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -23,138 +24,112 @@
             android:padding="12dp"
             android:src="@drawable/ic_back" />
         <TextView
+            android:id="@+id/workspace_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/event_phases"
             android:textColor="@color/event_text"
             android:textSize="18sp"
             android:textStyle="bold" />
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/workspace_phases_edit"
+            android:id="@+id/workspace_edit"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="@string/venue_edit"
             android:textAllCaps="false"
             android:textColor="@color/event_navy"
             app:cornerRadius="10dp"
             app:strokeColor="@color/event_navy" />
     </LinearLayout>
-    <ScrollView
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-            <LinearLayout
-                android:id="@+id/workspace_phase_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-            <TextView
-                android:id="@+id/workspace_phase_empty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/workspace_no_phases"
-                android:textColor="@color/event_muted" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/workspace_phases_help"
-                android:textColor="@color/event_muted"
-                android:textSize="13sp" />
-        </LinearLayout>
-    </ScrollView>
+        android:background="@color/white">
+        <include android:id="@+id/workspace_section_area" layout="@layout/section_workspace_area" />
+        <include android:id="@+id/workspace_section_comms" layout="@layout/section_workspace_comms" />
+        <include android:id="@+id/workspace_section_phases" layout="@layout/section_workspace_phases" />
+    </FrameLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:background="@color/white"
         android:orientation="horizontal">
-
         <LinearLayout
             android:id="@+id/workspace_nav_area"
             style="@style/WorkspaceNavigationItem">
-
             <View
+                android:id="@+id/workspace_indicator_area"
                 android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:background="@android:color/transparent" />
-
+                android:layout_height="3dp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-
                 <ImageView
+                    android:id="@+id/workspace_icon_area"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_workspace_area" />
-
                 <TextView
+                    android:id="@+id/workspace_label_area"
                     style="@style/WorkspaceNavigationLabel"
-                    android:text="@string/workspace_area"
-                    android:textColor="@color/event_muted" />
+                    android:text="@string/workspace_area" />
             </LinearLayout>
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/workspace_nav_comms"
             style="@style/WorkspaceNavigationItem">
-
-            <Space android:layout_width="match_parent" android:layout_height="3dp" />
-
+            <View
+                android:id="@+id/workspace_indicator_comms"
+                android:layout_width="match_parent"
+                android:layout_height="3dp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-
                 <ImageView
+                    android:id="@+id/workspace_icon_comms"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_workspace_comms" />
-
                 <TextView
+                    android:id="@+id/workspace_label_comms"
                     style="@style/WorkspaceNavigationLabel"
                     android:text="@string/workspace_comms" />
             </LinearLayout>
         </LinearLayout>
-
         <LinearLayout
             android:id="@+id/workspace_nav_phases"
             style="@style/WorkspaceNavigationItem">
-
-            <View android:layout_width="match_parent" android:layout_height="3dp" android:background="@color/event_navy" />
-
+            <View
+                android:id="@+id/workspace_indicator_phases"
+                android:layout_width="match_parent"
+                android:layout_height="3dp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-
                 <ImageView
+                    android:id="@+id/workspace_icon_phases"
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_workspace_phases" />
-
                 <TextView
+                    android:id="@+id/workspace_label_phases"
                     style="@style/WorkspaceNavigationLabel"
-                    android:text="@string/workspace_phases"
-                    android:textColor="@color/event_navy"
-                    android:textStyle="bold" />
+                    android:text="@string/workspace_phases" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

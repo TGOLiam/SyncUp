@@ -24,7 +24,8 @@ android {
             "src/main/res-features/loading",
             "src/main/res-features/event-list",
             "src/main/res-features/join-event",
-            "src/main/res-features/create-event"
+            "src/main/res-features/create-event",
+            "src/main/res-features/workspace"
         )
     )
 

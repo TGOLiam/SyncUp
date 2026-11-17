@@ -12,6 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
+            android:name=".CommunicationsActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".EventAreaActivity"
+            android:exported="false" />
+        <activity
             android:name=".CodeShareActivity"
             android:exported="false" />
         <activity

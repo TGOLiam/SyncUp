@@ -124,4 +124,27 @@
     <string name="code_share_unavailable_description">Code unavailable</string>
     <string name="code_share_copy">Copy code</string>
     <string name="code_share_open_workspace">Open workspace</string>
+    <string name="workspace_edit_layout">Edit layout</string>
+    <string name="workspace_edit_pending">Layout editing is not available yet.</string>
+    <string name="workspace_report_pending">Location reporting is not available yet.</string>
+    <string name="workspace_section_pending">This workspace section is not available yet.</string>
+    <string name="workspace_active_phase">Active phase</string>
+    <string name="workspace_layout_description">Event venue and zones</string>
+    <string name="workspace_no_layout">No venue layout available.</string>
+    <string name="workspace_report_log">Report log</string>
+    <string name="workspace_manual_location">Manual, not GPS</string>
+    <string name="workspace_no_reports">No location reports yet.</string>
+    <string name="workspace_report_location">Report my location</string>
+    <string name="workspace_area">Event Area</string>
+    <string name="workspace_comms">Comms</string>
+    <string name="workspace_phases">Phases</string>
+    <string name="workspace_communications">Communications</string>
+    <string name="comms_empty_history">No messages yet.</string>
+    <string name="comms_not_connected">Not connected</string>
+    <string name="comms_send">Send</string>
+    <string name="comms_message_hint">Message %1$s</string>
+    <string name="comms_hold_to_talk">Hold to talk · %1$s</string>
+    <string name="comms_connected_description">%1$s connected (preview)</string>
+    <string name="comms_disconnected_description">%1$s disconnected (preview)</string>
+    <string name="comms_feature_pending">Communication is not available yet.</string>
 </resources>

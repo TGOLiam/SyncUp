@@ -1,53 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version='1.0' encoding='utf-8'?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/channels_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/white"
     android:orientation="vertical">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="16dp">
-
-        <ImageButton
-            android:id="@+id/channels_back_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/create_event"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="16dp">
-
             <include layout="@layout/create_event_progress" />
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,13 +29,11 @@
                 android:text="@string/channel_global"
                 android:textColor="@color/event_text"
                 android:textSize="16sp" />
-
             <LinearLayout
                 android:id="@+id/channel_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/add_channel_button"
                 style="@style/Widget.Material3.Button.OutlinedButton"
@@ -79,7 +47,6 @@
                 app:strokeColor="@color/event_navy" />
         </LinearLayout>
     </ScrollView>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,7 +54,6 @@
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/channels_footer_back_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
@@ -100,7 +66,6 @@
             android:textColor="@color/event_navy"
             app:cornerRadius="12dp"
             app:strokeColor="@color/event_navy" />
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/channels_review_button"
             android:layout_width="0dp"

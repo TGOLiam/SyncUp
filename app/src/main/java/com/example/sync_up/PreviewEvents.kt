@@ -33,6 +33,10 @@ object PreviewEvents {
                         phase = stringAttribute("phase"),
                         activePhase = parser.getAttributeBooleanValue(null, "activePhase", false),
                         workspacePhase = stringAttribute("workspacePhase"),
+                        phases = stringAttribute("phases")
+                            ?.split("|")
+                            ?.filter { it.isNotBlank() }
+                            ?: emptyList(),
                         channels = stringAttribute("channels")
                             ?.split("|")
                             ?.filter { it.isNotBlank() }

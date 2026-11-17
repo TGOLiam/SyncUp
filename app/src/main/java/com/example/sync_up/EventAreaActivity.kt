@@ -49,7 +49,9 @@ class EventAreaActivity : AppCompatActivity() {
             startActivity(communicationsIntent)
         }
         findViewById<View>(R.id.workspace_nav_phases).setOnClickListener {
-            Toast.makeText(this, R.string.workspace_section_pending, Toast.LENGTH_SHORT).show()
+            val phasesIntent = Intent(this, WorkspacePhasesActivity::class.java)
+            phasesIntent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
+            startActivity(phasesIntent)
         }
     }
 }

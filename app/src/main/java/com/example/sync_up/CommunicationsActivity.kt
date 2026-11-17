@@ -1,6 +1,7 @@
 package com.example.sync_up
 
 import android.content.res.ColorStateList
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,8 +36,23 @@ class CommunicationsActivity : AppCompatActivity() {
         renderChannels()
         renderConversation()
 
-        findViewById<View>(R.id.workspace_nav_area).setOnClickListener { finish() }
-        findViewById<View>(R.id.workspace_nav_phases).setOnClickListener { showUnavailable() }
+        findViewById<View>(R.id.workspace_nav_area).setOnClickListener {
+            val areaIntent = Intent(this, EventAreaActivity::class.java)
+            areaIntent.putExtra(
+                PreviewEvents.EXTRA_EVENT_INDEX,
+                intent.getIntExtra(PreviewEvents.EXTRA_EVENT_INDEX, -1)
+            )
+            areaIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(areaIntent)
+        }
+        findViewById<View>(R.id.workspace_nav_phases).setOnClickListener {
+            val phasesIntent = Intent(this, WorkspacePhasesActivity::class.java)
+            phasesIntent.putExtra(
+                PreviewEvents.EXTRA_EVENT_INDEX,
+                intent.getIntExtra(PreviewEvents.EXTRA_EVENT_INDEX, -1)
+            )
+            startActivity(phasesIntent)
+        }
         findViewById<View>(R.id.comms_send).setOnClickListener { showUnavailable() }
         findViewById<View>(R.id.comms_push_to_talk).setOnClickListener { showUnavailable() }
     }

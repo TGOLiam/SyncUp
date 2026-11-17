@@ -3,6 +3,7 @@
     <event name="@string/event_techconf" role="lead"
         detail="@string/event_techconf_detail" phase="@string/event_phase_active"
         activePhase="true" workspacePhase="Registration"
+        phases="Load-in|Registration|Keynote|Breakouts|Teardown"
         channels="Registration|Stage Crew|Food and Bev" />
     <event name="@string/event_fun_run" role="organizer"
         detail="@string/event_fun_run_detail" phase="@string/event_no_phase" />

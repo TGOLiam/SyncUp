@@ -147,4 +147,10 @@
     <string name="comms_connected_description">%1$s connected (preview)</string>
     <string name="comms_disconnected_description">%1$s disconnected (preview)</string>
     <string name="comms_feature_pending">Communication is not available yet.</string>
+    <string name="workspace_no_phases">No phases configured yet.</string>
+    <string name="workspace_phases_help">Only Event Leads can change the active phase.</string>
+    <string name="workspace_phase_completed">Completed</string>
+    <string name="workspace_phase_active">Active now</string>
+    <string name="workspace_phase_upcoming">Upcoming</string>
+    <string name="workspace_phase_activate">Activate</string>
 </resources>

@@ -17,6 +17,7 @@ data class EventListItem(
     val phase: String? = null,
     val activePhase: Boolean = false,
     val workspacePhase: String? = null,
+    val phases: List<String> = emptyList(),
     val channels: List<String> = emptyList()
 )
 

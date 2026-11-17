@@ -285,4 +285,188 @@ class CreateEventActivity : AppCompatActivity() {
     private fun fieldValue(fieldId: Int): String {
         return findViewById<EditText>(fieldId).text.toString().trim()
     }
+    private fun updateDrawingMode(editing: Boolean) {
+        val drawColor = if (editing) R.color.white else R.color.venue_selected
+        val editColor = if (editing) R.color.venue_selected else R.color.white
+        findViewById<MaterialButton>(R.id.venue_draw_button).backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(this, drawColor))
+        findViewById<MaterialButton>(R.id.venue_edit_button).backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(this, editColor))
+    }
+
+    private fun showAddZoneDialog(drawing: VenueDrawingView) {
+        val inputs = layoutInflater.inflate(R.layout.dialog_zone_input, null)
+        val name = inputs.findViewById<EditText>(R.id.zone_input_name)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+            .setTitle(R.string.venue_add_zone_title)
+            .setView(inputs)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.save, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val zoneName = name.text.toString().trim()
+                if (zoneName.isEmpty()) {
+                    name.error = getString(R.string.event_details_required)
+                } else if (drawing.addZone(zoneName)) {
+                    updateDrawingMode(true)
+                    dialog.dismiss()
+                } else {
+                    Toast.makeText(this, R.string.zone_placement_unavailable, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        dialog.show()
+    }
+    private fun bindTimePicker(fieldId: Int, errorId: Int) {
+        val field = findViewById<EditText>(fieldId)
+        field.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            TimePickerDialog(
+                this,
+                { _, hour, minute ->
+                    calendar.set(Calendar.HOUR_OF_DAY, hour)
+                    calendar.set(Calendar.MINUTE, minute)
+                    field.setText(android.text.format.DateFormat.getTimeFormat(this).format(calendar.time))
+                    findViewById<View>(errorId).visibility = View.GONE
+                },
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                android.text.format.DateFormat.is24HourFormat(this)
+            ).show()
+        }
+    }
+
+    private fun timeValue(fieldId: Int): String {
+        return findViewById<EditText>(fieldId).text.toString()
+    }
+
+    private fun validatePhases(): Boolean {
+        val startMissing = timeValue(R.id.phases_start_time).isBlank()
+        val endMissing = timeValue(R.id.phases_end_time).isBlank()
+        val phasesMissing = phases.isEmpty()
+
+        findViewById<View>(R.id.phases_start_time_error).visibility =
+            if (startMissing) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.phases_end_time_error).visibility =
+            if (endMissing) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.phases_list_error).visibility =
+            if (phasesMissing) View.VISIBLE else View.GONE
+
+        return !startMissing && !endMissing && !phasesMissing
+    }
+
+    private fun renderPhases() {
+        val list = findViewById<LinearLayout>(R.id.phase_list)
+        list.removeAllViews()
+        for ((index, phase) in phases.withIndex()) {
+            val row = LayoutInflater.from(this).inflate(R.layout.item_preview_phase, list, false)
+            row.findViewById<TextView>(R.id.phase_name).text = phase.label
+            row.findViewById<TextView>(R.id.phase_duration).text =
+                getString(R.string.phase_duration_format, phase.hours, phase.minutes)
+            row.findViewById<View>(R.id.phase_edit_button).setOnClickListener { showPhaseDialog(index) }
+            row.findViewById<View>(R.id.phase_remove_button).setOnClickListener {
+                phases.removeAt(index)
+                renderPhases()
+            }
+            list.addView(row)
+        }
+    }
+
+    private fun showPhaseDialog(index: Int?) {
+        val inputs = layoutInflater.inflate(R.layout.dialog_phase_input, null)
+        val label = inputs.findViewById<EditText>(R.id.phase_input_label)
+        val hours = inputs.findViewById<EditText>(R.id.phase_input_hours)
+        val minutes = inputs.findViewById<EditText>(R.id.phase_input_minutes)
+        if (index != null) {
+            val phase = phases[index]
+            label.setText(phase.label)
+            hours.setText(phase.hours.toString())
+            minutes.setText(phase.minutes.toString())
+        }
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+            .setTitle(if (index == null) R.string.phase_add_title else R.string.phase_edit_title)
+            .setView(inputs)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.save, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val phaseLabel = label.text.toString().trim()
+                val phaseHours = hours.text.toString().toIntOrNull() ?: 0
+                val phaseMinutes = minutes.text.toString().toIntOrNull() ?: 0
+                if (phaseLabel.isEmpty()) {
+                    label.error = getString(R.string.event_details_required)
+                } else if (phaseMinutes >= 60 || (phaseHours == 0 && phaseMinutes == 0)) {
+                    minutes.error = getString(R.string.phase_duration_invalid)
+                } else {
+                    val phase = Phase(phaseLabel, phaseHours, phaseMinutes)
+                    if (index == null) phases.add(phase) else phases[index] = phase
+                    findViewById<View>(R.id.phases_list_error).visibility = View.GONE
+                    renderPhases()
+                    dialog.dismiss()
+                }
+            }
+        }
+        dialog.show()
+    }
+    private fun renderChannels() {
+        val list = findViewById<LinearLayout>(R.id.channel_list)
+        list.removeAllViews()
+        for ((index, name) in channels.withIndex()) {
+            val row = layoutInflater.inflate(R.layout.item_channel, list, false)
+            row.findViewById<TextView>(R.id.channel_name).text = name
+            row.findViewById<View>(R.id.channel_remove_button).apply {
+                contentDescription = getString(R.string.channel_remove, name)
+                setOnClickListener {
+                    channels.removeAt(index)
+                    renderChannels()
+                }
+            }
+            list.addView(row)
+        }
+    }
+
+    private fun showChannelDialog() {
+        val inputs = layoutInflater.inflate(R.layout.dialog_channel_input, null)
+        val name = inputs.findViewById<EditText>(R.id.channel_input_name)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+            .setTitle(R.string.channel_add_title)
+            .setView(inputs)
+            .setNegativeButton(R.string.cancel, null)
+            .setPositiveButton(R.string.save, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val channelName = name.text.toString().trim()
+                if (channelName.isEmpty()) {
+                    name.error = getString(R.string.event_details_required)
+                } else {
+                    channels.add(channelName)
+                    renderChannels()
+                    dialog.dismiss()
+                }
+            }
+        }
+        dialog.show()
+    }
+    private fun showEventDetails() {
+        val draft = EventCreationSession.draft
+        val fallback = getString(R.string.review_not_provided)
+        fun value(text: String): String = text.takeIf { it.isNotBlank() } ?: fallback
+        fun dateAndTime(date: String, time: String): String {
+            return listOf(date, time).filter { it.isNotBlank() }.joinToString(" · ")
+                .ifBlank { fallback }
+        }
+
+        findViewById<TextView>(R.id.review_event_name).text = value(draft.name)
+        findViewById<TextView>(R.id.review_event_venue).text = value(draft.venue)
+        findViewById<TextView>(R.id.review_event_schedule).text = getString(
+            R.string.review_schedule,
+            dateAndTime(draft.startDate, draft.startTime),
+            dateAndTime(draft.endDate, draft.endTime)
+        )
+    }
+
+
 }

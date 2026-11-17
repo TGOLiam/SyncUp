@@ -39,4 +39,8 @@ object EventCreationSession {
     fun start() {
         draft = EventCreationDraft()
     }
+
+    fun resume(savedDraft: EventCreationDraft) {
+        draft = savedDraft
+    }
 }

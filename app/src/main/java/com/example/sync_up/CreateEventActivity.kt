@@ -20,18 +20,26 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
+import com.example.sync_up.data.DraftSaveQueue
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.UUID
+import java.lang.ref.WeakReference
 
 /** Hosts the event creation steps and keeps their views alive while navigating. */
 class CreateEventActivity : AppCompatActivity() {
+    companion object {
+        const val EXTRA_DRAFT_ID = "draft_id"
+        const val EXTRA_DRAFT_STEP = "draft_step"
+    }
     private data class Phase(val label: String, val hours: Int, val minutes: Int)
     private val phases = mutableListOf<Phase>()
     private val channels = mutableListOf<String>()
     private var step = 0
+    private lateinit var draftId: String
     private val sections = intArrayOf(
         R.id.creation_details, R.id.creation_venue, R.id.creation_phases,
         R.id.creation_channels, R.id.creation_review, R.id.creation_code
@@ -39,6 +47,9 @@ class CreateEventActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        draftId = savedInstanceState?.getString("draft_id")
+            ?: intent.getStringExtra(EXTRA_DRAFT_ID)
+            ?: UUID.randomUUID().toString()
         setContentView(R.layout.activity_creation_workspace)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.creation_workspace_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -92,7 +103,10 @@ class CreateEventActivity : AppCompatActivity() {
             CreateEventProgress.show(this, findViewById(sections[index]), index + 1, titles[index])
         }
         bindActions(drawing)
-        showStep(savedInstanceState?.getInt("creation_step") ?: 0, save = false)
+        showStep(
+            savedInstanceState?.getInt("creation_step") ?: intent.getIntExtra(EXTRA_DRAFT_STEP, 0),
+            save = false
+        )
     }
 
     private fun bindActions(drawing: VenueDrawingView) {
@@ -145,6 +159,7 @@ class CreateEventActivity : AppCompatActivity() {
             it.clearFocus()
         }
         step = next
+        if (save) persistDraft()
         for (index in sections.indices) findViewById<View>(sections[index]).visibility = if (index == step) View.VISIBLE else View.GONE
         findViewById<TextView>(R.id.creation_title).setText(if (step == 5) R.string.code_share_title else R.string.create_event)
         findViewById<TextView>(R.id.phases_event_date).text = EventCreationSession.draft.startDate
@@ -161,10 +176,12 @@ class CreateEventActivity : AppCompatActivity() {
 
     override fun onPause() {
         saveDraft()
+        persistDraft()
         super.onPause()
     }
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("creation_step", step)
+        outState.putString("draft_id", draftId)
         outState.putStringArrayList("phase_labels", ArrayList(phases.map { it.label }))
         outState.putIntegerArrayList("phase_hours", ArrayList(phases.map { it.hours }))
         outState.putIntegerArrayList("phase_minutes", ArrayList(phases.map { it.minutes }))
@@ -194,6 +211,40 @@ class CreateEventActivity : AppCompatActivity() {
         phases.forEach { draft.phases.add(DraftPhase(it.label, it.hours, it.minutes)) }
         draft.channels.clear()
         draft.channels.addAll(channels)
+    }
+
+    private fun persistDraft() {
+        val draft = EventCreationSession.draft
+        val snapshot = EventCreationDraft().apply {
+            name = draft.name
+            venue = draft.venue
+            startDate = draft.startDate
+            endDate = draft.endDate
+            startTime = draft.startTime
+            endTime = draft.endTime
+            startDateIso = draft.startDateIso
+            endDateIso = draft.endDateIso
+            startTimeIso = draft.startTimeIso
+            endTimeIso = draft.endTimeIso
+            layout = draft.layout?.let { savedLayout ->
+                DraftLayout(
+                    savedLayout.aspectRatio,
+                    savedLayout.boundary.toList(),
+                    savedLayout.zones.map { DraftZone(it.name, it.vertices.toList()) }
+                )
+            }
+            phasesInitialized = draft.phasesInitialized
+            phases.addAll(draft.phases)
+            channels.addAll(draft.channels)
+        }
+        val activity = WeakReference(this)
+        DraftSaveQueue.save(applicationContext, draftId, step, snapshot) {
+            activity.get()?.let { current ->
+                if (!current.isFinishing && !current.isDestroyed) {
+                    Toast.makeText(current, R.string.draft_save_failed, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     private fun toIsoTime(value: String): String? {
@@ -397,7 +448,7 @@ class CreateEventActivity : AppCompatActivity() {
                 val phaseMinutes = minutes.text.toString().toIntOrNull() ?: 0
                 if (phaseLabel.isEmpty()) {
                     label.error = getString(R.string.event_details_required)
-                } else if (phaseMinutes >= 60 || (phaseHours == 0 && phaseMinutes == 0)) {
+                } else if (phaseHours > 99 || phaseMinutes >= 60 || (phaseHours == 0 && phaseMinutes == 0)) {
                     minutes.error = getString(R.string.phase_duration_invalid)
                 } else {
                     val phase = Phase(phaseLabel, phaseHours, phaseMinutes)

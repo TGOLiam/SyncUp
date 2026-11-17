@@ -27,6 +27,7 @@ object PreviewEvents {
 
                 events.add(
                     EventListItem(
+                        previewId = requireNotNull(stringAttribute("id")),
                         name = requireNotNull(stringAttribute("name")),
                         detail = requireNotNull(stringAttribute("detail")),
                         isLead = stringAttribute("role") == "lead",

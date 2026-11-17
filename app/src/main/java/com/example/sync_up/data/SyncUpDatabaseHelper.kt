@@ -9,6 +9,7 @@ internal class SyncUpDatabaseHelper(
     context: Context,
     databaseName: String = DATABASE_NAME
 ) : SQLiteOpenHelper(context.applicationContext, databaseName, null, DATABASE_VERSION) {
+    private val appContext = context.applicationContext
 
     init {
         setWriteAheadLoggingEnabled(true)
@@ -20,16 +21,21 @@ internal class SyncUpDatabaseHelper(
     }
 
     override fun onCreate(db: SQLiteDatabase) {
-        // Tables will be introduced with the reviewed event setup schema.
+        EventSetupSchema.create(db)
+        PreviewEventSeeder.seed(appContext, db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        // No migrations exist yet; never silently discard existing data.
-        throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
+        if (oldVersion == 1 && newVersion == 2) {
+            EventSetupSchema.create(db)
+            PreviewEventSeeder.seed(appContext, db)
+        } else {
+            throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
+        }
     }
 
     companion object {
         const val DATABASE_NAME = "syncup.db"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
     }
 }

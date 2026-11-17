@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <events>
-    <event name="@string/event_techconf" role="lead"
+    <event id="techconf" name="@string/event_techconf" role="lead"
         detail="@string/event_techconf_detail" phase="@string/event_phase_active"
         activePhase="true" workspacePhase="Registration"
         phases="Load-in|Registration|Keynote|Breakouts|Teardown"
@@ -32,7 +32,7 @@
             </zone>
         </layout>
     </event>
-    <event name="@string/event_fun_run" role="organizer"
+    <event id="fun-run" name="@string/event_fun_run" role="organizer"
         detail="@string/event_fun_run_detail" phase="@string/event_no_phase"
         phases="Setup|Registration|Run|Cleanup"
         channels="Registration|Course Team">

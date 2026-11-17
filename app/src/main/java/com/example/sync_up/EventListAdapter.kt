@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 
 /** Presentation data for an event card, independent of its data source. */
 data class EventListItem(
+    val previewId: String,
     val name: String,
     val detail: String,
     val isLead: Boolean,

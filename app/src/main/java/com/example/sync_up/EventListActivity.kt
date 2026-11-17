@@ -17,7 +17,7 @@ class EventListActivity : AppCompatActivity() {
         findViewById<ListView>(R.id.event_list).apply {
             adapter = EventListAdapter(this@EventListActivity, events)
             setOnItemClickListener { _, _, position, _ ->
-                val intent = Intent(this@EventListActivity, EventAreaActivity::class.java)
+                val intent = Intent(this@EventListActivity, WorkspaceActivity::class.java)
                 intent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, position)
                 startActivity(intent)
             }

@@ -12,30 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
-            android:name=".WorkspacePhasesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CommunicationsActivity"
+            android:name=".WorkspaceActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".EventAreaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".CodeShareActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EventReviewActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ChannelsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EventPhasesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VenueLayoutActivity"
-            android:exported="false" />
         <activity
             android:name=".CreateEventActivity"
             android:exported="false"

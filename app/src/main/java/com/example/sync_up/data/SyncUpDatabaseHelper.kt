@@ -22,13 +22,17 @@ internal class SyncUpDatabaseHelper(
 
     override fun onCreate(db: SQLiteDatabase) {
         EventSetupSchema.create(db)
+        DraftInputSchema.create(db)
         PreviewEventSeeder.seed(appContext, db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion == 1 && newVersion == 2) {
+        if (oldVersion == 1 && newVersion == 3) {
             EventSetupSchema.create(db)
+            DraftInputSchema.create(db)
             PreviewEventSeeder.seed(appContext, db)
+        } else if (oldVersion == 2 && newVersion == 3) {
+            DraftInputSchema.create(db)
         } else {
             throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
         }
@@ -36,6 +40,6 @@ internal class SyncUpDatabaseHelper(
 
     companion object {
         const val DATABASE_NAME = "syncup.db"
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
     }
 }

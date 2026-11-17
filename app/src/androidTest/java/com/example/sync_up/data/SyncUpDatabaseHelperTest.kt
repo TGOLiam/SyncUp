@@ -116,7 +116,7 @@ class SyncUpDatabaseHelperTest {
                 val helper = SyncUpDatabaseHelper(context, databaseName)
                 try {
                     val database = helper.writableDatabase
-                    assertEquals(2, database.version)
+                    assertEquals(SyncUpDatabaseHelper.DATABASE_VERSION, database.version)
                     database.rawQuery("SELECT COUNT(*) FROM events WHERE is_preview = 1", null).use { cursor ->
                         assertTrue(cursor.moveToFirst())
                         assertEquals(2, cursor.getInt(0))

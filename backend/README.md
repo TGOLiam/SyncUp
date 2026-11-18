@@ -3,36 +3,48 @@
 This project runs the Supabase development stack locally. It is for testing,
 not a production deployment.
 
-From this directory, install the pinned CLI and start the services:
+From this directory, install the pinned CLI and start Supabase and LiveKit
+together:
 
 ```bash
 npm ci
-npx supabase start
+python3 stack.py up
 ```
+
+Manage the local stack with:
+
+```bash
+python3 stack.py status
+python3 stack.py logs
+python3 stack.py down
+```
+
+These commands coordinate the Supabase CLI's containers and the supervised
+LiveKit container. `down` retains the Supabase data volumes. `logs` shows
+LiveKit logs; Supabase services can also be inspected with Docker. If LiveKit
+startup fails, Supabase remains running so you can diagnose and retry `up`.
 
 The local API is available on `http://127.0.0.1:54321`, and Supabase Studio is
 available on `http://127.0.0.1:54323` on the computer running Docker. Use
 `npx supabase status` to inspect local project connection details. Its output
 includes secret development credentials; do not commit or share them.
 
-Stop the local stack with `npx supabase stop`. Check the CLI's current help
-before using any reset or no-backup options, which can delete local data.
+Check the CLI's current help before using any reset or no-backup options, which
+can delete local data.
+
+`stack.py up` detects the computer's LAN address and updates the ignored
+`local.properties` with the local API and LiveKit addresses and publishable
+key. Rebuild the app after the address changes. Set `SYNCUP_LAN_ADDRESS` when
+starting the stack to select a specific local IPv4 address.
 
 The Android app accepts `SYNCUP_SUPABASE_URL` and
 `SYNCUP_SUPABASE_PUBLISHABLE_KEY` as build environment variables (or the
 Gradle properties `syncup.supabase.url` and `syncup.supabase.publishableKey`).
 The same property names can be placed in the Git-ignored `local.properties`
-for Android Studio builds.
-Use only the publishable key, never the service-role or secret key. For a
-connected phone or emulator, route its loopback port to the local API:
-
-```bash
-adb reverse tcp:54321 tcp:54321
-```
-
-Build the debug app with the URL `http://127.0.0.1:54321` and the local
-publishable key from `npx supabase status`. The debug build permits HTTP to
-loopback only. Do not expose the local development stack to public traffic.
+for Android Studio builds. Use only the publishable key in the app, never the
+service-role or secret key. The debug build allows HTTP to reach the local
+stack. Use it only on a trusted network; HTTP does not encrypt credentials or
+session tokens. Production builds must use a secure deployed endpoint.
 The app requires a configured backend and an account to open the event list.
 
 For local live-audio server setup, see [livekit/README.md](livekit/README.md).

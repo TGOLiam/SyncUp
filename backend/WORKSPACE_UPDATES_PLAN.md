@@ -38,7 +38,8 @@
 6. **Still to verify on devices:** Two-device synchronization, channel changes,
    reconnects, notification permissions, and background behavior. An isolated
    two-account HTTP test covered sending, retrying, phase activation, location
-   reporting, and polling; the phone's Android test suite also passed.
+   reporting, and polling. Isolated Android client send-and-poll tests passed on
+   both the phone and VM, and the phone's Android test suite passed.
 
 The poll returns a recent snapshot of at most 20 messages per channel. If more
 than 20 messages arrive between successful polls, older messages can be missed;

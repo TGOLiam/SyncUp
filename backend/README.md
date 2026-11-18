@@ -35,12 +35,26 @@ publishable key from `npx supabase status`. The debug build permits HTTP to
 loopback only. Do not expose the local development stack to public traffic.
 The app requires a configured backend and an account to open the event list.
 
+For local voice validation, install FFmpeg and run the separate local service:
+
+```bash
+python3 media/run_local.py
+```
+
+Keep it running while testing voice. It listens only on `127.0.0.1:54325`;
+connect a phone with `adb reverse tcp:54325 tcp:54325` and set
+`syncup.voice.url=http://127.0.0.1:54325` in the ignored `local.properties`.
+The service uses the local service-role key only on the computer, validates
+actual decoded audio, and uploads to a private bucket. It is a development
+service and requires a secure deployment and TLS before production use.
+
 The migrations define the shared SyncUp tables, automatic account profiles, and
 creator-only phase activation. Signup metadata must include a nonblank `name`.
 Row-level security restricts event data to event members and shared profiles to
 the user's event teammates. Event setup cannot be modified through direct
-client writes. Voice-message writes are disabled until protected audio storage
-is configured. Event creation and joining functions are available locally.
+client writes. Direct voice-message writes are disabled; the trusted media
+service validates and saves voice messages in protected storage. Event creation
+and joining functions are available locally.
 
 To apply new migrations to the local stack, run `npx supabase migration up`
 from this directory. The schema test uses temporary rows and rolls them back:
@@ -50,6 +64,7 @@ docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/auth_profiles.sql
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/access_policies.sql
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/event_creation_joining.sql
+docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/channel_speech_leases.sql
 ```
 
 `create_event` accepts client-generated IDs and the complete setup, and returns

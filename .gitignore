@@ -4,6 +4,7 @@
 
 # Gradle and Android build output
 .gradle/
+.kotlin/
 **/build/
 /captures/
 .externalNativeBuild/
@@ -11,6 +12,10 @@
 
 # Machine-specific SDK configuration
 local.properties
+
+# Python bytecode from local backend tests
+__pycache__/
+*.pyc
 
 # Operating system files
 .DS_Store

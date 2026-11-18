@@ -6,8 +6,10 @@
    profile and event members to access the event's data. Protect creator-only
    phase activation and preserve read-only setup after creation. Voice-message
    writes remain disabled until protected audio storage is configured.
-3. **Event creation and joining:** Create an event and its setup atomically;
-   allow an authenticated user to join using a code.
+3. **Event creation and joining — implemented locally:** Create an event and
+   its setup atomically; allow an authenticated user to join using a code.
+   Codes expire at event end. An account is limited after ten incorrect
+   attempts in a one-minute window.
 4. **Android authentication:** Add signup, sign-in, session restoration,
    validation, and error states.
 5. **Event submission:** Send a completed local draft to Supabase and update

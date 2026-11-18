@@ -28,7 +28,7 @@ creator-only phase activation. Signup metadata must include a nonblank `name`.
 Row-level security restricts event data to event members and shared profiles to
 the user's event teammates. Event setup cannot be modified through direct
 client writes. Voice-message writes are disabled until protected audio storage
-is configured. Event creation and joining functions have not been added yet.
+is configured. Event creation and joining functions are available locally.
 
 To apply new migrations to the local stack, run `npx supabase migration up`
 from this directory. The schema test uses temporary rows and rolls them back:
@@ -37,4 +37,15 @@ from this directory. The schema test uses temporary rows and rolls them back:
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/shared_entities.sql
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/auth_profiles.sql
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/access_policies.sql
+docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/event_creation_joining.sql
 ```
+
+`create_event` accepts client-generated IDs and the complete setup, and returns
+the event ID and six-digit code. Repeating the same request with the same event
+ID returns the original code; a different payload with that ID is rejected.
+Start and end timestamps should include a UTC offset. The creator can retrieve a
+valid code with `get_event_join_code`. `join_event` returns `JOINED`,
+`ALREADY_MEMBER`, `INVALID_CODE`, or `RATE_LIMITED`. Expired and unknown codes
+both return `INVALID_CODE`; ten failed attempts in a one-minute window block
+further attempts until the window resets. Local codes are retained after expiry
+and cannot currently be reused.

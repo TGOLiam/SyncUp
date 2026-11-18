@@ -43,7 +43,8 @@ class StoredEventReaderTest {
                 try {
                     val event = reopened.load(techConf.id)
                     assertNotNull(event)
-                    assertEquals(4, event!!.layout!!.boundary.size)
+                    assertEquals(techConf.activePhaseId, event!!.phaseIds[event.phases.indexOf("Registration")])
+                    assertEquals(4, event.layout!!.boundary.size)
                     assertEquals(listOf("Stage", "Registration", "Food"), event.layout!!.zones.map { it.name })
                     assertEquals(5, event.phases.size)
                     assertEquals(listOf("Registration", "Stage Crew", "Food and Bev"), event.channels)

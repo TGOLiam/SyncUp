@@ -54,6 +54,7 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private var channelIds: Map<String, String> = emptyMap()
     private var phaseIds: List<String> = emptyList()
+    private var activePhaseId: String? = null
     private var zoneIds: List<Pair<String, String>> = emptyList()
     private var pressHeld = false
     private var requestPending = false
@@ -151,6 +152,7 @@ class WorkspaceActivity : AppCompatActivity() {
                             phases = update.snapshot.phases.map { it.name }
                         )
                         phaseIds = update.snapshot.phases.map { it.id }
+                        activePhaseId = update.snapshot.currentPhaseId
                         findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
                         renderPhases()
                         renderLocations(update.snapshot.locations)
@@ -175,6 +177,7 @@ class WorkspaceActivity : AppCompatActivity() {
                 }
                 channelIds = stored.channelIds
                 phaseIds = stored.phaseIds
+                activePhaseId = stored.summary.activePhaseId
                 zoneIds = stored.zoneIds
                 event = EventListItem(
                     previewId = stored.summary.id,
@@ -417,7 +420,11 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun renderPhases() {
         val phases = event?.phases ?: draft.phases.map { it.label }
-        val activeIndex = event?.workspacePhase?.let { phases.indexOf(it) } ?: -1
+        val activeIndex = if (activePhaseId != null) {
+            phaseIds.indexOf(activePhaseId)
+        } else {
+            -1
+        }
         val isLead = event?.isLead ?: true
         findViewById<View>(R.id.workspace_phase_empty).visibility =
             if (phases.isEmpty()) View.VISIBLE else View.GONE
@@ -483,6 +490,7 @@ class WorkspaceActivity : AppCompatActivity() {
                 val active = remote.phases.firstOrNull { it.id == remote.event.currentPhaseId }
                 event = current.copy(workspacePhase = active?.name, phases = remote.phases.sortedBy { it.sequence }.map { it.name })
                 phaseIds = remote.phases.sortedBy { it.sequence }.map { it.id }
+                activePhaseId = remote.event.currentPhaseId
                 findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
                 renderPhases()
             } catch (error: CancellationException) {

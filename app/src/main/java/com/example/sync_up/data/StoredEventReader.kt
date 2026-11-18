@@ -21,7 +21,8 @@ internal class StoredEventReader(
         val isLeadPreview: Boolean,
         val activePhase: String?,
         val isPreview: Boolean,
-        val isCreator: Boolean
+        val isCreator: Boolean,
+        val activePhaseId: String?
     )
 
     data class Event(
@@ -39,7 +40,7 @@ internal class StoredEventReader(
         val events = mutableListOf<Summary>()
         val sql = """
             SELECT e.event_id, e.name, COALESCE(e.preview_detail, e.venue),
-                COALESCE(m.is_lead, 0), p.name, e.is_preview, e.creator_id
+                COALESCE(m.is_lead, 0), p.name, e.is_preview, e.creator_id, e.current_phase_id
             FROM events e
             LEFT JOIN preview_metadata m ON m.event_id = e.event_id
             LEFT JOIN phases p ON p.phase_id = e.current_phase_id AND p.event_id = e.event_id
@@ -60,7 +61,8 @@ internal class StoredEventReader(
                         isLeadPreview = cursor.getInt(3) == 1,
                         activePhase = cursor.getString(4),
                         isPreview = cursor.getInt(5) == 1,
-                        isCreator = userId != null && cursor.getString(6) == userId
+                        isCreator = userId != null && cursor.getString(6) == userId,
+                        activePhaseId = cursor.getString(7)
                     )
                 )
             }

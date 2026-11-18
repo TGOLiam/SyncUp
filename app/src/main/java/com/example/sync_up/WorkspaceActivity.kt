@@ -31,6 +31,7 @@ import com.example.sync_up.liveaudio.LiveAudioPreferences
 import com.example.sync_up.liveaudio.LiveAudioService
 import com.example.sync_up.liveaudio.LiveAudioSession
 import com.example.sync_up.liveaudio.LiveSpeechClient
+import com.example.sync_up.liveaudio.WorkspaceUpdates
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -134,6 +135,23 @@ class WorkspaceActivity : AppCompatActivity() {
                         }
                         renderChannels()
                         renderConversation()
+                    }
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                WorkspaceUpdates.state.collect { update ->
+                    val current = event
+                    if (update != null && current != null && current.previewId == update.eventId) {
+                        val active = update.snapshot.phases.firstOrNull { it.id == update.snapshot.currentPhaseId }
+                        event = current.copy(
+                            workspacePhase = active?.name,
+                            phases = update.snapshot.phases.map { it.name }
+                        )
+                        findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
+                        renderPhases()
+                        loadMessages()
                     }
                 }
             }

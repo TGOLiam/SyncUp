@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 
 /** Calls the server's atomic event creation and membership operations. */
 internal class SupabaseEventService(private val client: SupabaseClient) {
@@ -40,6 +41,16 @@ internal class SupabaseEventService(private val client: SupabaseClient) {
             put("p_text", text)
         }
         return client.postgrest.rpc("send_text_message", arguments).decodeSingle()
+    }
+
+    suspend fun pollWorkspace(eventId: String, channelIds: List<String>): WorkspaceSnapshot {
+        val arguments = buildJsonObject {
+            put("p_event_id", eventId)
+            putJsonArray("p_channel_ids") {
+                for (channelId in channelIds) add(kotlinx.serialization.json.JsonPrimitive(channelId))
+            }
+        }
+        return client.postgrest.rpc("poll_workspace", arguments).decodeAs()
     }
 
     suspend fun listEvents(): List<RemoteEventRow> {

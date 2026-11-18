@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.os.Looper
 import com.example.sync_up.data.remote.RemoteEvent
+import com.example.sync_up.data.remote.WorkspaceSnapshot
 
 /** Stores server-confirmed event data and records which account fetched it. */
 internal class SharedEventCache(context: Context, databaseName: String = SyncUpDatabaseHelper.DATABASE_NAME) : AutoCloseable {
@@ -96,6 +97,24 @@ internal class SharedEventCache(context: Context, databaseName: String = SyncUpD
                 "user_id = ? AND event_id IN (SELECT event_id FROM events WHERE creation_status = 'CREATED') AND event_id NOT IN ($placeholders)",
                 (listOf(userId) + eventIds).toTypedArray()
             )
+        }
+    }
+
+    fun updatePhases(eventId: String, snapshot: WorkspaceSnapshot) {
+        checkWorkerThread()
+        val database = helper.writableDatabase
+        database.beginTransaction()
+        try {
+            database.update("phases", ContentValues().apply { put("status", "UPCOMING") }, "event_id = ?", arrayOf(eventId))
+            for (phase in snapshot.phases) {
+                database.update("phases", ContentValues().apply { put("status", phase.status) },
+                    "event_id = ? AND phase_id = ?", arrayOf(eventId, phase.id))
+            }
+            database.update("events", ContentValues().apply { put("current_phase_id", snapshot.currentPhaseId) },
+                "event_id = ?", arrayOf(eventId))
+            database.setTransactionSuccessful()
+        } finally {
+            database.endTransaction()
         }
     }
 

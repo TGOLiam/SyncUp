@@ -192,6 +192,8 @@
     <string name="voice_channel_unavailable">Voice is unavailable for this channel.</string>
     <string name="text_channel_unavailable">Connect to this channel before sending a message.</string>
     <string name="text_send_failed">Could not send message. Try again.</string>
+    <string name="text_notification_channel">Text messages</string>
+    <string name="text_notification_title">New message</string>
     <string name="voice_channel_busy">Someone is speaking. Try again in 3 seconds.</string>
     <string name="voice_recording">Recording… release to send</string>
     <string name="voice_live_speaking">Speaking live… release to stop</string>

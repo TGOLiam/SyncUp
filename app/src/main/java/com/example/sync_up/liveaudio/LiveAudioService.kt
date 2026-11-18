@@ -10,6 +10,10 @@ import android.os.IBinder
 import androidx.core.content.ContextCompat
 import com.example.sync_up.R
 import com.example.sync_up.data.remote.SupabaseClientFactory
+import com.example.sync_up.data.remote.SupabaseEventService
+import com.example.sync_up.data.SharedEventCache
+import com.example.sync_up.data.TextMessageCache
+import androidx.core.app.NotificationCompat
 import io.github.jan.supabase.auth.auth
 import io.livekit.android.LiveKit
 import io.livekit.android.events.RoomEvent
@@ -25,6 +29,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withContext
 
 /** Keeps listen-only room connections alive while the user participates in an event. */
 internal class LiveAudioService : Service() {
@@ -33,6 +38,7 @@ internal class LiveAudioService : Service() {
     private var userId: String? = null
     private var eventId: String? = null
     private var globalId: String? = null
+    private var pollingJob: Job? = null
     private var selection = LiveAudioPreferences.Selection(false, null)
     private val preferences by lazy { LiveAudioPreferences(applicationContext) }
 
@@ -128,6 +134,61 @@ internal class LiveAudioService : Service() {
         for (id in desired) {
             if (jobs[id] == null) jobs[id] = scope.launch { maintainRoom(id) }
         }
+        if (pollingJob == null) pollingJob = scope.launch { pollWorkspace() }
+    }
+
+    private suspend fun pollWorkspace() {
+        val seen = mutableMapOf<String, MutableSet<String>>()
+        while (scope.isActive) {
+            val currentEvent = eventId ?: break
+            val currentUser = userId ?: break
+            val client = SupabaseClientFactory.get(applicationContext) ?: break
+            val state = LiveAudioSession.state.value
+            val channels = buildList {
+                if (state.global == LiveAudioSession.Status.CONNECTED) state.globalId?.let { add(it) }
+                if (state.selected == LiveAudioSession.Status.CONNECTED) state.selectedId?.let { add(it) }
+            }.distinct()
+            seen.keys.retainAll(channels.toSet())
+            try {
+                val snapshot = SupabaseEventService(client).pollWorkspace(currentEvent, channels)
+                if (eventId != currentEvent || userId != currentUser) break
+                withContext(Dispatchers.IO) {
+                    TextMessageCache(applicationContext).use { it.save(currentUser, snapshot.messages) }
+                    SharedEventCache(applicationContext).use { it.updatePhases(currentEvent, snapshot) }
+                }
+                val ownMember = snapshot.locations.firstOrNull { it.userId == currentUser }?.memberId
+                for (channel in channels) {
+                    val messages = snapshot.messages.filter { it.channelId == channel }
+                    val previous = seen[channel]
+                    if (previous != null) {
+                        val newest = messages.lastOrNull { it.id !in previous && it.senderMemberId != ownMember }
+                        if (newest != null) notifyText(newest.text)
+                    }
+                    seen[channel] = messages.mapTo(mutableSetOf()) { it.id }
+                }
+                WorkspaceUpdates.publish(currentEvent, snapshot)
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                // Keep the last confirmed state and retry on the next cycle.
+            }
+            delay(3_000)
+        }
+    }
+
+    private fun notifyText(text: String) {
+        val manager = getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(NotificationChannel("workspace_messages", getString(R.string.text_notification_channel), NotificationManager.IMPORTANCE_DEFAULT))
+        }
+        val notification = NotificationCompat.Builder(this, "workspace_messages")
+            .setSmallIcon(R.drawable.ic_workspace_microphone)
+            .setContentTitle(getString(R.string.text_notification_title))
+            .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
+            .setAutoCancel(true)
+            .build()
+        manager.notify(103, notification)
     }
 
     private fun statusFor(id: String, desired: Set<String>): LiveAudioSession.Status {
@@ -221,6 +282,9 @@ internal class LiveAudioService : Service() {
     }
 
     private fun cancelConnections() {
+        pollingJob?.cancel()
+        pollingJob = null
+        WorkspaceUpdates.clear()
         jobs.values.forEach { it.cancel() }
         jobs.clear()
         LiveAudioSession.set(LiveAudioSession.State())

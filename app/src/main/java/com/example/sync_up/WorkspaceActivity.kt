@@ -18,6 +18,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.example.sync_up.data.DraftSaveQueue
+import com.example.sync_up.data.remote.SupabaseClientFactory
+import io.github.jan.supabase.auth.auth
 
 /** Hosts the three workspace sections while keeping their views and navigation in place. */
 class WorkspaceActivity : AppCompatActivity() {
@@ -57,7 +59,8 @@ class WorkspaceActivity : AppCompatActivity() {
             renderEvent()
         } else {
             findViewById<View>(R.id.workspace_root).visibility = View.INVISIBLE
-            DraftSaveQueue.readEvents(applicationContext, { it.load(eventId) }) { result ->
+            val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+            DraftSaveQueue.readEvents(applicationContext, { it.load(eventId, userId) }) { result ->
                 if (isFinishing || isDestroyed) return@readEvents
                 val stored = result.getOrNull()
                 if (stored == null) {
@@ -67,9 +70,10 @@ class WorkspaceActivity : AppCompatActivity() {
                 }
                 event = EventListItem(
                     previewId = stored.summary.id,
+                    isPreview = stored.summary.isPreview,
                     name = stored.summary.name,
                     detail = stored.summary.detail.orEmpty(),
-                    isLead = stored.summary.isLeadPreview,
+                    isLead = if (stored.summary.isPreview) stored.summary.isLeadPreview else stored.summary.isCreator,
                     workspacePhase = stored.summary.activePhase,
                     phases = stored.phases,
                     channels = stored.channels
@@ -134,7 +138,11 @@ class WorkspaceActivity : AppCompatActivity() {
             else -> draft.name
         }
         findViewById<MaterialButton>(R.id.workspace_edit).apply {
-            visibility = if (section != 1 && (event?.isLead ?: true)) View.VISIBLE else View.GONE
+            visibility = if (section != 1 && (event?.isPreview != false) && (event?.isLead ?: true)) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
             setText(if (section == 2) R.string.venue_edit else R.string.workspace_edit_layout)
             setOnClickListener {
                 val message = if (section == 2) R.string.phases_edit_placeholder else R.string.workspace_edit_pending

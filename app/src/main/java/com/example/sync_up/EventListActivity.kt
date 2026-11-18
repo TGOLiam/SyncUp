@@ -6,9 +6,16 @@ import android.view.View
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.sync_up.data.DraftSaveQueue
+import com.example.sync_up.data.remote.SupabaseClientFactory
+import com.example.sync_up.data.remote.SupabaseEventService
+import io.github.jan.supabase.auth.auth
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 class EventListActivity : AppCompatActivity() {
     private lateinit var events: List<EventListItem>
@@ -39,6 +46,11 @@ class EventListActivity : AppCompatActivity() {
             EventCreationSession.start()
             startActivity(Intent(this, CreateEventActivity::class.java))
         }
+        findViewById<View>(R.id.settings_button).setOnClickListener {
+            AlertDialog.Builder(this)
+                .setItems(arrayOf(getString(R.string.auth_sign_out))) { _, _ -> signOut() }
+                .show()
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.home_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -49,9 +61,36 @@ class EventListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        val client = SupabaseClientFactory.get(applicationContext)
+        val userId = client?.auth?.currentUserOrNull()?.id
+        loadLocalEvents(userId)
+        if (client != null && userId != null) {
+            lifecycleScope.launch {
+                try {
+                    val service = SupabaseEventService(client)
+                    val remoteEvents = service.listEvents().map { service.loadEvent(it.id) }
+                    DraftSaveQueue.updateShared(applicationContext, { cache ->
+                        for (event in remoteEvents) cache.save(userId, event)
+                        cache.retainAccess(userId, remoteEvents.map { it.event.id })
+                    }) { result ->
+                        if (isFinishing || isDestroyed || client.auth.currentUserOrNull()?.id != userId) return@updateShared
+                        result.onSuccess { loadLocalEvents(userId) }
+                            .onFailure { Toast.makeText(this@EventListActivity, R.string.event_refresh_failed, Toast.LENGTH_LONG).show() }
+                    }
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    Toast.makeText(this@EventListActivity, R.string.event_refresh_failed, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun loadLocalEvents(userId: String?) {
         DraftSaveQueue.read(applicationContext, { store ->
-            val drafts = store.list()
-            val storedEvents = com.example.sync_up.data.StoredEventReader(applicationContext).use { it.list() }
+            if (userId != null) store.claimUnownedDrafts(userId)
+            val drafts = store.list(userId)
+            val storedEvents = com.example.sync_up.data.StoredEventReader(applicationContext).use { it.list(userId) }
             Pair(drafts, storedEvents)
         }) { result ->
             if (isFinishing || isDestroyed) return@read
@@ -68,9 +107,10 @@ class EventListActivity : AppCompatActivity() {
                 val eventCards = storedEvents.map { event ->
                     EventListItem(
                         previewId = event.id,
+                        isPreview = event.isPreview,
                         name = event.name,
                         detail = event.detail.orEmpty(),
-                        isLead = event.isLeadPreview,
+                        isLead = if (event.isPreview) event.isLeadPreview else event.isCreator,
                         phase = event.activePhase?.let { getString(R.string.event_active_phase_format, it) }
                             ?: getString(R.string.event_no_phase),
                         activePhase = event.activePhase != null
@@ -100,6 +140,21 @@ class EventListActivity : AppCompatActivity() {
             intent.putExtra(CreateEventActivity.EXTRA_DRAFT_ID, saved.id)
             intent.putExtra(CreateEventActivity.EXTRA_DRAFT_STEP, saved.step)
             startActivity(intent)
+        }
+    }
+
+    private fun signOut() {
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        lifecycleScope.launch {
+            try {
+                client.auth.signOut()
+                startActivity(Intent(this@EventListActivity, AuthActivity::class.java))
+                finish()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                Toast.makeText(this@EventListActivity, R.string.auth_sign_out_failed, Toast.LENGTH_LONG).show()
+            }
         }
     }
 }

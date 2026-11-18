@@ -36,12 +36,12 @@ class TokenServerTest(unittest.TestCase):
         cls.server.server_close()
         cls.thread.join()
 
-    def request(self, payload, authorization="Bearer user-token"):
+    def request(self, payload, authorization="Bearer user-token", path="/livekit/token"):
         headers = {"Content-Type": "application/json"}
         if authorization is not None:
             headers["Authorization"] = authorization
         req = urllib.request.Request(
-            f"http://127.0.0.1:{self.server.server_port}/livekit/token",
+            f"http://127.0.0.1:{self.server.server_port}{path}",
             data=json.dumps(payload).encode(),
             headers=headers,
         )
@@ -81,6 +81,22 @@ class TokenServerTest(unittest.TestCase):
             status, body, _ = self.request({"channel_id": CHANNEL_ID})
         self.assertEqual(403, status)
         self.assertNotIn("token", body)
+
+    def test_speech_routes_require_supervised_controller_and_authenticated_member(self):
+        request_id = "30000000-0000-0000-0000-000000000001"
+        payload = {"channel_id": CHANNEL_ID, "request_id": request_id}
+        with patch.object(token_server, "supabase_get", side_effect=[{"id": USER_ID}, []]):
+            self.assertEqual(403, self.request(payload, path="/livekit/speak")[0])
+        with patch.object(token_server, "supabase_get", side_effect=[{"id": USER_ID}, [{"channel_id": CHANNEL_ID}]]):
+            with patch.object(token_server, "controller", None):
+                self.assertEqual(503, self.request(payload, path="/livekit/speak")[0])
+        with patch.object(token_server, "supabase_get", side_effect=[{"id": USER_ID}, [{"channel_id": CHANNEL_ID}]]):
+            with patch.object(token_server, "controller") as controller:
+                controller.start.return_value = True
+                status, body, _ = self.request(payload, path="/livekit/speak")
+                self.assertEqual(200, status)
+                self.assertTrue(body["granted"])
+                controller.start.assert_called_once_with(CHANNEL_ID, USER_ID, request_id, "Bearer user-token")
 
     def test_invalid_request_and_missing_auth_are_denied(self):
         with patch.object(token_server, "supabase_get") as get:

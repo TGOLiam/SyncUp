@@ -118,7 +118,12 @@ class CreateEventActivity : AppCompatActivity() {
         findViewById<View>(R.id.venue_next_button).setOnClickListener { showStep(2) }
         findViewById<View>(R.id.phases_next_button).setOnClickListener { if (validatePhases()) showStep(3) }
         findViewById<View>(R.id.channels_review_button).setOnClickListener { showStep(4) }
-        findViewById<View>(R.id.review_create_button).setOnClickListener { showStep(5) }
+        findViewById<View>(R.id.review_create_button).setOnClickListener {
+            // Submission requires the backend; keep the saved draft editable for now.
+            saveDraft()
+            persistDraft()
+            Toast.makeText(this, R.string.creation_requires_backend, Toast.LENGTH_LONG).show()
+        }
         findViewById<View>(R.id.review_edit_details).setOnClickListener { showStep(0) }
         bindReviewSection(R.id.review_venue_section, R.string.review_venue_title, 1)
         bindReviewSection(R.id.review_phases_section, R.string.review_phases_title, 2)
@@ -404,7 +409,20 @@ class CreateEventActivity : AppCompatActivity() {
         findViewById<View>(R.id.phases_list_error).visibility =
             if (phasesMissing) View.VISIBLE else View.GONE
 
-        return !startMissing && !endMissing && !phasesMissing
+        if (startMissing || endMissing || phasesMissing) return false
+
+        val startDate = toIsoDate(fieldValue(R.id.create_event_start))
+        val endDate = toIsoDate(fieldValue(R.id.create_event_end))
+        val startTime = toIsoTime(timeValue(R.id.phases_start_time))
+        val endTime = toIsoTime(timeValue(R.id.phases_end_time))
+        if (startDate == null || endDate == null || startTime == null || endTime == null ||
+            !EventScheduleValidator.isEndAfterStart(startDate, startTime, endDate, endTime)
+        ) {
+            findViewById<EditText>(R.id.phases_end_time).error = getString(R.string.event_end_after_start)
+            return false
+        }
+        findViewById<EditText>(R.id.phases_end_time).error = null
+        return true
     }
 
     private fun renderPhases() {

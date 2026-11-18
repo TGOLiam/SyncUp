@@ -75,6 +75,11 @@
                     android:textColor="@color/event_muted"
 
                     android:textSize="14sp" />
+                <LinearLayout
+                    android:id="@+id/comms_messages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
             </LinearLayout>
         </ScrollView>
 
@@ -170,4 +175,4 @@
             app:iconTint="@color/white" />
     </LinearLayout>
 
-    
+

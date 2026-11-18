@@ -35,9 +35,13 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
 import com.example.sync_up.data.remote.SupabaseClientFactory
+import com.example.sync_up.data.remote.SupabaseEventService
+import com.example.sync_up.data.TextMessageCache
 import io.github.jan.supabase.auth.auth
 
 /** Hosts the three workspace sections while keeping their views and navigation in place. */
@@ -52,6 +56,8 @@ class WorkspaceActivity : AppCompatActivity() {
     private var lease: Pair<String, String>? = null
     private var speechTimeout: Job? = null
     private var speakingLive = false
+    private var messageRetry: Triple<String, String, String>? = null
+    private var messageLoad: Job? = null
     private var retryAfter = 0L
     private var pendingAudioAction: (() -> Unit)? = null
     private var automaticNotificationRequestMade = false
@@ -92,7 +98,7 @@ class WorkspaceActivity : AppCompatActivity() {
         findViewById<View>(R.id.workspace_report_location).setOnClickListener {
             Toast.makeText(this, R.string.workspace_report_pending, Toast.LENGTH_SHORT).show()
         }
-        findViewById<View>(R.id.comms_send).setOnClickListener { showUnavailable() }
+        findViewById<View>(R.id.comms_send).setOnClickListener { sendTextMessage() }
         findViewById<View>(R.id.comms_push_to_talk).setOnTouchListener { _, motion ->
             when (motion.actionMasked) {
                 MotionEvent.ACTION_DOWN -> startPushToTalk()
@@ -561,6 +567,72 @@ class WorkspaceActivity : AppCompatActivity() {
                 }
             }
             tabs.addView(tab, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f))
+        }
+        loadMessages()
+    }
+
+    private fun sendTextMessage() {
+        val input = findViewById<EditText>(R.id.comms_message)
+        val text = input.text.toString()
+        if (text.isBlank()) return
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        val userId = client.auth.currentUserOrNull()?.id ?: return
+        val currentEvent = event ?: return
+        val channelId = channelIds[if (selectedChannel == globalChannel) "" else selectedChannel]
+        val state = LiveAudioSession.state.value
+        val status = if (channelId == state.globalId) state.global else state.selected
+        if (currentEvent.isPreview || channelId == null || state.eventId != currentEvent.previewId ||
+            status != LiveAudioSession.Status.CONNECTED
+        ) {
+            Toast.makeText(this, R.string.text_channel_unavailable, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val retry = messageRetry
+        val messageId = if (retry != null && retry.first == channelId && retry.second == text) {
+            retry.third
+        } else {
+            UUID.randomUUID().toString()
+        }
+        messageRetry = Triple(channelId, text, messageId)
+        val button = findViewById<View>(R.id.comms_send)
+        button.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                val message = SupabaseEventService(client).sendTextMessage(messageId, channelId, text)
+                withContext(Dispatchers.IO) {
+                    TextMessageCache(applicationContext).use { it.save(userId, listOf(message)) }
+                }
+                messageRetry = null
+                if (input.text.toString() == text) input.text.clear()
+                loadMessages()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                Toast.makeText(this@WorkspaceActivity, R.string.text_send_failed, Toast.LENGTH_LONG).show()
+            } finally {
+                button.isEnabled = true
+            }
+        }
+    }
+
+    private fun loadMessages() {
+        messageLoad?.cancel()
+        val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id ?: return
+        val channelId = channelIds[if (selectedChannel == globalChannel) "" else selectedChannel] ?: return
+        messageLoad = lifecycleScope.launch {
+            val messages = withContext(Dispatchers.IO) {
+                TextMessageCache(applicationContext).use { it.recent(userId, channelId) }
+            }
+            val list = findViewById<LinearLayout>(R.id.comms_messages)
+            list.removeAllViews()
+            findViewById<View>(R.id.comms_empty_history).visibility = if (messages.isEmpty()) View.VISIBLE else View.GONE
+            for (message in messages) {
+                list.addView(TextView(this@WorkspaceActivity).apply {
+                    text = message.text
+                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.event_text))
+                    setPadding(0, dp(8), 0, dp(8))
+                })
+            }
         }
     }
 

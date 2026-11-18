@@ -17,8 +17,7 @@ class EventListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_list)
-        // Preview data is temporary; the adapter can later receive events from a repository.
-        events = PreviewEvents.load(this)
+        events = emptyList()
         findViewById<ListView>(R.id.event_list).apply {
             adapter = EventListAdapter(this@EventListActivity, events)
             setOnItemClickListener { _, _, position, _ ->
@@ -26,10 +25,8 @@ class EventListActivity : AppCompatActivity() {
                 if (event.draftId != null) {
                     openDraft(event.draftId)
                 } else {
-                    val previewIndex = PreviewEvents.load(this@EventListActivity)
-                        .indexOfFirst { it.previewId == event.previewId }
                     val intent = Intent(this@EventListActivity, WorkspaceActivity::class.java)
-                    intent.putExtra(PreviewEvents.EXTRA_EVENT_INDEX, previewIndex)
+                    intent.putExtra(WorkspaceActivity.EXTRA_EVENT_ID, event.previewId)
                     startActivity(intent)
                 }
             }
@@ -52,9 +49,13 @@ class EventListActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        DraftSaveQueue.read(applicationContext, { it.list() }) { result ->
+        DraftSaveQueue.read(applicationContext, { store ->
+            val drafts = store.list()
+            val storedEvents = com.example.sync_up.data.StoredEventReader(applicationContext).use { it.list() }
+            Pair(drafts, storedEvents)
+        }) { result ->
             if (isFinishing || isDestroyed) return@read
-            result.onSuccess { drafts ->
+            result.onSuccess { (drafts, storedEvents) ->
                 val draftCards = drafts.map { draft ->
                     EventListItem(
                         previewId = "",
@@ -64,7 +65,18 @@ class EventListActivity : AppCompatActivity() {
                         isLead = false
                     )
                 }
-                events = draftCards + PreviewEvents.load(this)
+                val eventCards = storedEvents.map { event ->
+                    EventListItem(
+                        previewId = event.id,
+                        name = event.name,
+                        detail = event.detail.orEmpty(),
+                        isLead = event.isLeadPreview,
+                        phase = event.activePhase?.let { getString(R.string.event_active_phase_format, it) }
+                            ?: getString(R.string.event_no_phase),
+                        activePhase = event.activePhase != null
+                    )
+                }
+                events = draftCards + eventCards
                 findViewById<ListView>(R.id.event_list).adapter = EventListAdapter(this, events)
             }.onFailure {
                 Toast.makeText(this, R.string.draft_load_failed, Toast.LENGTH_LONG).show()

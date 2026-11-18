@@ -17,16 +17,20 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
+import com.example.sync_up.data.DraftSaveQueue
 
 /** Hosts the three workspace sections while keeping their views and navigation in place. */
 class WorkspaceActivity : AppCompatActivity() {
+    companion object {
+        const val EXTRA_EVENT_ID = "event_id"
+    }
+
     private var selectedChannel = ""
     private var connectedChannel: String? = null
     private val globalChannel by lazy { getString(R.string.channel_global) }
     private var selectedSection = 0
-    private val previewIndex by lazy { intent.getIntExtra(PreviewEvents.EXTRA_EVENT_INDEX, -1) }
-    private val event by lazy { PreviewEvents.load(this).getOrNull(previewIndex) }
-    private val draft by lazy { PreviewEvents.workspaceDraft(this, previewIndex) ?: EventCreationSession.draft }
+    private var event: EventListItem? = null
+    private var draft: EventCreationDraft = EventCreationSession.draft
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +52,40 @@ class WorkspaceActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.comms_send).setOnClickListener { showUnavailable() }
         findViewById<View>(R.id.comms_push_to_talk).setOnClickListener { showUnavailable() }
+        val eventId = intent.getStringExtra(EXTRA_EVENT_ID)
+        if (eventId == null) {
+            renderEvent()
+        } else {
+            findViewById<View>(R.id.workspace_root).visibility = View.INVISIBLE
+            DraftSaveQueue.readEvents(applicationContext, { it.load(eventId) }) { result ->
+                if (isFinishing || isDestroyed) return@readEvents
+                val stored = result.getOrNull()
+                if (stored == null) {
+                    Toast.makeText(this, R.string.workspace_load_failed, Toast.LENGTH_LONG).show()
+                    finish()
+                    return@readEvents
+                }
+                event = EventListItem(
+                    previewId = stored.summary.id,
+                    name = stored.summary.name,
+                    detail = stored.summary.detail.orEmpty(),
+                    isLead = stored.summary.isLeadPreview,
+                    workspacePhase = stored.summary.activePhase,
+                    phases = stored.phases,
+                    channels = stored.channels
+                )
+                draft = EventCreationDraft().apply {
+                    name = stored.summary.name
+                    layout = stored.layout
+                    channels.addAll(stored.channels)
+                }
+                renderEvent()
+                findViewById<View>(R.id.workspace_root).visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun renderEvent() {
         findViewById<WorkspaceLayoutView>(R.id.workspace_layout).layout = draft.layout
         findViewById<View>(R.id.workspace_empty_layout).visibility =
             if (draft.layout == null) View.VISIBLE else View.GONE

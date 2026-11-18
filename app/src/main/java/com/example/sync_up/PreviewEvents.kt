@@ -5,8 +5,6 @@ import org.xmlpull.v1.XmlPullParser
 
 /** Temporary sample data for the frontend; replace with an event data source later. */
 object PreviewEvents {
-    const val EXTRA_EVENT_INDEX = "preview_event_index"
-
     fun load(context: Context): List<EventListItem> {
         val events = mutableListOf<EventListItem>()
         context.resources.getXml(R.xml.preview_events).use { parser ->

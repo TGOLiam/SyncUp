@@ -21,6 +21,8 @@
     <string name="event_fun_run_detail">Quezon Memorial Circle · Dec 3</string>
     <string name="event_homecoming_detail">FEU Tech Gym, Manila · Oct 24 · Ended</string>
     <string name="event_phase_active">Active phase: Registration</string>
+    <string name="event_active_phase_format">Active phase: %1$s</string>
+    <string name="workspace_load_failed">Could not load the event.</string>
     <string name="event_no_phase">No phase active yet</string>
     <string name="back">Back</string>
     <string name="join_event_title">Join event</string>

@@ -79,8 +79,11 @@ SELECT set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002
 SET LOCAL ROLE authenticated;
 DO $$
 BEGIN
-    IF (SELECT count(*) FROM public.events) <> 0 THEN
-        RAISE EXCEPTION 'A client could read events without an access policy';
+    IF EXISTS (
+        SELECT 1 FROM public.events
+        WHERE event_id = '20000000-0000-0000-0000-000000000001'
+    ) THEN
+        RAISE EXCEPTION 'A non-member could read the event';
     END IF;
     BEGIN
         PERFORM public.activate_event_phase('20000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001');

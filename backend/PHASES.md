@@ -2,9 +2,10 @@
 
 1. **User profiles — implemented locally:** Create a shared profile when a
    Supabase Auth account is created, requiring a display name and email.
-2. **Access policies:** Allow users to access their profile and event members
-   to access the event's data. Protect creator-only phase activation and
-   preserve read-only setup after creation.
+2. **Access policies — implemented locally:** Allow users to access their
+   profile and event members to access the event's data. Protect creator-only
+   phase activation and preserve read-only setup after creation. Voice-message
+   writes remain disabled until protected audio storage is configured.
 3. **Event creation and joining:** Create an event and its setup atomically;
    allow an authenticated user to join using a code.
 4. **Android authentication:** Add signup, sign-in, session restoration,

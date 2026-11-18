@@ -25,9 +25,10 @@ stack should not be exposed to public traffic.
 
 The migrations define the shared SyncUp tables, automatic account profiles, and
 creator-only phase activation. Signup metadata must include a nonblank `name`.
-Row-level security is enabled on the shared tables, but general
-client access policies have not been added yet. As a result, the Android app
-cannot read or write these tables through the Data API yet.
+Row-level security restricts event data to event members and shared profiles to
+the user's event teammates. Event setup cannot be modified through direct
+client writes. Voice-message writes are disabled until protected audio storage
+is configured. Event creation and joining functions have not been added yet.
 
 To apply new migrations to the local stack, run `npx supabase migration up`
 from this directory. The schema test uses temporary rows and rolls them back:
@@ -35,4 +36,5 @@ from this directory. The schema test uses temporary rows and rolls them back:
 ```bash
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/shared_entities.sql
 docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/auth_profiles.sql
+docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/access_policies.sql
 ```

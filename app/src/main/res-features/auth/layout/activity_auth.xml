@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/auth_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/event_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:id="@+id/auth_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/auth_sign_in"
+            android:textColor="@color/event_text"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/auth_name_label"
+            style="@style/CreateEventFieldLabel"
+            android:layout_marginTop="24dp"
+            android:labelFor="@id/auth_name"
+            android:text="@string/auth_name"
+            android:visibility="gone" />
+        <EditText
+            android:id="@+id/auth_name"
+            style="@style/CreateEventField"
+            android:autofillHints="name"
+            android:inputType="textPersonName"
+            android:visibility="gone" />
+
+        <TextView
+            style="@style/CreateEventFieldLabel"
+            android:layout_marginTop="24dp"
+            android:labelFor="@id/auth_email"
+            android:text="@string/auth_email" />
+        <EditText
+            android:id="@+id/auth_email"
+            style="@style/CreateEventField"
+            android:autofillHints="emailAddress"
+            android:inputType="textEmailAddress" />
+
+        <TextView
+            style="@style/CreateEventFieldLabel"
+            android:labelFor="@id/auth_password"
+            android:text="@string/auth_password" />
+        <EditText
+            android:id="@+id/auth_password"
+            style="@style/CreateEventField"
+            android:autofillHints="password"
+            android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/auth_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/event_text"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/auth_submit"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/auth_sign_in"
+            android:textAllCaps="false"
+            app:backgroundTint="@color/event_navy"
+            app:cornerRadius="12dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/auth_toggle"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/auth_switch_sign_up"
+            android:textAllCaps="false"
+            android:textColor="@color/event_navy"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/event_navy" />
+    </LinearLayout>
+</ScrollView>

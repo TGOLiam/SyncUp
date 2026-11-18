@@ -14,6 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYNCUP">
         <activity
+            android:name=".AuthActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".WorkspaceActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />

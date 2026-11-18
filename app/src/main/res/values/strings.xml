@@ -4,6 +4,20 @@
     <string name="loading">Loading</string>
     <string name="home_placeholder">Events</string>
     <string name="settings">Settings</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_sign_up">Create account</string>
+    <string name="auth_switch_sign_up">Create an account</string>
+    <string name="auth_switch_sign_in">Already have an account? Sign in</string>
+    <string name="auth_name">Name</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_invalid_email">Enter a valid email address.</string>
+    <string name="auth_invalid_password">Password must contain at least 6 characters.</string>
+    <string name="auth_unavailable">Supabase is not configured for this build.</string>
+    <string name="auth_failed">Unable to sign in or create the account. Check your details and connection, then try again.</string>
+    <string name="auth_check_email">Check your email to confirm your account before signing in.</string>
+    <string name="auth_sign_out">Sign out</string>
+    <string name="auth_sign_out_failed">Could not sign out. Check your connection and try again.</string>
     <string name="events_placeholder">Your events will appear here.</string>
     <string name="join_event">Join Event</string>
     <string name="create_event">Create Event</string>
@@ -23,6 +37,7 @@
     <string name="event_phase_active">Active phase: Registration</string>
     <string name="event_active_phase_format">Active phase: %1$s</string>
     <string name="workspace_load_failed">Could not load the event.</string>
+    <string name="event_refresh_failed">Could not refresh events. Showing saved events.</string>
     <string name="event_no_phase">No phase active yet</string>
     <string name="back">Back</string>
     <string name="join_event_title">Join event</string>
@@ -31,6 +46,10 @@
     <string name="join_code_description">Six-digit event code</string>
     <string name="join">Join</string>
     <string name="join_event_placeholder">Joining an event is not available yet.</string>
+    <string name="join_invalid_code">Enter a valid, active six-digit event code.</string>
+    <string name="join_rate_limited">Too many incorrect attempts. Wait a minute and try again.</string>
+    <string name="join_failed">Could not finish joining. Check your connection and try again.</string>
+    <string name="join_cache_failed">You joined, but the event could not be saved on this device. Refresh your events to try again.</string>
     <string name="create_progress_step">Step %1$d of %2$d</string>
     <string name="event_details">Event Details</string>
     <string name="create_event_name">Event name *</string>
@@ -162,4 +181,9 @@
     <string name="workspace_phase_active">Active now</string>
     <string name="workspace_phase_upcoming">Upcoming</string>
     <string name="workspace_phase_activate">Activate</string>
+    <string name="code_share_ready_message">Share this code with people joining your event.</string>
+    <string name="creation_submit_failed">Could not confirm event creation. Your draft is saved; retry with the same details.</string>
+    <string name="creation_cache_failed">Event created, but it could not be saved locally. Return to My Events to refresh.</string>
+    <string name="creation_invalid_schedule">Check the event details and schedule before creating.</string>
+    <string name="code_copied">Join code copied</string>
 </resources>

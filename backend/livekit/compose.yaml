@@ -1,7 +1,11 @@
 # Development only: LiveKit's --dev mode uses public, fixed test credentials.
 services:
   livekit:
-    image: livekit/livekit-server:v1.13.11
+    build: .
     network_mode: host
-    command:
-      - --dev
+    environment:
+      SYNCUP_SUPABASE_INTERNAL_URL: http://127.0.0.1:54321
+      SYNCUP_SUPABASE_PUBLISHABLE_KEY: ${SYNCUP_SUPABASE_PUBLISHABLE_KEY:-}
+      LIVEKIT_API_KEY: devkey
+      LIVEKIT_API_SECRET: secret
+      LIVEKIT_URL: ws://127.0.0.1:7883

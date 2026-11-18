@@ -1,16 +1,15 @@
 # Local LiveKit test server
 
-This configuration is for local development only. LiveKit development mode
-uses publicly known credentials and is not suitable for a public network or
-production deployment. It runs separately from the local Supabase stack.
-
-From this directory:
+This setup is for local development. Development credentials are public and the
+HTTP endpoints are not suitable for a public network or production use.
+Start local Supabase first, then from the project root run:
 
 ```bash
-docker compose up -d
+python3 backend/livekit/run_supervised_local.py
 ```
 
-Check and stop the server with:
+The script gets the local Supabase configuration and builds and starts the
+supervised LiveKit container. Manage it from `backend/livekit` with:
 
 ```bash
 docker compose ps
@@ -18,56 +17,31 @@ docker compose logs livekit
 docker compose down
 ```
 
-The signaling endpoint is `ws://127.0.0.1:7880` on the host. Host networking
-is used so WebRTC media traffic can reach the server without a large Docker
-port mapping. The development server defaults to loopback signaling; it is not
-configured for access from other devices. Phone testing needs a separately
-reviewed network configuration: forwarding the signaling port alone does not
-establish the WebRTC media path.
+The container runs the token service, speech controller, signaling gate and
+LiveKit together. If speech revocation cannot be confirmed, the supervisor
+stops the media server, disconnecting all rooms. The gate prevents clients from
+reconnecting using a token with publishing permission. Direct LiveKit signaling
+on port 7880 is for the local host only; do not forward it to clients.
 
-To test the host media path with the [LiveKit CLI](https://docs.livekit.io/reference/developer-tools/livekit-cli/):
-
-```bash
-lk --dev perf load-test --room syncup-test --audio-publishers 1 --subscribers 1 --duration 10s
-```
-
-This sends simulated silent packets between two clients on the computer; it
-does not exercise a microphone or prove phone connectivity. Do not run load
-tests against a shared or production service without authorization.
-
-The local token service checks the caller's Supabase session and channel
-membership before issuing a five-minute, listen-only token. Start it in a
-separate terminal after starting local Supabase and LiveKit:
+For Android debug builds, set `syncup.livekit.tokenUrl=http://127.0.0.1:54326`
+in the Git-ignored `local.properties`, then forward the local ports:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python run_token_server.py
-```
-
-The endpoint is `POST http://127.0.0.1:54326/livekit/token`. Supply the user's
-Supabase access token as a bearer token and JSON `{"channel_id":"<uuid>"}`.
-The response contains a LiveKit server URL, room token, and `expires_in`.
-The endpoint and LiveKit signaling URL are host-only by default. For Android
-debug builds, set `syncup.livekit.tokenUrl=http://127.0.0.1:54326` in the
-Git-ignored `local.properties`, then forward the token and signaling ports:
-
-```bash
+adb reverse tcp:54321 tcp:54321
 adb reverse tcp:54326 tcp:54326
-adb reverse tcp:7880 tcp:7880
+adb reverse tcp:7883 tcp:7883
 ```
 
-The WebRTC media path still needs the phone to reach the server's advertised
-LAN address and media ports; ADB reverse only forwards TCP signaling. Use a
-trusted local network and verify audio reception from a phone. Global and the
-selected channel use separate listen-only connections.
+The WebRTC media path also needs the phone to reach the server's advertised LAN
+address and media ports; ADB reverse only forwards TCP. Use a trusted local
+network. Global and the selected channel use separate listening connections.
 
-Test the service with `.venv/bin/python -m unittest discover -p 'test_*.py'`.
-LiveKit's development credentials stay on the server side. Do not embed the
-API secret in the Android app. This local service uses HTTP, fixed development
-credentials, and a loopback listener; it is not a production token service.
+The token endpoint is `POST http://127.0.0.1:54326/livekit/token`. The speech
+endpoints require the supervised controller. The older standalone
+`run_token_server.py` can issue listening tokens but cannot authorize speech.
 
-Membership is checked when a token is issued. A previously issued token can
-remain usable until it expires, and an already connected participant is not
-automatically disconnected if membership changes. Immediate revocation needs
-additional server-side connection management before production use.
+Run server tests with `python3 -m unittest discover -s backend/livekit -p
+'test_*.py'`. Membership is checked when a token is issued; immediate removal of
+already connected participants after membership changes requires additional
+server-side connection management. Production also needs private signaling,
+proper secrets, TLS, and a deployment designed for media availability.

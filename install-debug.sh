@@ -7,9 +7,9 @@ usage() {
     cat <<'HELP'
 Usage: ./install-debug.sh [device-serial]
 
-Build and install the debug app on one connected Android device.
+Build and install the debug app on every connected, authorized Android device.
 Verify the installed APK and restart the app after installation.
-Pass a serial or set ANDROID_SERIAL when more than one device is connected.
+Pass a serial to install only on that device.
 Run 'adb devices -l' to see available devices.
 HELP
 }
@@ -23,7 +23,7 @@ if (( $# > 1 )); then
     exit 2
 fi
 
-serial=${1:-${ANDROID_SERIAL:-}}
+serial=${1:-}
 
 # Android Studio often configures the SDK in local.properties without adding adb to PATH.
 if command -v adb >/dev/null 2>&1; then
@@ -55,15 +55,16 @@ if [[ -n $serial ]]; then
     fi
 else
     mapfile -t available < <(awk '$2 == "device" {print $1}' <<< "$devices")
-    if (( ${#available[@]} != 1 )); then
-        printf 'Error: expected one authorized device, found %s.\n%s\n' "${#available[@]}" "$devices" >&2
-        echo "Connect and authorize a device, or pass its serial when multiple devices are connected." >&2
+    if (( ${#available[@]} == 0 )); then
+        printf 'Error: no authorized devices found.\n%s\n' "$devices" >&2
         exit 1
     fi
-    serial=${available[0]}
+fi
+if [[ -n $serial ]]; then
+    available=("$serial")
 fi
 
-printf 'Building debug APK for device %s...\n' "$serial"
+printf 'Building debug APK for %s device(s)...\n' "${#available[@]}"
 ./gradlew :app:assembleDebug
 apk=app/build/outputs/apk/debug/app-debug.apk
 package=com.example.sync_up
@@ -72,33 +73,35 @@ if [[ ! -f $apk ]]; then
     exit 1
 fi
 
-printf 'Installing on %s...\n' "$serial"
-if ! "$adb_cmd" -s "$serial" install -r "$apk"; then
-    echo "Error: installation failed. Check the device's installation prompt and adb output above." >&2
-    echo "A signing-key conflict may require removing the existing app, which deletes its data." >&2
-    exit 1
-fi
-
-installed_path=$("$adb_cmd" -s "$serial" shell pm path "$package" | tr -d '\r' | sed -n 's/^package://p' | head -n 1)
-if [[ -z $installed_path ]]; then
-    echo "Error: installation reported success, but the installed APK could not be found." >&2
-    exit 1
-fi
 local_hash=$(sha256sum "$apk" | awk '{print $1}')
-if ! remote_hash=$("$adb_cmd" -s "$serial" shell sha256sum "$installed_path"); then
-    echo "Error: could not verify the installed APK on the device." >&2
+failures=0
+for serial in "${available[@]}"; do
+    printf 'Installing on %s...\n' "$serial"
+    if ! "$adb_cmd" -s "$serial" install --no-streaming -r "$apk"; then
+        echo "Error: installation failed on $serial. Check its installation prompt and signing key." >&2
+        failures=$((failures + 1))
+        continue
+    fi
+    installed_path=$("$adb_cmd" -s "$serial" shell pm path "$package" | tr -d '\r' | sed -n 's/^package://p' | head -n 1) || installed_path=
+    if [[ -z $installed_path ]] || ! remote_hash=$("$adb_cmd" -s "$serial" shell sha256sum "$installed_path"); then
+        echo "Error: could not verify the installed APK on $serial." >&2
+        failures=$((failures + 1))
+        continue
+    fi
+    remote_hash=${remote_hash%% *}
+    if [[ $local_hash != "$remote_hash" ]]; then
+        echo "Error: installed APK on $serial does not match the build." >&2
+        failures=$((failures + 1))
+        continue
+    fi
+    if ! "$adb_cmd" -s "$serial" shell am start -S -n "$package/.MainActivity"; then
+        echo "Error: the app could not be started on $serial." >&2
+        failures=$((failures + 1))
+        continue
+    fi
+    printf 'Installed, verified, and started on %s.\n' "$serial"
+done
+if (( failures > 0 )); then
+    printf 'Installation failed on %s device(s).\n' "$failures" >&2
     exit 1
 fi
-remote_hash=${remote_hash%% *}
-if [[ $local_hash != "$remote_hash" ]]; then
-    echo "Error: the installed APK does not match the APK built by Gradle." >&2
-    exit 1
-fi
-echo "Installed APK verified: $local_hash"
-
-printf 'Restarting SyncUp...\n'
-if ! "$adb_cmd" -s "$serial" shell am start -S -n "$package/.MainActivity"; then
-    echo "Error: the APK was installed, but the app could not be started." >&2
-    exit 1
-fi
-echo "Debug app installed, verified, and started successfully."

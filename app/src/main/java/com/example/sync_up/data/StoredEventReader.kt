@@ -19,7 +19,9 @@ internal class StoredEventReader(
         val name: String,
         val detail: String?,
         val isLeadPreview: Boolean,
-        val activePhase: String?
+        val activePhase: String?,
+        val isPreview: Boolean,
+        val isCreator: Boolean
     )
 
     data class Event(
@@ -29,18 +31,23 @@ internal class StoredEventReader(
         val channels: List<String>
     )
 
-    fun list(): List<Summary> {
+    fun list(userId: String? = null): List<Summary> {
         checkWorkerThread()
         val events = mutableListOf<Summary>()
         val sql = """
-            SELECT e.event_id, e.name, e.preview_detail, COALESCE(m.is_lead, 0), p.name
+            SELECT e.event_id, e.name, COALESCE(e.preview_detail, e.venue),
+                COALESCE(m.is_lead, 0), p.name, e.is_preview, e.creator_id
             FROM events e
             LEFT JOIN preview_metadata m ON m.event_id = e.event_id
             LEFT JOIN phases p ON p.phase_id = e.current_phase_id AND p.event_id = e.event_id
             WHERE e.creation_status = 'CREATED'
+              AND (e.is_preview = 1 OR EXISTS (
+                  SELECT 1 FROM shared_event_access a
+                  WHERE a.event_id = e.event_id AND a.user_id = ?
+              ))
             ORDER BY e.rowid
         """.trimIndent()
-        helper.readableDatabase.rawQuery(sql, null).use { cursor ->
+        helper.readableDatabase.rawQuery(sql, arrayOf(userId.orEmpty())).use { cursor ->
             while (cursor.moveToNext()) {
                 events.add(
                     Summary(
@@ -48,7 +55,9 @@ internal class StoredEventReader(
                         name = cursor.getString(1),
                         detail = cursor.getString(2),
                         isLeadPreview = cursor.getInt(3) == 1,
-                        activePhase = cursor.getString(4)
+                        activePhase = cursor.getString(4),
+                        isPreview = cursor.getInt(5) == 1,
+                        isCreator = userId != null && cursor.getString(6) == userId
                     )
                 )
             }
@@ -56,9 +65,9 @@ internal class StoredEventReader(
         return events
     }
 
-    fun load(id: String): Event? {
+    fun load(id: String, userId: String? = null): Event? {
         checkWorkerThread()
-        val summary = list().firstOrNull { it.id == id } ?: return null
+        val summary = list(userId).firstOrNull { it.id == id } ?: return null
         val db = helper.readableDatabase
         val phases = mutableListOf<String>()
         db.rawQuery("SELECT name FROM phases WHERE event_id = ? ORDER BY sequence_number", arrayOf(id)).use { cursor ->

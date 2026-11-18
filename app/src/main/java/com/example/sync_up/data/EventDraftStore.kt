@@ -24,7 +24,7 @@ internal class EventDraftStore(
     data class SavedDraft(val id: String, val step: Int, val draft: EventCreationDraft)
     data class DraftSummary(val id: String, val name: String, val step: Int)
 
-    fun save(id: String, step: Int, draft: EventCreationDraft) {
+    fun save(id: String, step: Int, draft: EventCreationDraft, userId: String? = null) {
         checkWorkerThread()
         require(step in 0..5)
         val db = helper.writableDatabase
@@ -44,6 +44,19 @@ internal class EventDraftStore(
                 event.put("event_id", id)
                 event.put("creation_status", "DRAFT")
                 db.insertOrThrow("events", null, event)
+            }
+            if (userId != null) {
+                db.rawQuery(
+                    "SELECT user_id FROM shared_event_access WHERE event_id = ? AND user_id != ? LIMIT 1",
+                    arrayOf(id, userId)
+                ).use { cursor ->
+                    check(!cursor.moveToFirst()) { "Draft belongs to another account" }
+                }
+                val owner = ContentValues().apply {
+                    put("event_id", id)
+                    put("user_id", userId)
+                }
+                db.insertWithOnConflict("shared_event_access", null, owner, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE)
             }
             val inputs = ContentValues().apply {
                 put("event_id", id)
@@ -153,12 +166,25 @@ internal class EventDraftStore(
         return SavedDraft(id, step, draft)
     }
 
-    fun list(): List<DraftSummary> {
+    fun claimUnownedDrafts(userId: String) {
+        checkWorkerThread()
+        helper.writableDatabase.execSQL(
+            """
+            INSERT INTO shared_event_access (event_id, user_id)
+            SELECT event_id, ? FROM events
+            WHERE creation_status = 'DRAFT' AND is_preview = 0
+                AND NOT EXISTS (SELECT 1 FROM shared_event_access WHERE shared_event_access.event_id = events.event_id)
+            """.trimIndent(),
+            arrayOf(userId)
+        )
+    }
+
+    fun list(userId: String? = null): List<DraftSummary> {
         checkWorkerThread()
         val drafts = mutableListOf<DraftSummary>()
         helper.readableDatabase.rawQuery(
-            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT' AND is_preview = 0 ORDER BY rowid DESC",
-            null
+            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT' AND is_preview = 0 AND (? IS NULL OR EXISTS (SELECT 1 FROM shared_event_access WHERE shared_event_access.event_id = events.event_id AND user_id = ?)) ORDER BY rowid DESC",
+            arrayOf(userId, userId)
         ).use { cursor ->
             while (cursor.moveToNext()) drafts.add(DraftSummary(cursor.getString(0), cursor.getString(1), cursor.getInt(2)))
         }

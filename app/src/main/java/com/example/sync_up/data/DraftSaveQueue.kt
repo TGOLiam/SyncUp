@@ -27,18 +27,27 @@ internal object DraftSaveQueue {
         }
     }
 
+    fun <T> updateShared(context: Context, operation: (SharedEventCache) -> T, callback: (Result<T>) -> Unit) {
+        val appContext = context.applicationContext
+        executor.execute {
+            val result = runCatching { SharedEventCache(appContext).use(operation) }
+            mainHandler.post { callback(result) }
+        }
+    }
+
     fun save(
         context: Context,
         id: String,
         step: Int,
         snapshot: EventCreationDraft,
+        userId: String? = null,
         onFailure: (Exception) -> Unit
     ) {
         val appContext = context.applicationContext
         executor.execute {
             try {
                 EventDraftStore(appContext).use { store ->
-                    store.save(id, step, snapshot)
+                    store.save(id, step, snapshot, userId)
                 }
             } catch (error: Exception) {
                 mainHandler.post { onFailure(error) }

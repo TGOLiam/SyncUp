@@ -159,6 +159,7 @@
 
                     <TextView
 
+                        android:id="@+id/workspace_reports"
                         android:layout_width="match_parent"
 
                         android:layout_height="wrap_content"
@@ -197,4 +198,4 @@
             app:cornerRadius="10dp" />
     </FrameLayout>
 
-    
+

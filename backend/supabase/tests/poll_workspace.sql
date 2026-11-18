@@ -31,6 +31,9 @@ BEGIN
     IF jsonb_array_length(snapshot->'locations') <> 1 OR snapshot->'phases' <> '[]'::jsonb THEN
         RAISE EXCEPTION 'Poll omitted workspace state';
     END IF;
+    IF snapshot->'locations'->0->>'name' <> 'Owner' THEN
+        RAISE EXCEPTION 'Poll omitted the member display name';
+    END IF;
     snapshot := public.poll_workspace('b2000000-0000-0000-0000-000000000001', ARRAY['b3000000-0000-0000-0000-000000000002'::uuid]);
     IF jsonb_array_length(snapshot->'messages') <> 20 OR snapshot->'messages'->0->>'text_content' <> 'History 6' THEN
         RAISE EXCEPTION 'Poll did not return the latest 20 messages in order';

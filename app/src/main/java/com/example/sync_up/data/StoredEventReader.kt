@@ -29,6 +29,7 @@ internal class StoredEventReader(
         val layout: DraftLayout?,
         val phases: List<String>,
         val phaseIds: List<String>,
+        val zoneIds: List<Pair<String, String>>,
         val channels: List<String>,
         val channelIds: Map<String, String>
     )
@@ -98,18 +99,20 @@ internal class StoredEventReader(
         }
         for (name in ambiguousNames) channelIds.remove(name)
         var layout: DraftLayout? = null
+        val zoneIds = mutableListOf<Pair<String, String>>()
         db.rawQuery("SELECT aspect_ratio, boundary_vertices_json FROM venue_layouts WHERE event_id = ?", arrayOf(id)).use { cursor ->
             if (cursor.moveToFirst()) {
                 val zones = mutableListOf<DraftZone>()
-                db.rawQuery("SELECT name, vertices_json FROM zones WHERE event_id = ? ORDER BY rowid", arrayOf(id)).use { zoneCursor ->
+                db.rawQuery("SELECT name, vertices_json, zone_id FROM zones WHERE event_id = ? ORDER BY rowid", arrayOf(id)).use { zoneCursor ->
                     while (zoneCursor.moveToNext()) {
                         zones.add(DraftZone(zoneCursor.getString(0), points(zoneCursor.getString(1))))
+                        zoneIds.add(zoneCursor.getString(2) to zoneCursor.getString(0))
                     }
                 }
                 layout = DraftLayout(cursor.getFloat(0), points(cursor.getString(1)), zones)
             }
         }
-        return Event(summary, layout, phases, phaseIds, channels, channelIds)
+        return Event(summary, layout, phases, phaseIds, zoneIds, channels, channelIds)
     }
 
     private fun points(json: String): List<DraftPoint> {

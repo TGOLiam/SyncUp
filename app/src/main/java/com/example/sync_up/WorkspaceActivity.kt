@@ -19,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -53,6 +54,7 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private var channelIds: Map<String, String> = emptyMap()
     private var phaseIds: List<String> = emptyList()
+    private var zoneIds: List<Pair<String, String>> = emptyList()
     private var pressHeld = false
     private var requestPending = false
     private var lease: Pair<String, String>? = null
@@ -97,9 +99,7 @@ class WorkspaceActivity : AppCompatActivity() {
         findViewById<View>(R.id.workspace_nav_area).setOnClickListener { showSection(0) }
         findViewById<View>(R.id.workspace_nav_comms).setOnClickListener { showSection(1) }
         findViewById<View>(R.id.workspace_nav_phases).setOnClickListener { showSection(2) }
-        findViewById<View>(R.id.workspace_report_location).setOnClickListener {
-            Toast.makeText(this, R.string.workspace_report_pending, Toast.LENGTH_SHORT).show()
-        }
+        findViewById<View>(R.id.workspace_report_location).setOnClickListener { reportLocation() }
         findViewById<View>(R.id.comms_send).setOnClickListener { sendTextMessage() }
         findViewById<View>(R.id.comms_push_to_talk).setOnTouchListener { _, motion ->
             when (motion.actionMasked) {
@@ -153,6 +153,7 @@ class WorkspaceActivity : AppCompatActivity() {
                         phaseIds = update.snapshot.phases.map { it.id }
                         findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
                         renderPhases()
+                        renderLocations(update.snapshot.locations)
                         loadMessages()
                     }
                 }
@@ -174,6 +175,7 @@ class WorkspaceActivity : AppCompatActivity() {
                 }
                 channelIds = stored.channelIds
                 phaseIds = stored.phaseIds
+                zoneIds = stored.zoneIds
                 event = EventListItem(
                     previewId = stored.summary.id,
                     isPreview = stored.summary.isPreview,
@@ -420,6 +422,7 @@ class WorkspaceActivity : AppCompatActivity() {
         findViewById<View>(R.id.workspace_phase_empty).visibility =
             if (phases.isEmpty()) View.VISIBLE else View.GONE
         val list = findViewById<LinearLayout>(R.id.workspace_phase_list)
+        list.removeAllViews()
         for ((index, phase) in phases.withIndex()) {
             val active = index == activeIndex
             val row = LinearLayout(this).apply {
@@ -664,6 +667,40 @@ class WorkspaceActivity : AppCompatActivity() {
                 button.isEnabled = true
             }
         }
+    }
+
+    private fun reportLocation() {
+        val current = event ?: return
+        if (current.isPreview) return
+        if (zoneIds.isEmpty()) {
+            Toast.makeText(this, R.string.location_no_zones, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        AlertDialog.Builder(this)
+            .setTitle(R.string.location_choose_zone)
+            .setItems(zoneIds.map { it.second }.toTypedArray()) { _, index ->
+                lifecycleScope.launch {
+                    try {
+                        SupabaseEventService(client).reportLocation(current.previewId, zoneIds[index].first)
+                        Toast.makeText(this@WorkspaceActivity, R.string.location_report_sent, Toast.LENGTH_SHORT).show()
+                    } catch (error: CancellationException) {
+                        throw error
+                    } catch (_: Exception) {
+                        Toast.makeText(this@WorkspaceActivity, R.string.location_report_failed, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+            .show()
+    }
+
+    private fun renderLocations(locations: List<com.example.sync_up.data.remote.WorkspaceLocation>) {
+        val reports = locations.mapNotNull { location ->
+            val zone = zoneIds.firstOrNull { it.first == location.zoneId }?.second ?: return@mapNotNull null
+            getString(R.string.location_report_entry, location.name ?: location.userId, zone)
+        }
+        findViewById<TextView>(R.id.workspace_reports).text =
+            if (reports.isEmpty()) getString(R.string.workspace_no_reports) else reports.joinToString("\n")
     }
 
     private fun loadMessages() {

@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 internal data class WorkspaceLocation(
     @SerialName("member_id") val memberId: String,
     @SerialName("user_id") val userId: String,
+    val name: String? = null,
     @SerialName("current_zone_id") val zoneId: String? = null,
     @SerialName("location_reported_at") val reportedAt: String? = null
 )

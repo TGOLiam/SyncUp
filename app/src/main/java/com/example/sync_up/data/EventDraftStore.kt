@@ -182,9 +182,16 @@ internal class EventDraftStore(
     fun list(userId: String? = null): List<DraftSummary> {
         checkWorkerThread()
         val drafts = mutableListOf<DraftSummary>()
+        val ownershipFilter = if (userId == null) {
+            ""
+        } else {
+            " AND EXISTS (SELECT 1 FROM shared_event_access WHERE shared_event_access.event_id = events.event_id AND user_id = ?)"
+        }
+        val arguments = userId?.let { arrayOf(it) }
         helper.readableDatabase.rawQuery(
-            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT' AND is_preview = 0 AND (? IS NULL OR EXISTS (SELECT 1 FROM shared_event_access WHERE shared_event_access.event_id = events.event_id AND user_id = ?)) ORDER BY rowid DESC",
-            arrayOf(userId, userId)
+            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT' AND is_preview = 0" +
+                ownershipFilter + " ORDER BY rowid DESC",
+            arguments
         ).use { cursor ->
             while (cursor.moveToNext()) drafts.add(DraftSummary(cursor.getString(0), cursor.getString(1), cursor.getInt(2)))
         }

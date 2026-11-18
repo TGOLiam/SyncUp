@@ -28,6 +28,7 @@ internal class StoredEventReader(
         val summary: Summary,
         val layout: DraftLayout?,
         val phases: List<String>,
+        val phaseIds: List<String>,
         val channels: List<String>,
         val channelIds: Map<String, String>
     )
@@ -71,9 +72,11 @@ internal class StoredEventReader(
         val summary = list(userId).firstOrNull { it.id == id } ?: return null
         val db = helper.readableDatabase
         val phases = mutableListOf<String>()
-        db.rawQuery("SELECT name FROM phases WHERE event_id = ? ORDER BY sequence_number", arrayOf(id)).use { cursor ->
+        val phaseIds = mutableListOf<String>()
+        db.rawQuery("SELECT name, phase_id FROM phases WHERE event_id = ? ORDER BY sequence_number", arrayOf(id)).use { cursor ->
             while (cursor.moveToNext()) {
                 phases.add(cursor.getString(0))
+                phaseIds.add(cursor.getString(1))
             }
         }
         val channels = mutableListOf<String>()
@@ -106,7 +109,7 @@ internal class StoredEventReader(
                 layout = DraftLayout(cursor.getFloat(0), points(cursor.getString(1)), zones)
             }
         }
-        return Event(summary, layout, phases, channels, channelIds)
+        return Event(summary, layout, phases, phaseIds, channels, channelIds)
     }
 
     private fun points(json: String): List<DraftPoint> {

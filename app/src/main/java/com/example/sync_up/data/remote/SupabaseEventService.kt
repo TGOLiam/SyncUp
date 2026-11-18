@@ -53,6 +53,14 @@ internal class SupabaseEventService(private val client: SupabaseClient) {
         return client.postgrest.rpc("poll_workspace", arguments).decodeAs()
     }
 
+    suspend fun activatePhase(eventId: String, phaseId: String) {
+        val arguments = buildJsonObject {
+            put("p_event_id", eventId)
+            put("p_phase_id", phaseId)
+        }
+        client.postgrest.rpc("activate_event_phase", arguments)
+    }
+
     suspend fun listEvents(): List<RemoteEventRow> {
         return client.from("events").select().decodeList()
     }

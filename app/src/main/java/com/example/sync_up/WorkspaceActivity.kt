@@ -52,6 +52,7 @@ class WorkspaceActivity : AppCompatActivity() {
     }
 
     private var channelIds: Map<String, String> = emptyMap()
+    private var phaseIds: List<String> = emptyList()
     private var pressHeld = false
     private var requestPending = false
     private var lease: Pair<String, String>? = null
@@ -149,6 +150,7 @@ class WorkspaceActivity : AppCompatActivity() {
                             workspacePhase = active?.name,
                             phases = update.snapshot.phases.map { it.name }
                         )
+                        phaseIds = update.snapshot.phases.map { it.id }
                         findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
                         renderPhases()
                         loadMessages()
@@ -171,6 +173,7 @@ class WorkspaceActivity : AppCompatActivity() {
                     return@readEvents
                 }
                 channelIds = stored.channelIds
+                phaseIds = stored.phaseIds
                 event = EventListItem(
                     previewId = stored.summary.id,
                     isPreview = stored.summary.isPreview,
@@ -449,13 +452,43 @@ class WorkspaceActivity : AppCompatActivity() {
                 button.isAllCaps = false
                 button.cornerRadius = dp(10)
                 button.setOnClickListener {
-                    Toast.makeText(this, R.string.phases_edit_placeholder, Toast.LENGTH_SHORT).show()
+                    activatePhase(index, button)
                 }
                 row.addView(button)
             }
             val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
             params.bottomMargin = dp(8)
             list.addView(row, params)
+        }
+    }
+
+    private fun activatePhase(index: Int, button: View) {
+        val current = event ?: return
+        val phaseId = phaseIds.getOrNull(index) ?: return
+        if (current.isPreview || !current.isLead) return
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        val userId = client.auth.currentUserOrNull()?.id ?: return
+        button.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                val service = SupabaseEventService(client)
+                service.activatePhase(current.previewId, phaseId)
+                val remote = service.loadEvent(current.previewId)
+                withContext(Dispatchers.IO) {
+                    com.example.sync_up.data.SharedEventCache(applicationContext).use { it.save(userId, remote) }
+                }
+                val active = remote.phases.firstOrNull { it.id == remote.event.currentPhaseId }
+                event = current.copy(workspacePhase = active?.name, phases = remote.phases.sortedBy { it.sequence }.map { it.name })
+                phaseIds = remote.phases.sortedBy { it.sequence }.map { it.id }
+                findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
+                renderPhases()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                Toast.makeText(this@WorkspaceActivity, R.string.phase_activate_failed, Toast.LENGTH_LONG).show()
+            } finally {
+                button.isEnabled = true
+            }
         }
     }
 

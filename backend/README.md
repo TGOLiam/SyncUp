@@ -35,6 +35,8 @@ publishable key from `npx supabase status`. The debug build permits HTTP to
 loopback only. Do not expose the local development stack to public traffic.
 The app requires a configured backend and an account to open the event list.
 
+For local live-audio server setup, see [livekit/README.md](livekit/README.md).
+
 For local voice validation, install FFmpeg and run the separate local service:
 
 ```bash

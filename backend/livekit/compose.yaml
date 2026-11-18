@@ -1,0 +1,7 @@
+# Development only: LiveKit's --dev mode uses public, fixed test credentials.
+services:
+  livekit:
+    image: livekit/livekit-server:v1.13.11
+    network_mode: host
+    command:
+      - --dev

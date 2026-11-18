@@ -33,6 +33,15 @@ internal class SupabaseEventService(private val client: SupabaseClient) {
         return client.postgrest.rpc("join_event", arguments).decodeSingle()
     }
 
+    suspend fun sendTextMessage(messageId: String, channelId: String, text: String): TextMessage {
+        val arguments = buildJsonObject {
+            put("p_message_id", messageId)
+            put("p_channel_id", channelId)
+            put("p_text", text)
+        }
+        return client.postgrest.rpc("send_text_message", arguments).decodeSingle()
+    }
+
     suspend fun listEvents(): List<RemoteEventRow> {
         return client.from("events").select().decodeList()
     }

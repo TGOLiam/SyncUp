@@ -26,37 +26,45 @@ internal class SyncUpDatabaseHelper(
         PreviewMetadataSchema.create(db)
         SharedEventCacheSchema.create(db)
         VoiceRecordingSchema.create(db)
+        TextMessageSchema.create(db)
         PreviewEventSeeder.seed(appContext, db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion == 1 && newVersion == 6) {
+        if (oldVersion == 1 && newVersion >= 6) {
             EventSetupSchema.create(db)
             DraftInputSchema.create(db)
             PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
             PreviewEventSeeder.seed(appContext, db)
-        } else if (oldVersion == 2 && newVersion == 6) {
+        } else if (oldVersion == 2 && newVersion >= 6) {
             DraftInputSchema.create(db)
             PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
             PreviewEventSeeder.addMissingMetadata(appContext, db)
-        } else if (oldVersion == 3 && newVersion == 6) {
+        } else if (oldVersion == 3 && newVersion >= 6) {
             PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
             PreviewEventSeeder.addMissingMetadata(appContext, db)
-        } else if (oldVersion == 4 && newVersion == 6) {
+        } else if (oldVersion == 4 && newVersion >= 6) {
             SharedEventCacheSchema.create(db)
-        } else if (oldVersion == 5 && newVersion == 6) {
+        } else if (oldVersion == 5 && newVersion >= 6) {
             // The version 5 schema already has shared-event access.
+        } else if (oldVersion == 6 && newVersion >= 7) {
+            // Version 6 already has voice recording metadata.
         } else {
             throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
         }
-        VoiceRecordingSchema.create(db)
+        if (oldVersion < 6) {
+            VoiceRecordingSchema.create(db)
+        }
+        if (oldVersion < 7) {
+            TextMessageSchema.create(db)
+        }
     }
 
     companion object {
         const val DATABASE_NAME = "syncup.db"
-        const val DATABASE_VERSION = 6
+        const val DATABASE_VERSION = 7
     }
 }

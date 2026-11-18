@@ -3,6 +3,7 @@ package com.example.sync_up
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.SystemClock
+import android.os.Build
 import android.view.MotionEvent
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -18,7 +19,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,6 +29,9 @@ import com.google.android.material.button.MaterialButton
 import com.example.sync_up.data.DraftSaveQueue
 import com.example.sync_up.data.VoiceRecordingStore
 import com.example.sync_up.audio.VoiceRecorder
+import com.example.sync_up.liveaudio.LiveAudioPreferences
+import com.example.sync_up.liveaudio.LiveAudioService
+import com.example.sync_up.liveaudio.LiveAudioSession
 import com.example.sync_up.data.remote.VoiceService
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +54,17 @@ class WorkspaceActivity : AppCompatActivity() {
     private var lease: Pair<String, String>? = null
     private var recordingStartedAt = 0L
     private var retryAfter = 0L
+    private var pendingAudioAction: (() -> Unit)? = null
+    private var automaticNotificationRequestMade = false
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        val action = pendingAudioAction
+        pendingAudioAction = null
+        if (granted && lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            action?.invoke()
+        } else if (!granted) {
+            Toast.makeText(this, R.string.live_audio_notification_required, Toast.LENGTH_LONG).show()
+        }
+    }
     private val microphonePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         Toast.makeText(this, if (granted) R.string.voice_hold_again else R.string.voice_permission_denied, Toast.LENGTH_LONG).show()
     }
@@ -85,6 +102,26 @@ class WorkspaceActivity : AppCompatActivity() {
             }
             true
         }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                LiveAudioSession.state.collect { state ->
+                    if (event?.isPreview == false) {
+                        connectedChannel = if (state.eventId == event?.previewId) {
+                            state.selectedId?.let { id ->
+                                channelIds.entries.firstOrNull { it.key.isNotEmpty() && it.value == id }?.key
+                            }
+                        } else {
+                            null
+                        }
+                        if (selectedChannel != globalChannel && selectedChannel != connectedChannel) {
+                            selectedChannel = globalChannel
+                        }
+                        renderChannels()
+                        renderConversation()
+                    }
+                }
+            }
+        }
         val eventId = intent.getStringExtra(EXTRA_EVENT_ID)
         if (eventId == null) {
             renderEvent()
@@ -117,7 +154,41 @@ class WorkspaceActivity : AppCompatActivity() {
                 }
                 renderEvent()
                 findViewById<View>(R.id.workspace_root).visibility = View.VISIBLE
+                ensureLiveListening()
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        ensureLiveListening()
+    }
+
+    private fun ensureLiveListening() {
+        val currentEvent = event ?: return
+        if (currentEvent.isPreview || !lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        if (LiveAudioSession.state.value.eventId == currentEvent.previewId) return
+        val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id ?: return
+        val global = channelIds[""] ?: return
+        val selection = LiveAudioPreferences(applicationContext).load(user, currentEvent.previewId)
+        if (!selection.globalEnabled && selection.selectedId == null) return
+        val permissionMissing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        if (permissionMissing && (automaticNotificationRequestMade || pendingAudioAction != null)) return
+        if (permissionMissing) automaticNotificationRequestMade = true
+        withNotificationPermission {
+            LiveAudioService.start(applicationContext, user, currentEvent.previewId, global)
+        }
+    }
+
+    private fun withNotificationPermission(action: () -> Unit) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        ) {
+            action()
+        } else {
+            pendingAudioAction = action
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
@@ -368,7 +439,23 @@ class WorkspaceActivity : AppCompatActivity() {
                 text = name
                 setTypeface(null, if (name == selectedChannel) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
             }
-            val connected = index == 0 || name == connectedChannel
+            val state = LiveAudioSession.state.value
+            val isShared = event?.isPreview == false
+            val id = channelIds[if (index == 0) "" else name]
+            val sameEvent = state.eventId == event?.previewId
+            val status = if (!isShared) {
+                if (index == 0 || name == connectedChannel) LiveAudioSession.Status.CONNECTED
+                else LiveAudioSession.Status.DISCONNECTED
+            } else if (!sameEvent) {
+                LiveAudioSession.Status.DISCONNECTED
+            } else if (index == 0) {
+                state.global
+            } else if (id == state.selectedId) {
+                state.selected
+            } else {
+                LiveAudioSession.Status.DISCONNECTED
+            }
+            val connected = status == LiveAudioSession.Status.CONNECTED
             row.findViewById<ImageButton>(R.id.comms_channel_call).apply {
                 imageTintList = ColorStateList.valueOf(
                     ContextCompat.getColor(this@WorkspaceActivity,
@@ -379,11 +466,33 @@ class WorkspaceActivity : AppCompatActivity() {
                     name
                 )
                 setOnClickListener {
-                    if (index != 0) {
-                        connectedChannel = if (connectedChannel == name) null else name
-                        selectedChannel = connectedChannel ?: globalChannel
-                        renderChannels()
-                        renderConversation()
+                    if (!isShared) {
+                        if (index != 0) {
+                            connectedChannel = if (connectedChannel == name) null else name
+                            selectedChannel = connectedChannel ?: globalChannel
+                            renderChannels()
+                            renderConversation()
+                        }
+                        return@setOnClickListener
+                    }
+                    val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+                    val eventId = event?.previewId
+                    val globalId = channelIds[""]
+                    if (user == null || eventId == null || globalId == null || id == null) {
+                        Toast.makeText(this@WorkspaceActivity, R.string.voice_channel_unavailable, Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    if (index == 0) {
+                        val enabled = if (sameEvent) state.global != LiveAudioSession.Status.DISCONNECTED else false
+                        withNotificationPermission {
+                            LiveAudioService.setGlobal(applicationContext, user, eventId, globalId, !enabled)
+                        }
+                    } else {
+                        val selected = if (sameEvent && state.selectedId == id) null else id
+                        withNotificationPermission {
+                            LiveAudioService.select(applicationContext, user, eventId, globalId, selected)
+                            selectedChannel = if (selected == null) globalChannel else name
+                        }
                     }
                 }
             }

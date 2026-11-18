@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.sync_up.data.DraftSaveQueue
+import com.example.sync_up.liveaudio.LiveAudioService
 import com.example.sync_up.data.remote.SupabaseClientFactory
 import com.example.sync_up.data.remote.SupabaseEventService
 import io.github.jan.supabase.auth.auth
@@ -147,6 +148,7 @@ class EventListActivity : AppCompatActivity() {
         val client = SupabaseClientFactory.get(applicationContext) ?: return
         lifecycleScope.launch {
             try {
+                LiveAudioService.disconnect(applicationContext)
                 client.auth.signOut()
                 startActivity(Intent(this@EventListActivity, AuthActivity::class.java))
                 finish()

@@ -196,4 +196,11 @@
     <string name="voice_connection_failed">Could not request permission to speak.</string>
     <string name="voice_sent">Voice message sent.</string>
     <string name="voice_send_failed">Could not send the recording.</string>
+    <string name="live_audio_notification_channel">Event listening</string>
+    <string name="live_audio_notification_title">SyncUp event listening</string>
+    <string name="live_audio_notification_text">Listening to your connected channels</string>
+    <string name="live_audio_notification_connecting">Connecting to live audio</string>
+    <string name="live_audio_notification_retrying">Live audio unavailable. Reconnecting…</string>
+    <string name="live_audio_disconnect">Disconnect</string>
+    <string name="live_audio_notification_required">Allow notifications to use background listening.</string>
 </resources>

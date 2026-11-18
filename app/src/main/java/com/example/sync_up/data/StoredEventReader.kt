@@ -28,7 +28,8 @@ internal class StoredEventReader(
         val summary: Summary,
         val layout: DraftLayout?,
         val phases: List<String>,
-        val channels: List<String>
+        val channels: List<String>,
+        val channelIds: Map<String, String>
     )
 
     fun list(userId: String? = null): List<Summary> {
@@ -76,11 +77,23 @@ internal class StoredEventReader(
             }
         }
         val channels = mutableListOf<String>()
-        db.rawQuery("SELECT name FROM channels WHERE event_id = ? AND channel_type != 'GLOBAL' ORDER BY rowid", arrayOf(id)).use { cursor ->
+        val channelIds = mutableMapOf<String, String>()
+        val ambiguousNames = mutableSetOf<String>()
+        db.rawQuery("SELECT channel_id, name, channel_type FROM channels WHERE event_id = ? ORDER BY rowid", arrayOf(id)).use { cursor ->
             while (cursor.moveToNext()) {
-                channels.add(cursor.getString(0))
+                val channelId = cursor.getString(0)
+                val name = cursor.getString(1)
+                val type = cursor.getString(2)
+                if (type == "GLOBAL") {
+                    channelIds[""] = channelId
+                } else {
+                    channels.add(name)
+                    if (channelIds.containsKey(name)) ambiguousNames.add(name)
+                    channelIds[name] = channelId
+                }
             }
         }
+        for (name in ambiguousNames) channelIds.remove(name)
         var layout: DraftLayout? = null
         db.rawQuery("SELECT aspect_ratio, boundary_vertices_json FROM venue_layouts WHERE event_id = ?", arrayOf(id)).use { cursor ->
             if (cursor.moveToFirst()) {
@@ -93,7 +106,7 @@ internal class StoredEventReader(
                 layout = DraftLayout(cursor.getFloat(0), points(cursor.getString(1)), zones)
             }
         }
-        return Event(summary, layout, phases, channels)
+        return Event(summary, layout, phases, channels, channelIds)
     }
 
     private fun points(json: String): List<DraftPoint> {

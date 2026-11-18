@@ -1,6 +1,19 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+// Gradle properties or environment variables supply the public project configuration.
+fun buildConfigString(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"")
+        .replace("\n", "\\n").replace("\r", "\\r") + "\""
+
+val supabaseUrl = providers.gradleProperty("syncup.supabase.url")
+    .orElse(providers.environmentVariable("SYNCUP_SUPABASE_URL"))
+    .orElse("")
+val supabasePublishableKey = providers.gradleProperty("syncup.supabase.publishableKey")
+    .orElse(providers.environmentVariable("SYNCUP_SUPABASE_PUBLISHABLE_KEY"))
+    .orElse("")
 
 android {
     namespace = "com.example.sync_up"
@@ -16,6 +29,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SUPABASE_URL", buildConfigString(supabaseUrl.get()))
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", buildConfigString(supabasePublishableKey.get()))
     }
 
     // Each feature supplies a standard Android resource directory with its own layout folder.
@@ -37,8 +52,12 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -48,6 +67,11 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.auth)
+    implementation(libs.supabase.postgrest)
+    implementation(libs.ktor.client.android)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

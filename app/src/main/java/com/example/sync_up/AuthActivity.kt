@@ -2,6 +2,7 @@ package com.example.sync_up
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.widget.EditText
@@ -105,7 +106,9 @@ class AuthActivity : AppCompatActivity() {
                 }
             } catch (error: CancellationException) {
                 throw error
-            } catch (_: Exception) {
+            } catch (error: Exception) {
+                // Log only the exception type; authentication details may contain credentials.
+                Log.w("SyncUpAuth", "Authentication failed: ${error.javaClass.name}")
                 showError(R.string.auth_failed)
             } finally {
                 submitting = false

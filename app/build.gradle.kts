@@ -1,19 +1,27 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Gradle properties or environment variables supply the public project configuration.
+// Local settings are ignored by Git and let Android Studio use the local test stack.
+val localConfig = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.isFile) file.inputStream().use { load(it) }
+}
+
+// Gradle properties or environment variables override machine-local settings.
 fun buildConfigString(value: String): String =
     "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"")
         .replace("\n", "\\n").replace("\r", "\\r") + "\""
 
 val supabaseUrl = providers.gradleProperty("syncup.supabase.url")
     .orElse(providers.environmentVariable("SYNCUP_SUPABASE_URL"))
-    .orElse("")
+    .orElse(localConfig.getProperty("syncup.supabase.url", ""))
 val supabasePublishableKey = providers.gradleProperty("syncup.supabase.publishableKey")
     .orElse(providers.environmentVariable("SYNCUP_SUPABASE_PUBLISHABLE_KEY"))
-    .orElse("")
+    .orElse(localConfig.getProperty("syncup.supabase.publishableKey", ""))
 
 android {
     namespace = "com.example.sync_up"
@@ -37,6 +45,7 @@ android {
     sourceSets.getByName("main").res.directories.addAll(
         listOf(
             "src/main/res-features/loading",
+            "src/main/res-features/auth",
             "src/main/res-features/event-list",
             "src/main/res-features/join-event",
             "src/main/res-features/create-event",
@@ -65,6 +74,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     implementation(platform(libs.supabase.bom))

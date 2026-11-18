@@ -18,10 +18,22 @@ includes secret development credentials; do not commit or share them.
 Stop the local stack with `npx supabase stop`. Check the CLI's current help
 before using any reset or no-backup options, which can delete local data.
 
-The Android app is not yet connected to the local stack. An emulator or phone
-needs a connection to the computer's API, and the app's debug configuration
-must permit local HTTP before that connection can be tested. The CLI development
-stack should not be exposed to public traffic.
+The Android app accepts `SYNCUP_SUPABASE_URL` and
+`SYNCUP_SUPABASE_PUBLISHABLE_KEY` as build environment variables (or the
+Gradle properties `syncup.supabase.url` and `syncup.supabase.publishableKey`).
+The same property names can be placed in the Git-ignored `local.properties`
+for Android Studio builds.
+Use only the publishable key, never the service-role or secret key. For a
+connected phone or emulator, route its loopback port to the local API:
+
+```bash
+adb reverse tcp:54321 tcp:54321
+```
+
+Build the debug app with the URL `http://127.0.0.1:54321` and the local
+publishable key from `npx supabase status`. The debug build permits HTTP to
+loopback only. Do not expose the local development stack to public traffic.
+The app requires a configured backend and an account to open the event list.
 
 The migrations define the shared SyncUp tables, automatic account profiles, and
 creator-only phase activation. Signup metadata must include a nonblank `name`.

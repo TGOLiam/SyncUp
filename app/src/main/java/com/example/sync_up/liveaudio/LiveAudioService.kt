@@ -157,6 +157,7 @@ internal class LiveAudioService : Service() {
                 room.events.events.collect { event ->
                     when (event) {
                         is RoomEvent.Connected -> {
+                            LiveAudioSession.attach(channelId, room)
                             connected.complete(Unit)
                             setStatus(channelId, LiveAudioSession.Status.CONNECTED)
                         }
@@ -183,6 +184,7 @@ internal class LiveAudioService : Service() {
             } catch (_: Exception) {
                 // Network and authorization failures are retried with a bounded delay.
             } finally {
+                LiveAudioSession.detach(channelId, room)
                 listener.cancel()
                 room.disconnect()
                 room.release()

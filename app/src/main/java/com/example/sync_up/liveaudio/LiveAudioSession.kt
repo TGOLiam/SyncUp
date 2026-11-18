@@ -1,6 +1,7 @@
 package com.example.sync_up.liveaudio
 
 import android.content.Context
+import io.livekit.android.room.Room
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -16,12 +17,23 @@ internal object LiveAudioSession {
         val selected: Status = Status.DISCONNECTED
     )
 
+    private val rooms = mutableMapOf<String, Room>()
     private val mutableState = MutableStateFlow(State())
     val state: StateFlow<State> = mutableState
 
     fun set(value: State) {
         mutableState.value = value
     }
+
+    fun attach(channelId: String, room: Room) {
+        rooms[channelId] = room
+    }
+
+    fun detach(channelId: String, room: Room) {
+        if (rooms[channelId] === room) rooms.remove(channelId)
+    }
+
+    fun room(channelId: String): Room? = rooms[channelId]
 }
 
 /** Remembers explicit disconnections and the selected channel per account and event. */

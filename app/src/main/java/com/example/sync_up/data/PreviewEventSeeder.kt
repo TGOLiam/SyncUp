@@ -30,6 +30,7 @@ internal object PreviewEventSeeder {
             if (db.insertWithOnConflict("events", null, eventValues, SQLiteDatabase.CONFLICT_IGNORE) == -1L) {
                 continue
             }
+            insertMetadata(db, eventId, event.isLead)
             draft.layout?.let { layout ->
                 db.insertOrThrow("venue_layouts", null, ContentValues().apply {
                     put("event_id", eventId)
@@ -75,6 +76,24 @@ internal object PreviewEventSeeder {
                 })
             }
         }
+    }
+
+    /** Populate metadata for previews created by earlier database versions. */
+    fun addMissingMetadata(context: Context, db: SQLiteDatabase) {
+        for (event in PreviewEvents.load(context)) {
+            val eventId = previewId("event-${event.previewId}")
+            db.rawQuery("SELECT 1 FROM events WHERE event_id = ? AND is_preview = 1", arrayOf(eventId)).use { cursor ->
+                if (cursor.moveToFirst()) insertMetadata(db, eventId, event.isLead)
+            }
+        }
+    }
+
+    private fun insertMetadata(db: SQLiteDatabase, eventId: String, isLead: Boolean) {
+        val values = ContentValues().apply {
+            put("event_id", eventId)
+            put("is_lead", if (isLead) 1 else 0)
+        }
+        db.insertWithOnConflict("preview_metadata", null, values, SQLiteDatabase.CONFLICT_IGNORE)
     }
 
     private fun previewId(value: String): String {

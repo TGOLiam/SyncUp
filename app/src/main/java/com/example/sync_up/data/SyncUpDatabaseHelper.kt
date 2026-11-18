@@ -23,16 +23,23 @@ internal class SyncUpDatabaseHelper(
     override fun onCreate(db: SQLiteDatabase) {
         EventSetupSchema.create(db)
         DraftInputSchema.create(db)
+        PreviewMetadataSchema.create(db)
         PreviewEventSeeder.seed(appContext, db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        if (oldVersion == 1 && newVersion == 3) {
+        if (oldVersion == 1 && newVersion == 4) {
             EventSetupSchema.create(db)
             DraftInputSchema.create(db)
+            PreviewMetadataSchema.create(db)
             PreviewEventSeeder.seed(appContext, db)
-        } else if (oldVersion == 2 && newVersion == 3) {
+        } else if (oldVersion == 2 && newVersion == 4) {
             DraftInputSchema.create(db)
+            PreviewMetadataSchema.create(db)
+            PreviewEventSeeder.addMissingMetadata(appContext, db)
+        } else if (oldVersion == 3 && newVersion == 4) {
+            PreviewMetadataSchema.create(db)
+            PreviewEventSeeder.addMissingMetadata(appContext, db)
         } else {
             throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
         }
@@ -40,6 +47,6 @@ internal class SyncUpDatabaseHelper(
 
     companion object {
         const val DATABASE_NAME = "syncup.db"
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 4
     }
 }

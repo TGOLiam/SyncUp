@@ -19,6 +19,14 @@ internal object DraftSaveQueue {
         }
     }
 
+    fun <T> readEvents(context: Context, operation: (StoredEventReader) -> T, callback: (Result<T>) -> Unit) {
+        val appContext = context.applicationContext
+        executor.execute {
+            val result = runCatching { StoredEventReader(appContext).use(operation) }
+            mainHandler.post { callback(result) }
+        }
+    }
+
     fun save(
         context: Context,
         id: String,

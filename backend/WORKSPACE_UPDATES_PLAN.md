@@ -24,16 +24,22 @@
 
 ## Reviewable phases
 
-1. Define and test the server contract for one polling cycle, including
-   authorization, connected-channel message selection, deterministic message
-   ordering, and recovery after an interrupted request.
-2. Add confirmed text sending and local message caching. Repeated requests must
+1. **Implemented:** Define and test the server contract for one polling cycle,
+   including authorization, connected-channel message selection, and
+   deterministic message ordering.
+2. **Implemented:** Add confirmed text sending and local message caching. Repeated requests must
    not create duplicate messages.
-3. Connect creator-only phase activation and refresh the confirmed phase in the
+3. **Implemented:** Connect creator-only phase activation and refresh the confirmed phase in the
    local event cache.
-4. Connect location reporting to the current member's zone and report time.
-5. Add the shared foreground/background polling lifecycle, update the workspace
+4. **Implemented:** Connect location reporting to the current member's zone and report time.
+5. **Implemented:** Add the shared foreground/background polling lifecycle, update the workspace
    from cached results, and deliver new-message notifications without creating
    one notification per message.
-6. Test two-device synchronization, channel changes, reconnects, permissions,
-   duplicate prevention, and background behavior.
+6. **Still to verify on devices:** Two-device synchronization, channel changes,
+   reconnects, notification permissions, and background behavior. An isolated
+   two-account HTTP test covered sending, retrying, phase activation, location
+   reporting, and polling; the phone's Android test suite also passed.
+
+The poll returns a recent snapshot of at most 20 messages per channel. If more
+than 20 messages arrive between successful polls, older messages can be missed;
+the current endpoint does not provide paginated recovery.

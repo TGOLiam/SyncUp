@@ -2,6 +2,8 @@ package com.example.sync_up
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -14,6 +16,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -21,6 +24,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.example.sync_up.data.DraftSaveQueue
+import com.example.sync_up.data.remote.SupabaseClientFactory
+import com.example.sync_up.data.remote.SupabaseEventService
+import com.example.sync_up.data.remote.EventRequestMapper
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
+import java.time.ZoneId
+import io.github.jan.supabase.auth.auth
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -40,6 +51,9 @@ class CreateEventActivity : AppCompatActivity() {
     private val channels = mutableListOf<String>()
     private var step = 0
     private lateinit var draftId: String
+    private var submitting = false
+    private var createdEventId: String? = null
+    private var joinCode: String? = null
     private val sections = intArrayOf(
         R.id.creation_details, R.id.creation_venue, R.id.creation_phases,
         R.id.creation_channels, R.id.creation_review, R.id.creation_code
@@ -50,6 +64,8 @@ class CreateEventActivity : AppCompatActivity() {
         draftId = savedInstanceState?.getString("draft_id")
             ?: intent.getStringExtra(EXTRA_DRAFT_ID)
             ?: UUID.randomUUID().toString()
+        createdEventId = savedInstanceState?.getString("created_event_id")
+        joinCode = savedInstanceState?.getString("join_code")
         setContentView(R.layout.activity_creation_workspace)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.creation_workspace_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -103,6 +119,11 @@ class CreateEventActivity : AppCompatActivity() {
             CreateEventProgress.show(this, findViewById(sections[index]), index + 1, titles[index])
         }
         bindActions(drawing)
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                goBack()
+            }
+        })
         showStep(
             savedInstanceState?.getInt("creation_step") ?: intent.getIntExtra(EXTRA_DRAFT_STEP, 0),
             save = false
@@ -119,18 +140,22 @@ class CreateEventActivity : AppCompatActivity() {
         findViewById<View>(R.id.phases_next_button).setOnClickListener { if (validatePhases()) showStep(3) }
         findViewById<View>(R.id.channels_review_button).setOnClickListener { showStep(4) }
         findViewById<View>(R.id.review_create_button).setOnClickListener {
-            // Submission requires the backend; keep the saved draft editable for now.
-            saveDraft()
-            persistDraft()
-            Toast.makeText(this, R.string.creation_requires_backend, Toast.LENGTH_LONG).show()
+            submitEvent()
         }
         findViewById<View>(R.id.review_edit_details).setOnClickListener { showStep(0) }
         bindReviewSection(R.id.review_venue_section, R.string.review_venue_title, 1)
         bindReviewSection(R.id.review_phases_section, R.string.review_phases_title, 2)
         bindReviewSection(R.id.review_channels_section, R.string.review_channels_title, 3)
         findViewById<View>(R.id.code_share_open_workspace).setOnClickListener {
-            saveDraft()
-            startActivity(Intent(this, WorkspaceActivity::class.java))
+            val eventId = createdEventId ?: return@setOnClickListener
+            startActivity(Intent(this, WorkspaceActivity::class.java).putExtra(WorkspaceActivity.EXTRA_EVENT_ID, eventId))
+            finish()
+        }
+        findViewById<View>(R.id.code_share_copy).setOnClickListener {
+            val code = joinCode ?: return@setOnClickListener
+            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.code_share_title), code))
+            Toast.makeText(this, R.string.code_copied, Toast.LENGTH_SHORT).show()
         }
         findViewById<View>(R.id.add_phase_button).setOnClickListener { showPhaseDialog(null) }
         findViewById<View>(R.id.add_channel_button).setOnClickListener { showChannelDialog() }
@@ -169,24 +194,29 @@ class CreateEventActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.creation_title).setText(if (step == 5) R.string.code_share_title else R.string.create_event)
         findViewById<TextView>(R.id.phases_event_date).text = EventCreationSession.draft.startDate
         if (step == 4) updateReview()
-        if (step == 5) findViewById<TextView>(R.id.code_share_event_name).text = getString(R.string.code_share_event_ready, EventCreationSession.draft.name)
+        if (step == 5) {
+            findViewById<TextView>(R.id.code_share_event_name).text = getString(R.string.code_share_event_ready, EventCreationSession.draft.name)
+            findViewById<TextView>(R.id.code_share_value).text = joinCode.orEmpty()
+        }
     }
 
     private fun goBack() {
-        if (step == 0) finish() else showStep(step - 1)
+        if (submitting) return
+        if (step == 0 || createdEventId != null) finish() else showStep(step - 1)
     }
 
-    @Deprecated("Deprecated in Android")
-    override fun onBackPressed() { goBack() }
-
     override fun onPause() {
-        saveDraft()
-        persistDraft()
+        if (!submitting && createdEventId == null) {
+            saveDraft()
+            persistDraft()
+        }
         super.onPause()
     }
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt("creation_step", step)
         outState.putString("draft_id", draftId)
+        outState.putString("created_event_id", createdEventId)
+        outState.putString("join_code", joinCode)
         outState.putStringArrayList("phase_labels", ArrayList(phases.map { it.label }))
         outState.putIntegerArrayList("phase_hours", ArrayList(phases.map { it.hours }))
         outState.putIntegerArrayList("phase_minutes", ArrayList(phases.map { it.minutes }))
@@ -218,9 +248,9 @@ class CreateEventActivity : AppCompatActivity() {
         draft.channels.addAll(channels)
     }
 
-    private fun persistDraft() {
+    private fun draftSnapshot(): EventCreationDraft {
         val draft = EventCreationSession.draft
-        val snapshot = EventCreationDraft().apply {
+        return EventCreationDraft().apply {
             name = draft.name
             venue = draft.venue
             startDate = draft.startDate
@@ -242,11 +272,86 @@ class CreateEventActivity : AppCompatActivity() {
             phases.addAll(draft.phases)
             channels.addAll(draft.channels)
         }
+    }
+
+    private fun persistDraft() {
+        val snapshot = draftSnapshot()
         val activity = WeakReference(this)
-        DraftSaveQueue.save(applicationContext, draftId, step, snapshot) {
+        val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+        DraftSaveQueue.save(applicationContext, draftId, step, snapshot, userId) {
             activity.get()?.let { current ->
                 if (!current.isFinishing && !current.isDestroyed) {
                     Toast.makeText(current, R.string.draft_save_failed, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun submitEvent() {
+        if (submitting || createdEventId != null) return
+        if (!validateDetails() || !validatePhases()) {
+            Toast.makeText(this, R.string.creation_invalid_schedule, Toast.LENGTH_LONG).show()
+            return
+        }
+        val client = SupabaseClientFactory.get(applicationContext)
+        val userId = client?.auth?.currentUserOrNull()?.id
+        if (client == null || userId == null) {
+            Toast.makeText(this, R.string.creation_submit_failed, Toast.LENGTH_LONG).show()
+            return
+        }
+        saveDraft()
+        val snapshot = draftSnapshot()
+        val arguments = try {
+            EventRequestMapper.createArguments(draftId, snapshot, ZoneId.systemDefault())
+        } catch (_: Exception) {
+            Toast.makeText(this, R.string.creation_invalid_schedule, Toast.LENGTH_LONG).show()
+            return
+        }
+        submitting = true
+        findViewById<View>(R.id.review_create_button).isEnabled = false
+        // Save the exact request before sending it, so a lost response can be retried.
+        DraftSaveQueue.read(applicationContext, { store ->
+            store.save(draftId, step, snapshot, userId)
+        }) { saved ->
+            if (isFinishing || isDestroyed) return@read
+            if (saved.isFailure) {
+                submitting = false
+                findViewById<View>(R.id.review_create_button).isEnabled = true
+                Toast.makeText(this, R.string.draft_save_failed, Toast.LENGTH_LONG).show()
+                return@read
+            }
+            lifecycleScope.launch {
+                val service = SupabaseEventService(client)
+                val created = try {
+                    service.createEvent(arguments)
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    submitting = false
+                    findViewById<View>(R.id.review_create_button).isEnabled = true
+                    Toast.makeText(this@CreateEventActivity, R.string.creation_submit_failed, Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                try {
+                    val event = service.loadEvent(created.eventId)
+                    DraftSaveQueue.updateShared(applicationContext, { cache -> cache.save(userId, event) }) { result ->
+                        if (isFinishing || isDestroyed) return@updateShared
+                        submitting = false
+                        if (result.isSuccess) {
+                            createdEventId = created.eventId
+                            joinCode = created.joinCode
+                            showStep(5, save = false)
+                        } else {
+                            Toast.makeText(this@CreateEventActivity, R.string.creation_cache_failed, Toast.LENGTH_LONG).show()
+                            finish()
+                        }
+                    }
+                } catch (error: CancellationException) {
+                    throw error
+                } catch (_: Exception) {
+                    submitting = false
+                    Toast.makeText(this@CreateEventActivity, R.string.creation_cache_failed, Toast.LENGTH_LONG).show()
+                    finish()
                 }
             }
         }

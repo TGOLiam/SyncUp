@@ -23,4 +23,14 @@ needs a connection to the computer's API, and the app's debug configuration
 must permit local HTTP before that connection can be tested. The CLI development
 stack should not be exposed to public traffic.
 
-SyncUp tables, policies, and migrations have not been added yet.
+The migrations define the shared SyncUp tables and creator-only phase
+activation. Row-level security is enabled on the shared tables, but general
+client access policies have not been added yet. As a result, the Android app
+cannot read or write these tables through the Data API yet.
+
+To apply new migrations to the local stack, run `npx supabase migration up`
+from this directory. The schema test uses temporary rows and rolls them back:
+
+```bash
+docker exec -i supabase_db_backend psql -U postgres -d postgres -v ON_ERROR_STOP=1 < supabase/tests/shared_entities.sql
+```

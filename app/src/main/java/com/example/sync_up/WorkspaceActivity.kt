@@ -1,5 +1,9 @@
 package com.example.sync_up
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.SystemClock
+import android.view.MotionEvent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,12 +16,22 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import com.example.sync_up.data.DraftSaveQueue
+import com.example.sync_up.data.VoiceRecordingStore
+import com.example.sync_up.audio.VoiceRecorder
+import com.example.sync_up.data.remote.VoiceService
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 import com.example.sync_up.data.remote.SupabaseClientFactory
 import io.github.jan.supabase.auth.auth
 
@@ -27,6 +41,16 @@ class WorkspaceActivity : AppCompatActivity() {
         const val EXTRA_EVENT_ID = "event_id"
     }
 
+    private val recorder by lazy { VoiceRecorder(applicationContext) }
+    private var channelIds: Map<String, String> = emptyMap()
+    private var pressHeld = false
+    private var requestPending = false
+    private var lease: Pair<String, String>? = null
+    private var recordingStartedAt = 0L
+    private var retryAfter = 0L
+    private val microphonePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        Toast.makeText(this, if (granted) R.string.voice_hold_again else R.string.voice_permission_denied, Toast.LENGTH_LONG).show()
+    }
     private var selectedChannel = ""
     private var connectedChannel: String? = null
     private val globalChannel by lazy { getString(R.string.channel_global) }
@@ -53,7 +77,14 @@ class WorkspaceActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.workspace_report_pending, Toast.LENGTH_SHORT).show()
         }
         findViewById<View>(R.id.comms_send).setOnClickListener { showUnavailable() }
-        findViewById<View>(R.id.comms_push_to_talk).setOnClickListener { showUnavailable() }
+        findViewById<View>(R.id.comms_push_to_talk).setOnTouchListener { _, motion ->
+            when (motion.actionMasked) {
+                MotionEvent.ACTION_DOWN -> startPushToTalk()
+                MotionEvent.ACTION_UP -> finishPushToTalk()
+                MotionEvent.ACTION_CANCEL -> cancelPushToTalk()
+            }
+            true
+        }
         val eventId = intent.getStringExtra(EXTRA_EVENT_ID)
         if (eventId == null) {
             renderEvent()
@@ -68,6 +99,7 @@ class WorkspaceActivity : AppCompatActivity() {
                     finish()
                     return@readEvents
                 }
+                channelIds = stored.channelIds
                 event = EventListItem(
                     previewId = stored.summary.id,
                     isPreview = stored.summary.isPreview,
@@ -87,6 +119,121 @@ class WorkspaceActivity : AppCompatActivity() {
                 findViewById<View>(R.id.workspace_root).visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun startPushToTalk() {
+        if (requestPending || lease != null) return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            microphonePermission.launch(Manifest.permission.RECORD_AUDIO)
+            return
+        }
+        if (SystemClock.elapsedRealtime() < retryAfter) {
+            Toast.makeText(this, R.string.voice_wait_before_retry, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val client = SupabaseClientFactory.get(applicationContext)
+        val currentEvent = event
+        val channelId = channelIds[if (selectedChannel == globalChannel) "" else selectedChannel]
+        if (client == null || currentEvent == null || currentEvent.isPreview || channelId == null) {
+            Toast.makeText(this, R.string.voice_channel_unavailable, Toast.LENGTH_LONG).show()
+            return
+        }
+        val token = UUID.randomUUID().toString()
+        pressHeld = true
+        requestPending = true
+        val service = VoiceService(client)
+        lifecycleScope.launch {
+            try {
+                val granted = service.request(channelId, token)
+                if (!granted) {
+                    retryAfter = SystemClock.elapsedRealtime() + 3000
+                    if (pressHeld) Toast.makeText(this@WorkspaceActivity, R.string.voice_channel_busy, Toast.LENGTH_SHORT).show()
+                    pressHeld = false
+                } else if (!pressHeld || isFinishing || isDestroyed) {
+                    service.release(channelId, token)
+                } else {
+                    lease = channelId to token
+                    try {
+                        recorder.start { if (recorder.isRecording) finishPushToTalk() }
+                        recordingStartedAt = SystemClock.elapsedRealtime()
+                        findViewById<MaterialButton>(R.id.comms_push_to_talk).setText(R.string.voice_recording)
+                    } catch (_: Exception) {
+                        lease = null
+                        pressHeld = false
+                        service.release(channelId, token)
+                        Toast.makeText(this@WorkspaceActivity, R.string.voice_recording_failed, Toast.LENGTH_LONG).show()
+                    }
+                }
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                pressHeld = false
+                Toast.makeText(this@WorkspaceActivity, R.string.voice_connection_failed, Toast.LENGTH_LONG).show()
+            } finally {
+                requestPending = false
+            }
+        }
+    }
+
+    private fun finishPushToTalk() {
+        pressHeld = false
+        val activeLease = lease ?: return
+        lease = null
+        val duration = (SystemClock.elapsedRealtime() - recordingStartedAt).coerceIn(1, 10000).toInt()
+        val recording = recorder.stop()
+        renderConversation()
+        val client = SupabaseClientFactory.get(applicationContext) ?: run { recording?.delete(); return }
+        val userId = client.auth.currentUserOrNull()?.id
+        val eventId = event?.previewId
+        val service = VoiceService(client)
+        lifecycleScope.launch {
+            try {
+                if (recording == null || userId == null || eventId == null) {
+                    recording?.delete()
+                    service.release(activeLease.first, activeLease.second)
+                    Toast.makeText(this@WorkspaceActivity, R.string.voice_recording_failed, Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                val messageId = UUID.randomUUID().toString()
+                val file = withContext(Dispatchers.IO) {
+                    VoiceRecordingStore(applicationContext).use {
+                        it.save(messageId, eventId, activeLease.first, userId, recording, duration)
+                    }
+                }
+                service.upload(activeLease.first, activeLease.second, messageId, file)
+                Toast.makeText(this@WorkspaceActivity, R.string.voice_sent, Toast.LENGTH_SHORT).show()
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                try {
+                    service.release(activeLease.first, activeLease.second)
+                } catch (_: Exception) {
+                    // The server also expires abandoned leases automatically.
+                }
+                Toast.makeText(this@WorkspaceActivity, R.string.voice_send_failed, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun cancelPushToTalk() {
+        pressHeld = false
+        val activeLease = lease ?: return
+        lease = null
+        recorder.cancel()
+        renderConversation()
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        lifecycleScope.launch {
+            try {
+                VoiceService(client).release(activeLease.first, activeLease.second)
+            } catch (_: Exception) {
+                // The server also expires abandoned leases automatically.
+            }
+        }
+    }
+
+    override fun onPause() {
+        cancelPushToTalk()
+        super.onPause()
     }
 
     private fun renderEvent() {

@@ -186,4 +186,14 @@
     <string name="creation_cache_failed">Event created, but it could not be saved locally. Return to My Events to refresh.</string>
     <string name="creation_invalid_schedule">Check the event details and schedule before creating.</string>
     <string name="code_copied">Join code copied</string>
+    <string name="voice_hold_again">Microphone enabled. Hold the button again to speak.</string>
+    <string name="voice_permission_denied">Microphone permission is needed to record voice.</string>
+    <string name="voice_wait_before_retry">Wait a moment before trying again.</string>
+    <string name="voice_channel_unavailable">Voice is unavailable for this channel.</string>
+    <string name="voice_channel_busy">Someone is speaking. Try again in 3 seconds.</string>
+    <string name="voice_recording">Recording… release to send</string>
+    <string name="voice_recording_failed">Could not record audio. Try again.</string>
+    <string name="voice_connection_failed">Could not request permission to speak.</string>
+    <string name="voice_sent">Voice message sent.</string>
+    <string name="voice_send_failed">Could not send the recording.</string>
 </resources>

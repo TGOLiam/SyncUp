@@ -23,6 +23,10 @@ val supabasePublishableKey = providers.gradleProperty("syncup.supabase.publishab
     .orElse(providers.environmentVariable("SYNCUP_SUPABASE_PUBLISHABLE_KEY"))
     .orElse(localConfig.getProperty("syncup.supabase.publishableKey", ""))
 
+val voiceServiceUrl = providers.gradleProperty("syncup.voice.url")
+    .orElse(providers.environmentVariable("SYNCUP_VOICE_URL"))
+    .orElse(localConfig.getProperty("syncup.voice.url", ""))
+
 android {
     namespace = "com.example.sync_up"
     compileSdk {
@@ -37,6 +41,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "VOICE_SERVICE_URL", buildConfigString(voiceServiceUrl.get()))
         buildConfigField("String", "SUPABASE_URL", buildConfigString(supabaseUrl.get()))
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", buildConfigString(supabasePublishableKey.get()))
     }

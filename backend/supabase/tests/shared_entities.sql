@@ -1,15 +1,10 @@
 -- Run as the local postgres administrator. All fixtures are rolled back.
 BEGIN;
 
-INSERT INTO auth.users (id, aud, role, email)
+INSERT INTO auth.users (id, aud, role, email, raw_user_meta_data)
 VALUES
-    ('10000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'creator@example.test'),
-    ('10000000-0000-0000-0000-000000000002', 'authenticated', 'authenticated', 'member@example.test');
-
-INSERT INTO public.users (user_id, name, email)
-VALUES
-    ('10000000-0000-0000-0000-000000000001', 'Creator', 'creator@example.test'),
-    ('10000000-0000-0000-0000-000000000002', 'Member', 'member@example.test');
+    ('10000000-0000-0000-0000-000000000001', 'authenticated', 'authenticated', 'creator@example.test', '{"name":"Creator"}'),
+    ('10000000-0000-0000-0000-000000000002', 'authenticated', 'authenticated', 'member@example.test', '{"name":"Member"}');
 
 INSERT INTO public.events (event_id, creator_id, name, venue, start_at, end_at)
 VALUES (

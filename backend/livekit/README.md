@@ -48,8 +48,19 @@ python3 -m venv .venv
 The endpoint is `POST http://127.0.0.1:54326/livekit/token`. Supply the user's
 Supabase access token as a bearer token and JSON `{"channel_id":"<uuid>"}`.
 The response contains a LiveKit server URL, room token, and `expires_in`.
-The endpoint and LiveKit signaling URL are host-only during this phase; the
-Android app is not connected yet.
+The endpoint and LiveKit signaling URL are host-only by default. For Android
+debug builds, set `syncup.livekit.tokenUrl=http://127.0.0.1:54326` in the
+Git-ignored `local.properties`, then forward the token and signaling ports:
+
+```bash
+adb reverse tcp:54326 tcp:54326
+adb reverse tcp:7880 tcp:7880
+```
+
+The WebRTC media path still needs the phone to reach the server's advertised
+LAN address and media ports; ADB reverse only forwards TCP signaling. Use a
+trusted local network and verify audio reception from a phone. Global and the
+selected channel use separate listen-only connections.
 
 Test the service with `.venv/bin/python -m unittest discover -p 'test_*.py'`.
 LiveKit's development credentials stay on the server side. Do not embed the

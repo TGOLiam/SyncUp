@@ -27,6 +27,10 @@ val voiceServiceUrl = providers.gradleProperty("syncup.voice.url")
     .orElse(providers.environmentVariable("SYNCUP_VOICE_URL"))
     .orElse(localConfig.getProperty("syncup.voice.url", ""))
 
+val liveKitTokenUrl = providers.gradleProperty("syncup.livekit.tokenUrl")
+    .orElse(providers.environmentVariable("SYNCUP_LIVEKIT_TOKEN_URL"))
+    .orElse(localConfig.getProperty("syncup.livekit.tokenUrl", ""))
+
 android {
     namespace = "com.example.sync_up"
     compileSdk {
@@ -41,6 +45,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "LIVEKIT_TOKEN_URL", buildConfigString(liveKitTokenUrl.get()))
         buildConfigField("String", "VOICE_SERVICE_URL", buildConfigString(voiceServiceUrl.get()))
         buildConfigField("String", "SUPABASE_URL", buildConfigString(supabaseUrl.get()))
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", buildConfigString(supabasePublishableKey.get()))
@@ -86,6 +91,7 @@ dependencies {
     implementation(libs.supabase.auth)
     implementation(libs.supabase.postgrest)
     implementation(libs.ktor.client.android)
+    implementation(libs.livekit.android)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)

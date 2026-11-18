@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- ADB reverse can expose the computer's local test API on phone loopback. -->
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="false">127.0.0.1</domain>
-    </domain-config>
+    <!-- Debug builds connect to the developer's LAN test stack over HTTP. -->
+    <base-config cleartextTrafficPermitted="true" />
 </network-security-config>

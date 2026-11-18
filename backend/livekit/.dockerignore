@@ -1,0 +1,3 @@
+.local-credentials.json
+__pycache__/
+*.pyc

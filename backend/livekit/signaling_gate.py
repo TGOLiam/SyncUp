@@ -1,6 +1,7 @@
 """Allow only listen-only LiveKit tokens to initiate a local signaling session."""
 
 import asyncio
+import os
 import urllib.parse
 
 import jwt
@@ -99,7 +100,7 @@ async def handle(client_reader, client_writer, api_key, api_secret):
 async def serve(api_key, api_secret):
     server = await asyncio.start_server(
         lambda reader, writer: handle(reader, writer, api_key, api_secret),
-        "127.0.0.1", 7883, limit=MAX_HEADER_BYTES,
+        os.environ.get("SYNCUP_LAN_ADDRESS", "127.0.0.1"), 7883, limit=MAX_HEADER_BYTES,
     )
     async with server:
         await server.serve_forever()

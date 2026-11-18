@@ -19,7 +19,14 @@ from speech_controller import SpeechController
 if os.getpid() != 1:
     raise RuntimeError("The fail-closed supervisor must run as container PID 1")
 
-media = subprocess.Popen(["/livekit-server", "--dev"])
+media = subprocess.Popen([
+    "/livekit-server",
+    "--dev",
+    "--bind",
+    "127.0.0.1",
+    "--keys",
+    token_server.LIVEKIT_API_KEY + ": " + token_server.LIVEKIT_API_SECRET,
+])
 
 
 def watch_media():
@@ -63,4 +70,6 @@ token_server.controller = SpeechController(
     token_server.LIVEKIT_API_SECRET,
 )
 threading.Thread(target=token_server.controller.monitor, args=(monitor_socket,), daemon=True).start()
-ThreadingHTTPServer(("127.0.0.1", 54326), token_server.TokenHandler).serve_forever()
+ThreadingHTTPServer(
+    (os.environ["SYNCUP_LAN_ADDRESS"], 54326), token_server.TokenHandler
+).serve_forever()

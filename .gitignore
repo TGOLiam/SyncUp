@@ -24,3 +24,4 @@ __pycache__/
 # Local backend dependencies and Supabase runtime state
 backend/node_modules/
 backend/supabase/.temp/
+backend/livekit/.local-credentials.json

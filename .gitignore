@@ -14,3 +14,7 @@ local.properties
 
 # Operating system files
 .DS_Store
+
+# Local backend dependencies and Supabase runtime state
+backend/node_modules/
+backend/supabase/.temp/

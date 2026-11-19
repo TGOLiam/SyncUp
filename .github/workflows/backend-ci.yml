@@ -38,7 +38,7 @@ jobs:
           SYNCUP_DOMAIN: example.invalid
         run: |
           docker compose -f backend/deploy/compose.yaml config --quiet
-          docker run --rm -i -e SYNCUP_DOMAIN caddy:2.10.2-alpine caddy validate --adapter caddyfile --config /dev/stdin < backend/deploy/Caddyfile
+          docker run --rm -i -e SYNCUP_DOMAIN caddy:2.11.4-alpine caddy validate --adapter caddyfile --config /dev/stdin < backend/deploy/Caddyfile
 
   database:
     runs-on: ubuntu-latest

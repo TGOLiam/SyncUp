@@ -30,13 +30,13 @@ or hosted Supabase authorization; verify those separately.
 
 1. Create a hosted Supabase project and apply the migrations. Configure Auth
    and test account creation and the event policies.
-2. Point a domain at the EC2 public IP. Give Caddy inbound TCP ports 80 and 443
+2. Use the EC2 public IPv4 address directly, or point a domain at it. Give Caddy inbound TCP ports 80 and 443
    for certificate issuance and HTTPS. Allow LiveKit UDP 7882 and TCP 7881
    in both the EC2 security group and the instance firewall. Limit SSH to the
    administrator's current IP. Network rules may need adjustment for TURN.
 3. Create `/etc/syncup/backend.env` from `backend.env.example`, owned by root
    and readable only by root (`chmod 600`). Fill in the hosted Supabase URL and
-   publishable key, domain, EC2 public IPv4 address, and a private LiveKit key
+   publishable key, public address (or domain), EC2 public IPv4 address, and a private LiveKit key
    and secret. Generate unique values; never commit or share the API secret.
 4. Trigger the timer or run `sudo systemctl start syncup-deploy.service` once
    the CI workflow has succeeded on the current main commit. Inspect status
@@ -49,6 +49,10 @@ or hosted Supabase authorization; verify those separately.
 An automatically assigned EC2 public IPv4 address can change after the instance
 is stopped and started. Update DNS and `LIVEKIT_PUBLIC_IP` if it changes; the
 deployer detects configuration changes and applies them after CI has passed.
+If the raw IP is used as `SYNCUP_DOMAIN`, update that value and rebuild the APK
+as well. The proxy requests a publicly trusted short-lived certificate and renews
+it automatically; certificate issuance and renewal require the IP to remain
+publicly reachable on port 80.
 
 The current EC2 instance has approximately 1 GB RAM. A Docker build and TLS
 proxy may compete for memory; test on the actual instance and resize if needed.

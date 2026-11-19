@@ -3,6 +3,14 @@
 }
 
 {$SYNCUP_DOMAIN} {
+    # Public IP certificates require Let's Encrypt's short-lived profile.
+    tls {
+        issuer acme https://acme-v02.api.letsencrypt.org/directory {
+            profile shortlived
+            disable_tlsalpn_challenge
+        }
+    }
+
     handle /livekit/* {
         reverse_proxy 127.0.0.1:54326
     }

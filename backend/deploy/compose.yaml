@@ -15,7 +15,7 @@ services:
       SYNCUP_LAN_ADDRESS: 127.0.0.1
 
   proxy:
-    image: caddy:2.10.2-alpine
+    image: caddy:2.11.4-alpine
     network_mode: host
     restart: unless-stopped
     environment:

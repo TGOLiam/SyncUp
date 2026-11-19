@@ -1,5 +1,7 @@
 {
     admin off
+    # Clients connecting to a raw IP do not send a TLS server name.
+    default_sni {$SYNCUP_DOMAIN}
 }
 
 {$SYNCUP_DOMAIN} {

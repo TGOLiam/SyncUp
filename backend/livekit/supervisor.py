@@ -19,14 +19,16 @@ from speech_controller import SpeechController
 if os.getpid() != 1:
     raise RuntimeError("The fail-closed supervisor must run as container PID 1")
 
-media = subprocess.Popen([
-    "/livekit-server",
-    "--dev",
-    "--bind",
-    "127.0.0.1",
-    "--keys",
-    token_server.LIVEKIT_API_KEY + ": " + token_server.LIVEKIT_API_SECRET,
-])
+media_environment = os.environ.copy()
+media_environment["LIVEKIT_KEYS"] = token_server.LIVEKIT_API_KEY + ": " + token_server.LIVEKIT_API_SECRET
+media_command = ["/livekit-server", "--bind", "127.0.0.1"]
+if os.environ.get("SYNCUP_DEPLOYED") == "1":
+    # The public address is advertised to WebRTC clients, while signaling and
+    # administration stay on loopback behind the protected signaling gate.
+    media_command.extend(["--node-ip", os.environ["LIVEKIT_PUBLIC_IP"], "--udp-port", "7882"])
+else:
+    media_command.append("--dev")
+media = subprocess.Popen(media_command, env=media_environment)
 
 
 def watch_media():

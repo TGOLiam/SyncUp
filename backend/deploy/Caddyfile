@@ -1,0 +1,15 @@
+{
+    admin off
+}
+
+{$SYNCUP_DOMAIN} {
+    handle /livekit/* {
+        reverse_proxy 127.0.0.1:54326
+    }
+
+    handle /rtc* {
+        reverse_proxy 127.0.0.1:7883
+    }
+
+    respond "Not found" 404
+}

@@ -1,0 +1,30 @@
+services:
+  livekit:
+    build:
+      context: ../livekit
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      SYNCUP_DEPLOYED: '1'
+      SYNCUP_SUPABASE_INTERNAL_URL: ${SUPABASE_URL:?Set SUPABASE_URL}
+      SYNCUP_SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:?Set SUPABASE_PUBLISHABLE_KEY}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:?Set LIVEKIT_API_KEY}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:?Set LIVEKIT_API_SECRET}
+      LIVEKIT_PUBLIC_IP: ${LIVEKIT_PUBLIC_IP:?Set LIVEKIT_PUBLIC_IP}
+      LIVEKIT_URL: wss://${SYNCUP_DOMAIN:?Set SYNCUP_DOMAIN}
+      SYNCUP_LAN_ADDRESS: 127.0.0.1
+
+  proxy:
+    image: caddy:2.10.2-alpine
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      SYNCUP_DOMAIN: ${SYNCUP_DOMAIN:?Set SYNCUP_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  caddy-data:
+  caddy-config:

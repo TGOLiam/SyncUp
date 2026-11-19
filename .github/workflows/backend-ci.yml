@@ -16,8 +16,8 @@ jobs:
   livekit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Install test dependencies
@@ -28,6 +28,17 @@ jobs:
         run: python -m unittest discover -s backend/deploy -p 'test_*.py' -v
       - name: Build supervised LiveKit image
         run: docker build -t syncup-livekit-ci backend/livekit
+      - name: Validate deployment configuration
+        env:
+          SUPABASE_URL: https://example.invalid
+          SUPABASE_PUBLISHABLE_KEY: test-key
+          LIVEKIT_API_KEY: test-key
+          LIVEKIT_API_SECRET: test-secret-at-least-32-characters
+          LIVEKIT_PUBLIC_IP: 127.0.0.1
+          SYNCUP_DOMAIN: example.invalid
+        run: |
+          docker compose -f backend/deploy/compose.yaml config --quiet
+          docker run --rm -i -e SYNCUP_DOMAIN caddy:2.10.2-alpine caddy validate --adapter caddyfile --config /dev/stdin < backend/deploy/Caddyfile
 
   database:
     runs-on: ubuntu-latest
@@ -35,8 +46,8 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm

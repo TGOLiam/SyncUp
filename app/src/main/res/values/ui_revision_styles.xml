@@ -226,4 +226,9 @@
         <item name="dialogCornerRadius">8dp</item>
         <item name="colorSurface">@color/ui_surface</item>
     </style>
+    <!-- Step indicator labels and mono progress keys -->
+    <style name="TextAppearance.Ui.Mono.Progress" parent="TextAppearance.Ui.Mono">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ui_muted</item>
+    </style>
 </resources>

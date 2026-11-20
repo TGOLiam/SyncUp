@@ -5,7 +5,7 @@
     android:id="@+id/code_share_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -19,59 +19,56 @@
             android:orientation="vertical"
             android:padding="16dp">
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:layout_marginTop="56dp"
-                android:background="@drawable/code_share_icon_background"
+                android:background="@drawable/bg_ui_success"
                 android:contentDescription="@null"
                 android:padding="16dp"
-                android:src="@drawable/ic_code_share_check" />
+                android:src="@drawable/ic_ui_check"
+                app:tint="@color/ui_success_text" />
             <TextView
                 android:id="@+id/code_share_event_name"
+                style="@style/TextAppearance.Ui.Headline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
                 android:gravity="center"
-                android:textColor="@color/event_text"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textColor="@color/ui_ink" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:gravity="center"
                 android:text="@string/code_share_ready_message"
-                android:textColor="@color/event_muted"
+                android:textColor="@color/ui_secondary_text"
                 android:textSize="14sp" />
             <TextView
                 android:id="@+id/code_share_value"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/code_share_code_background"
+                android:background="@drawable/bg_ui_field"
                 android:gravity="center"
                 android:paddingVertical="24dp"
                 android:text="@string/code_share_unavailable"
-                android:textColor="@color/event_text"
+                android:textColor="@color/ui_ink"
                 android:textSize="40sp"
                 android:textStyle="bold" />
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/code_share_copy"
+            style="@style/Widget.Ui.Button.Orange"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/code_share_copy"
-                android:textAllCaps="false"
-                app:cornerRadius="10dp" />
-            <com.google.android.material.button.MaterialButton
+                android:text="@string/code_share_copy" />
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/code_share_open_workspace"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/code_share_open_workspace"
-                android:textAllCaps="false"
-                app:cornerRadius="10dp" />
+                android:text="@string/code_share_open_workspace" />
             <Space
                 android:layout_width="1dp"
                 android:layout_height="0dp"

@@ -7,9 +7,9 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 
-/** Binds the shared six-step indicator used by Create Event screens. */
+/** Binds the five-step creation indicator from the approved prototype. */
 object CreateEventProgress {
-    private const val STEP_COUNT = 6
+    private const val STEP_COUNT = 5
 
     fun show(activity: Activity, root: View, currentStep: Int, @StringRes title: Int) {
         require(currentStep in 1..STEP_COUNT)
@@ -19,8 +19,9 @@ object CreateEventProgress {
         root.findViewById<TextView>(R.id.create_progress_title).setText(title)
 
         val segments = root.findViewById<LinearLayout>(R.id.create_progress_segments)
+        require(segments.childCount == STEP_COUNT)
         for (index in 0 until segments.childCount) {
-            val color = if (index < currentStep) R.color.event_navy else R.color.event_border
+            val color = if (index < currentStep) R.color.ui_orange else R.color.ui_divider
             segments.getChildAt(index).setBackgroundColor(ContextCompat.getColor(activity, color))
         }
     }

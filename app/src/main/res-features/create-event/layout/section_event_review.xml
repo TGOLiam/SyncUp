@@ -5,7 +5,7 @@
     android:id="@+id/event_review_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/review_heading"
-                android:textColor="@color/event_text"
+                android:textColor="@color/ui_ink"
                 android:textSize="24sp"
                 android:textStyle="bold" />
             <TextView
@@ -31,13 +31,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/review_subtitle"
-                android:textColor="@color/event_muted"
+                android:textColor="@color/ui_secondary_text"
                 android:textSize="14sp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/venue_canvas"
+                android:background="@drawable/bg_ui_wash"
                 android:orientation="vertical"
                 android:padding="14dp">
                 <LinearLayout
@@ -50,46 +50,43 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:id="@+id/review_event_name"
-                        android:textColor="@color/event_text"
+                        android:textColor="@color/ui_ink"
                         android:textSize="16sp"
                         android:textStyle="bold" />
-                    <com.google.android.material.button.MaterialButton
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/review_edit_details"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:contentDescription="@string/review_edit_details"
                         android:minWidth="64dp"
                         android:text="@string/venue_edit"
-                        android:textAllCaps="false"
-                        android:textColor="@color/event_navy"
-                        app:cornerRadius="10dp"
-                        app:strokeColor="@color/event_navy" />
+                        android:textColor="@color/ui_green" />
                 </LinearLayout>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/review_event_venue"
-                    android:textColor="@color/event_muted"
+                    android:textColor="@color/ui_secondary_text"
                     android:textSize="13sp" />
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="12dp"
-                    android:background="@color/event_border" />
+                    android:background="@color/ui_divider" />
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:id="@+id/review_event_schedule"
-                    android:textColor="@color/event_text"
+                    android:textColor="@color/ui_ink"
                     android:textSize="14sp" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/venue_canvas"
+                android:background="@drawable/bg_ui_wash"
                 android:orientation="vertical"
                 android:paddingHorizontal="14dp">
                 <include
@@ -109,39 +106,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/review_join_code_note"
-                android:textColor="@color/event_muted"
+                android:textColor="@color/ui_secondary_text"
                 android:textSize="13sp" />
         </LinearLayout>
     </ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/ui_surface"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/review_footer_back_button"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="@string/back"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/event_navy" />
-        <com.google.android.material.button.MaterialButton
+            android:textColor="@color/ui_green" />
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/review_create_button"
+            style="@style/Widget.Ui.Button.Orange"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="@string/create_event"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/event_navy"
-            app:cornerRadius="12dp" />
+            android:textColor="@color/ui_surface" />
     </LinearLayout>
 </LinearLayout>

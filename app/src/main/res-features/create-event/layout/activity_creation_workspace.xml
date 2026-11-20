@@ -3,16 +3,16 @@
     android:id="@+id/creation_workspace_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
+        android:layout_height="60dp"
+        android:background="@color/ui_surface"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
+        android:paddingStart="6dp"
         android:paddingEnd="16dp">
         <ImageButton
             android:id="@+id/creation_back"
@@ -20,22 +20,20 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back" />
+            android:padding="13dp"
+            android:src="@drawable/ic_ui_back" />
         <TextView
             android:id="@+id/creation_title"
+            style="@style/TextAppearance.Ui.ToolbarTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_event"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:text="@string/create_event" />
     </LinearLayout>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/white">
+        android:background="@color/ui_surface">
         <include android:id="@+id/creation_details" layout="@layout/section_create_event" />
         <include android:id="@+id/creation_venue" layout="@layout/section_venue_layout" />
         <include android:id="@+id/creation_phases" layout="@layout/section_event_phases" />

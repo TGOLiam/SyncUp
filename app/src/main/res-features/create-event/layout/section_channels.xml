@@ -5,7 +5,7 @@
     android:id="@+id/channels_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -22,60 +22,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:background="@drawable/venue_canvas"
+                android:background="@drawable/bg_ui_wash"
                 android:minHeight="56dp"
                 android:gravity="center_vertical"
                 android:padding="12dp"
                 android:text="@string/channel_global"
-                android:textColor="@color/event_text"
+                android:textColor="@color/ui_ink"
                 android:textSize="16sp" />
             <LinearLayout
                 android:id="@+id/channel_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/add_channel_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="12dp"
                 android:text="@string/add_custom_channel"
-                android:textAllCaps="false"
-                android:textColor="@color/event_navy"
-                app:cornerRadius="10dp"
-                app:strokeColor="@color/event_navy" />
+                android:textColor="@color/ui_green" />
         </LinearLayout>
     </ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/ui_surface"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/channels_footer_back_button"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="@string/back"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/event_navy" />
-        <com.google.android.material.button.MaterialButton
+            android:textColor="@color/ui_green" />
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/channels_review_button"
+            style="@style/Widget.Ui.Button.Orange"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="@string/review"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/event_navy"
-            app:cornerRadius="12dp" />
+            android:textColor="@color/ui_surface" />
     </LinearLayout>
 </LinearLayout>

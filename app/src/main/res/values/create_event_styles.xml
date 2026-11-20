@@ -1,31 +1,35 @@
 <resources>
+    <!-- Revised create-event field, label and validation presentation. -->
     <style name="CreateEventFieldLabel">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">16dp</item>
-        <item name="android:textColor">@color/event_text</item>
+        <item name="android:textColor">@color/ui_ink</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="fontFamily">@font/dm_sans_600</item>
     </style>
     <style name="CreateEventField">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">52dp</item>
-        <item name="android:layout_marginTop">6dp</item>
-        <item name="android:background">@drawable/join_code_field</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/bg_ui_field</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textColor">@color/event_text</item>
-        <item name="android:textColorHint">@color/event_muted</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/ui_input_text</item>
+        <item name="android:textColorHint">@color/ui_muted</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="fontFamily">@font/dm_sans_400</item>
     </style>
     <style name="PhaseValidationError">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">4dp</item>
-        <item name="android:textColor">@color/phase_error</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/ui_orange</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:visibility">gone</item>
         <item name="android:accessibilityLiveRegion">polite</item>
+        <item name="fontFamily">@font/dm_sans_400</item>
     </style>
 </resources>

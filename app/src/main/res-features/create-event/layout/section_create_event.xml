@@ -5,7 +5,7 @@
     android:id="@+id/create_event_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -65,16 +65,14 @@
                 android:layout_width="1dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/create_next_button"
+            style="@style/Widget.Ui.Button.Orange"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="24dp"
                 android:text="@string/next"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                app:backgroundTint="@color/event_navy"
-                app:cornerRadius="12dp" />
+                android:textColor="@color/ui_surface" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

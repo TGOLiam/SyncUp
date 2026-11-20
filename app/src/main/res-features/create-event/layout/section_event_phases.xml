@@ -5,7 +5,7 @@
     android:id="@+id/event_phases_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
     <ScrollView
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
                 android:id="@+id/phases_event_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/event_text"
+                android:textColor="@color/ui_ink"
                 android:textSize="16sp" />
             <TextView
                 style="@style/CreateEventFieldLabel"
@@ -64,16 +64,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:orientation="vertical" />
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/add_phase_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:text="@string/add_phase"
-                android:textAllCaps="false"
-                android:textColor="@color/event_navy"
-                app:cornerRadius="10dp"
-                app:strokeColor="@color/event_navy" />
+                android:textColor="@color/ui_green" />
             <TextView
                 android:id="@+id/phases_list_error"
                 style="@style/PhaseValidationError"
@@ -83,39 +80,34 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:text="@string/phases_help"
-                android:textColor="@color/event_muted"
+                android:textColor="@color/ui_secondary_text"
                 android:textSize="14sp" />
         </LinearLayout>
     </ScrollView>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/ui_surface"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/phases_footer_back_button"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
             android:text="@string/back"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/event_navy" />
-        <com.google.android.material.button.MaterialButton
+            android:textColor="@color/ui_green" />
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/phases_next_button"
+            style="@style/Widget.Ui.Button.Orange"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
             android:text="@string/next"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/event_navy"
-            app:cornerRadius="12dp" />
+            android:textColor="@color/ui_surface" />
     </LinearLayout>
 </LinearLayout>

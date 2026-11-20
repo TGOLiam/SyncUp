@@ -458,7 +458,7 @@ class CreateEventActivity : AppCompatActivity() {
     private fun showAddZoneDialog(drawing: VenueDrawingView) {
         val inputs = layoutInflater.inflate(R.layout.dialog_zone_input, null)
         val name = inputs.findViewById<EditText>(R.id.zone_input_name)
-        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
             .setTitle(R.string.venue_add_zone_title)
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)
@@ -558,7 +558,7 @@ class CreateEventActivity : AppCompatActivity() {
             hours.setText(phase.hours.toString())
             minutes.setText(phase.minutes.toString())
         }
-        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
             .setTitle(if (index == null) R.string.phase_add_title else R.string.phase_edit_title)
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)
@@ -604,7 +604,7 @@ class CreateEventActivity : AppCompatActivity() {
     private fun showChannelDialog() {
         val inputs = layoutInflater.inflate(R.layout.dialog_channel_input, null)
         val name = inputs.findViewById<EditText>(R.id.channel_input_name)
-        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_PhaseDialog)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
             .setTitle(R.string.channel_add_title)
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)

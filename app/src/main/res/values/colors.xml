@@ -12,4 +12,5 @@
     <color name="phase_error">#B3261E</color>
     <color name="comms_connected">#237A44</color>
     <color name="comms_disconnected">#B3261E</color>
+    <color name="comms_outgoing_metadata">#CBD7E3</color>
 </resources>

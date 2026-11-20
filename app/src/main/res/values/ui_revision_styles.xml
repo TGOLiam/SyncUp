@@ -1,0 +1,221 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        Shared type scale for the UI revision (handoff §3). Reference CSS px
+        sizes become equivalent sp; letter-spacing values use Android em units.
+        Styles bind to bundled static font files rather than font-family
+        resources so each requested weight is genuine on all supported APIs.
+        Sizes are starting points pending device review at large text.
+    -->
+
+    <style name="TextAppearance.Ui" parent="TextAppearance.MaterialComponents.Body1" />
+
+    <!-- Toolbar wordmark: DM Sans 700, two-color text set per screen. -->
+    <style name="TextAppearance.Ui.Wordmark">
+        <item name="fontFamily">@font/dm_sans_700</item>
+        <item name="android:textSize">27sp</item>
+        <item name="android:letterSpacing">-0.065</item>
+    </style>
+
+    <!-- Loading wordmark is the same style scaled to 40sp by the screen. -->
+
+    <!-- Screen headlines and greeting -->
+    <style name="TextAppearance.Ui.Headline">
+        <item name="fontFamily">@font/barlow_condensed_600</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Headline.EventList">
+        <item name="android:textSize">32sp</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Headline.Auth">
+        <item name="android:textSize">36sp</item>
+    </style>
+
+    <style name="TextAppearance.Ui.DialogTitle">
+        <item name="fontFamily">@font/barlow_condensed_600</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.SheetTitle">
+        <item name="fontFamily">@font/barlow_condensed_600</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <!-- Toolbar titles and event names -->
+    <style name="TextAppearance.Ui.ToolbarTitle">
+        <item name="fontFamily">@font/dm_sans_700</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.EventTitle" parent="TextAppearance.Ui.ToolbarTitle">
+        <item name="fontFamily">@font/dm_sans_600</item>
+    </style>
+
+    <!-- Body and supporting text -->
+    <style name="TextAppearance.Ui.Body">
+        <item name="fontFamily">@font/dm_sans_400</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:lineSpacingMultiplier">1.45</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Input">
+        <item name="fontFamily">@font/dm_sans_400</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ui_input_text</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Label">
+        <item name="fontFamily">@font/dm_sans_600</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Supporting" parent="TextAppearance.Ui.Body">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/ui_secondary_text</item>
+    </style>
+
+    <style name="TextAppearance.Ui.AuthCopy" parent="TextAppearance.Ui.Body">
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/ui_input_text</item>
+    </style>
+
+    <!-- Small action and metadata text (reviewed at device level) -->
+    <style name="TextAppearance.Ui.ConnectionAction">
+        <item name="fontFamily">@font/dm_sans_600</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ui_green</item>
+    </style>
+
+    <style name="TextAppearance.Ui.MessageMeta">
+        <item name="fontFamily">@font/dm_sans_400</item>
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="TextAppearance.Ui.NavLabel">
+        <item name="fontFamily">@font/dm_sans_400</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/ui_nav_text</item>
+    </style>
+
+    <style name="TextAppearance.Ui.NavLabelSelected">
+        <item name="fontFamily">@font/dm_sans_700</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/ui_green</item>
+    </style>
+
+    <!-- Monospace metadata -->
+    <style name="TextAppearance.Ui.Mono">
+        <item name="fontFamily">@font/noto_sans_mono_400</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Mono.Badge" parent="TextAppearance.Ui.Mono">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/ui_chip_text</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Mono.Caption" parent="TextAppearance.Ui.Mono">
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.07</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Mono.WorkContext" parent="TextAppearance.Ui.Mono">
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="TextAppearance.Ui.Mono.JoinCode" parent="TextAppearance.Ui.Mono">
+        <item name="fontFamily">@font/noto_sans_mono_600</item>
+        <item name="android:textSize">40sp</item>
+        <item name="android:letterSpacing">0.125</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <!-- Organizer initials use the condensed display family -->
+    <style name="TextAppearance.Ui.OrganizerInitials">
+        <item name="fontFamily">@font/barlow_condensed_500</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="Widget.Ui" parent="" />
+
+    <!--
+        Shared components (handoff §5). Buttons: 44dp reference height,
+        4dp radius, 12dp horizontal padding; Android expands tap targets to
+        at least 48dp everywhere these styles are applied.
+    -->
+    <style name="Widget.Ui.Button">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ui.Label</item>
+    </style>
+
+    <style name="Widget.Ui.Button.Green">
+        <item name="android:background">@drawable/bg_ui_button_green</item>
+        <item name="android:textColor">@color/ui_outgoing_text</item>
+    </style>
+
+    <style name="Widget.Ui.Button.Orange">
+        <item name="android:background">@drawable/bg_ui_button_orange</item>
+        <item name="android:textColor">@color/ui_outgoing_text</item>
+    </style>
+
+    <style name="Widget.Ui.Button.Outline">
+        <item name="android:background">@drawable/bg_ui_button_outline</item>
+        <item name="android:textColor">@color/ui_ink</item>
+    </style>
+
+    <style name="Widget.Ui.Button.Text">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:textColor">@color/ui_green</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ui.Label</item>
+    </style>
+
+    <!-- Form field (1dp border, 4dp radius, 48dp minimum, 12dp padding) -->
+    <style name="Widget.Ui.Field">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:background">@drawable/bg_ui_field</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ui.Input</item>
+        <item name="android:textColor">@color/ui_input_text</item>
+        <item name="android:textColorHint">@color/ui_muted</item>
+    </style>
+
+    <!-- Role badge / phase chip -->
+    <style name="Widget.Ui.Chip">
+        <item name="android:background">@drawable/bg_ui_chip</item>
+        <item name="android:paddingStart">7dp</item>
+        <item name="android:paddingEnd">7dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Ui.Mono.Badge</item>
+    </style>
+
+    <!-- Outlined event card (16dp padding, 4dp corners, bottom divider) -->
+    <style name="Widget.Ui.Card">
+        <item name="android:background">@drawable/bg_ui_card</item>
+    </style>
+
+    <!-- Revised dialog surface: 8dp corners, surface fill -->
+    <style name="Theme.SYNCUP.UiDialog" parent="Theme.Material3.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/ui_green</item>
+        <item name="android:colorBackground">@color/ui_surface</item>
+        <item name="dialogCornerRadius">8dp</item>
+        <item name="colorSurface">@color/ui_surface</item>
+    </style>
+</resources>

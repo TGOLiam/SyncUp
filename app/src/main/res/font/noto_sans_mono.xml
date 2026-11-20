@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bundled monospace for small metadata, progress labels, phase chips,
+     report headings and the join code. Chosen because the approved prototype
+     never loads Adwaita Mono and falls back to system monospace; see
+     docs/ui-design/PHASE_DECISIONS.md. -->
+<font-family xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <font
+        android:font="@font/noto_sans_mono_400"
+        android:fontStyle="normal"
+        android:fontWeight="400"
+        app:font="@font/noto_sans_mono_400"
+        app:fontStyle="normal"
+        app:fontWeight="400" />
+    <font
+        android:font="@font/noto_sans_mono_600"
+        android:fontStyle="normal"
+        android:fontWeight="600"
+        app:font="@font/noto_sans_mono_600"
+        app:fontStyle="normal"
+        app:fontWeight="600" />
+</font-family>

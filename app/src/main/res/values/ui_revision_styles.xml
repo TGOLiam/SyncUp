@@ -61,30 +61,30 @@
     <!-- Body and supporting text -->
     <style name="TextAppearance.Ui.Body">
         <item name="fontFamily">@font/dm_sans_400</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:lineSpacingMultiplier">1.45</item>
         <item name="android:textColor">@color/ui_ink</item>
     </style>
 
     <style name="TextAppearance.Ui.Input">
         <item name="fontFamily">@font/dm_sans_400</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/ui_input_text</item>
     </style>
 
     <style name="TextAppearance.Ui.Label">
         <item name="fontFamily">@font/dm_sans_600</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ui_ink</item>
     </style>
 
     <style name="TextAppearance.Ui.Supporting" parent="TextAppearance.Ui.Body">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/ui_secondary_text</item>
     </style>
 
     <style name="TextAppearance.Ui.AuthCopy" parent="TextAppearance.Ui.Body">
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/ui_input_text</item>
     </style>
 
@@ -97,18 +97,18 @@
 
     <style name="TextAppearance.Ui.MessageMeta">
         <item name="fontFamily">@font/dm_sans_400</item>
-        <item name="android:textSize">11sp</item>
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="TextAppearance.Ui.NavLabel">
         <item name="fontFamily">@font/dm_sans_400</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/ui_nav_text</item>
     </style>
 
     <style name="TextAppearance.Ui.NavLabelSelected">
         <item name="fontFamily">@font/dm_sans_700</item>
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/ui_green</item>
     </style>
 
@@ -118,17 +118,17 @@
     </style>
 
     <style name="TextAppearance.Ui.Mono.Badge" parent="TextAppearance.Ui.Mono">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/ui_chip_text</item>
     </style>
 
     <style name="TextAppearance.Ui.Mono.Caption" parent="TextAppearance.Ui.Mono">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.07</item>
     </style>
 
     <style name="TextAppearance.Ui.Mono.WorkContext" parent="TextAppearance.Ui.Mono">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.1</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/ui_ink</item>
@@ -137,7 +137,7 @@
     <!-- Section eyebrow above headings; exact casing is mandated by the
          handoff ("Your Events"), so no textAllCaps. -->
     <style name="TextAppearance.Ui.Eyebrow" parent="TextAppearance.Ui.Mono">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">11sp</item>
         <item name="android:letterSpacing">0.08</item>
         <item name="android:textColor">@color/ui_orange</item>
     </style>

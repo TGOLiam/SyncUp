@@ -22,6 +22,7 @@ internal class StoredEventReader(
         val activePhase: String?,
         val isPreview: Boolean,
         val isCreator: Boolean,
+        val creatorId: String?,
         val activePhaseId: String?
     )
 
@@ -62,6 +63,7 @@ internal class StoredEventReader(
                         activePhase = cursor.getString(4),
                         isPreview = cursor.getInt(5) == 1,
                         isCreator = userId != null && cursor.getString(6) == userId,
+                        creatorId = cursor.getString(6),
                         activePhaseId = cursor.getString(7)
                     )
                 )

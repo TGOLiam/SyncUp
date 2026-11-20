@@ -1,201 +1,150 @@
-<?xml version='1.0' encoding='utf-8'?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ref 16: Event Area. Dark happening-now banner, organizers entry row,
+     proportional venue map, report log rows, and the Report my location
+     primary action pinned above the shared navigation. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <ScrollView
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
+        <LinearLayout
             android:layout_width="match_parent"
-
-            android:layout_height="match_parent"
-
-            android:fillViewport="true">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="96dp">
 
             <LinearLayout
-
+                android:id="@+id/workspace_banner"
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_ui_button_green"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="14dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="12dp">
 
+                <TextView
+                    style="@style/TextAppearance.Ui.Mono.Caption"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/workspace_happening_now"
+                    android:textColor="@color/ui_phase_caption" />
+
+                <TextView
+                    android:id="@+id/workspace_phase"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/dm_sans_600"
+                    android:text="@string/event_no_phase"
+                    android:textColor="@color/ui_outgoing_text"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/workspace_organizers_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_ui_row_divider"
+                android:gravity="center_vertical"
                 android:orientation="vertical"
-
-                android:paddingStart="16dp"
-
-                android:paddingTop="16dp"
-
-                android:paddingEnd="16dp"
-
-                android:paddingBottom="80dp">
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
                 <LinearLayout
-
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
-
                     android:gravity="center_vertical"
-
                     android:orientation="horizontal">
 
                     <TextView
-
-                        android:layout_width="wrap_content"
-
+                        style="@style/TextAppearance.Ui.Label"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-
-                        android:text="@string/workspace_active_phase"
-
-                        android:textColor="@color/event_muted"
-
-                        android:textSize="13sp" />
+                        android:layout_weight="1"
+                        android:text="@string/workspace_organizers" />
 
                     <TextView
-
-                        android:id="@+id/workspace_phase"
-
+                        android:id="@+id/workspace_organizer_count"
+                        style="@style/TextAppearance.Ui.Mono.Caption"
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
-                        android:layout_marginStart="8dp"
-
-                        android:background="@drawable/workspace_phase_chip"
-
-                        android:paddingHorizontal="10dp"
-
-                        android:paddingVertical="3dp"
-
-                        android:text="@string/event_no_phase"
-
-                        android:textColor="@color/white"
-
-                        android:textSize="12sp"
-
-                        android:textStyle="bold" />
+                        android:layout_marginEnd="6dp"
+                        android:fontFamily="@font/noto_sans_mono_600"
+                        android:textColor="@color/ui_orange" />
                 </LinearLayout>
 
-                <FrameLayout
-
+                <TextView
+                    style="@style/TextAppearance.Ui.Supporting"
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
-
-                    android:layout_marginTop="14dp"
-
-                    android:background="@drawable/workspace_card">
-
-                    <com.example.sync_up.WorkspaceLayoutView
-
-                        android:id="@+id/workspace_layout"
-
-                        android:layout_width="match_parent"
-
-                        android:layout_height="wrap_content"
-
-                        android:contentDescription="@string/workspace_layout_description" />
-
-                    <TextView
-
-                        android:id="@+id/workspace_empty_layout"
-
-                        android:layout_width="match_parent"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_gravity="center"
-
-                        android:gravity="center"
-
-                        android:padding="16dp"
-
-                        android:text="@string/workspace_no_layout"
-
-                        android:textColor="@color/event_muted" />
-                </FrameLayout>
-
-                <LinearLayout
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    android:layout_marginTop="12dp"
-
-                    android:background="@drawable/workspace_card"
-
-                    android:orientation="vertical"
-
-                    android:padding="14dp">
-
-                    <LinearLayout
-
-                        android:layout_width="match_parent"
-
-                        android:layout_height="wrap_content"
-
-                        android:gravity="center_vertical"
-
-                        android:orientation="horizontal">
-
-                        <TextView
-
-                            android:layout_width="0dp"
-
-                            android:layout_height="wrap_content"
-
-                            android:layout_weight="1"
-
-                            android:text="@string/workspace_report_log"
-
-                            android:textColor="@color/event_text"
-
-                            android:textSize="14sp"
-
-                            android:textStyle="bold" />
-
-                    </LinearLayout>
-
-                    <TextView
-
-                        android:id="@+id/workspace_reports"
-                        android:layout_width="match_parent"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_marginTop="8dp"
-
-                        android:text="@string/workspace_no_reports"
-
-                        android:textColor="@color/event_muted"
-
-                        android:textSize="13sp" />
-                </LinearLayout>
+                    android:text="@string/workspace_organizers_hint" />
             </LinearLayout>
-        </ScrollView>
 
-        <com.google.android.material.button.MaterialButton
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_ui_wash">
+                <com.example.sync_up.WorkspaceLayoutView
+                    android:id="@+id/workspace_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/workspace_layout_description" />
+                <TextView
+                    android:id="@+id/workspace_empty_layout"
+                    style="@style/TextAppearance.Ui.Supporting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:text="@string/workspace_no_layout"
+                    android:visibility="gone" />
+            </FrameLayout>
 
-            android:id="@+id/workspace_report_location"
+            <TextView
+                style="@style/TextAppearance.Ui.Label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/workspace_report_log" />
 
-            android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/workspace_reports"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
-            android:layout_height="52dp"
+            <TextView
+                android:id="@+id/workspace_reports_empty"
+                style="@style/TextAppearance.Ui.Supporting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="@string/workspace_no_reports" />
+        </LinearLayout>
+    </ScrollView>
 
-            android:layout_gravity="bottom|center_horizontal"
-
-            android:layout_margin="16dp"
-
-            android:text="@string/workspace_report_location"
-
-            android:textAllCaps="false"
-
-            android:textColor="@color/white"
-
-            app:backgroundTint="@color/event_navy"
-
-            app:cornerRadius="10dp" />
-    </FrameLayout>
-
-
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/workspace_report_location"
+        style="@style/Widget.Ui.Button.Orange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:minHeight="48dp"
+        android:text="@string/workspace_report_location" />
+</FrameLayout>

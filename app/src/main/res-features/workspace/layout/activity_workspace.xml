@@ -1,61 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Refs 16-17, 21-22: shared workspace shell. Toolbar carries the mono
+     event context above the section title; foot nav keeps a persistent
+     orange-selected indicator row. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workspace_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
+        android:layout_height="wrap_content"
+        android:background="@color/ui_surface"
         android:gravity="center_vertical"
+        android:minHeight="60dp"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingEnd="12dp">
+        android:paddingStart="6dp"
+        android:paddingEnd="16dp">
         <ImageButton
             android:id="@+id/workspace_back"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back" />
-        <TextView
-            android:id="@+id/workspace_title"
+            android:padding="14dp"
+            android:src="@drawable/ic_ui_back" />
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-        <com.google.android.material.button.MaterialButton
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/workspace_context"
+                style="@style/TextAppearance.Ui.Mono.WorkContext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1" />
+            <TextView
+                android:id="@+id/workspace_title"
+                style="@style/TextAppearance.Ui.ToolbarTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1" />
+        </LinearLayout>
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/workspace_edit"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="10dp"
-            app:strokeColor="@color/event_navy" />
+            android:layout_height="wrap_content"
+            android:minWidth="72dp" />
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/white">
+        android:background="@color/ui_surface">
         <include android:id="@+id/workspace_section_area" layout="@layout/section_workspace_area" />
         <include android:id="@+id/workspace_section_comms" layout="@layout/section_workspace_comms" />
         <include android:id="@+id/workspace_section_phases" layout="@layout/section_workspace_phases" />
+        <include android:id="@+id/workspace_section_organizers" layout="@layout/section_workspace_organizers" />
     </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
-        android:background="@color/white"
+        android:background="@drawable/bg_ui_top_divider"
         android:orientation="horizontal">
         <LinearLayout
             android:id="@+id/workspace_nav_area"
@@ -78,7 +90,10 @@
                     android:src="@drawable/ic_workspace_area" />
                 <TextView
                     android:id="@+id/workspace_label_area"
-                    style="@style/WorkspaceNavigationLabel"
+                    style="@style/TextAppearance.Ui.NavLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="@string/workspace_area" />
             </LinearLayout>
         </LinearLayout>
@@ -103,7 +118,10 @@
                     android:src="@drawable/ic_workspace_comms" />
                 <TextView
                     android:id="@+id/workspace_label_comms"
-                    style="@style/WorkspaceNavigationLabel"
+                    style="@style/TextAppearance.Ui.NavLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="@string/workspace_comms" />
             </LinearLayout>
         </LinearLayout>
@@ -128,7 +146,10 @@
                     android:src="@drawable/ic_workspace_phases" />
                 <TextView
                     android:id="@+id/workspace_label_phases"
-                    style="@style/WorkspaceNavigationLabel"
+                    style="@style/TextAppearance.Ui.NavLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="@string/workspace_phases" />
             </LinearLayout>
         </LinearLayout>

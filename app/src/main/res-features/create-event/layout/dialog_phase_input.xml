@@ -34,4 +34,5 @@
         android:id="@+id/phase_input_minutes"
         style="@style/CreateEventField"
         android:inputType="number" />
+    <include layout="@layout/view_dialog_footer" android:layout_marginTop="24dp" />
 </LinearLayout>

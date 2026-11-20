@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Refs 09/11/13: dialog footer with outlined Cancel and filled dark Save. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:orientation="horizontal">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dialog_cancel"
+        style="@style/Widget.Ui.Button.Outline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="88dp"
+        android:minHeight="44dp"
+        android:text="@string/cancel" />
+
+    <Space
+        android:layout_width="8dp"
+        android:layout_height="match_parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dialog_save"
+        style="@style/Widget.Ui.Button.Green"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="88dp"
+        android:minHeight="44dp"
+        android:text="@string/save" />
+</LinearLayout>

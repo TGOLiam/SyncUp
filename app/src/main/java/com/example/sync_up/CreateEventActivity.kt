@@ -459,22 +459,20 @@ class CreateEventActivity : AppCompatActivity() {
         val inputs = layoutInflater.inflate(R.layout.dialog_zone_input, null)
         val name = inputs.findViewById<EditText>(R.id.zone_input_name)
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setCustomTitle(dialogTitle(R.string.venue_add_zone_title))
+            .setCustomTitle(uiDialogTitle(this, R.string.venue_add_zone_title))
             .setView(inputs)
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.save, null)
             .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val zoneName = name.text.toString().trim()
-                if (zoneName.isEmpty()) {
-                    name.error = getString(R.string.event_details_required)
-                } else if (drawing.addZone(zoneName)) {
-                    updateDrawingMode(true)
-                    dialog.dismiss()
-                } else {
-                    Toast.makeText(this, R.string.zone_placement_unavailable, Toast.LENGTH_SHORT).show()
-                }
+        // Ref 09: Cancel/Save live in the dialog view, not the platform frame.
+        inputs.findViewById<View>(R.id.dialog_cancel).setOnClickListener { dialog.dismiss() }
+        inputs.findViewById<View>(R.id.dialog_save).setOnClickListener {
+            val zoneName = name.text.toString().trim()
+            if (zoneName.isEmpty()) {
+                name.error = getString(R.string.event_details_required)
+            } else if (drawing.addZone(zoneName)) {
+                updateDrawingMode(true)
+                dialog.dismiss()
+            } else {
+                Toast.makeText(this, R.string.zone_placement_unavailable, Toast.LENGTH_SHORT).show()
             }
         }
         dialog.show()
@@ -559,27 +557,25 @@ class CreateEventActivity : AppCompatActivity() {
             minutes.setText(phase.minutes.toString())
         }
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setCustomTitle(dialogTitle(if (index == null) R.string.phase_add_title else R.string.phase_edit_title))
+            .setCustomTitle(uiDialogTitle(this, if (index == null) R.string.phase_add_title else R.string.phase_edit_title))
             .setView(inputs)
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.save, null)
             .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val phaseLabel = label.text.toString().trim()
-                val phaseHours = hours.text.toString().toIntOrNull() ?: 0
-                val phaseMinutes = minutes.text.toString().toIntOrNull() ?: 0
-                if (phaseLabel.isEmpty()) {
-                    label.error = getString(R.string.event_details_required)
-                } else if (phaseHours > 99 || phaseMinutes >= 60 || (phaseHours == 0 && phaseMinutes == 0)) {
-                    minutes.error = getString(R.string.phase_duration_invalid)
-                } else {
-                    val phase = Phase(phaseLabel, phaseHours, phaseMinutes)
-                    if (index == null) phases.add(phase) else phases[index] = phase
-                    findViewById<View>(R.id.phases_list_error).visibility = View.GONE
-                    renderPhases()
-                    dialog.dismiss()
-                }
+        // Ref 11: Cancel/Save live in the dialog view, not the platform frame.
+        inputs.findViewById<View>(R.id.dialog_cancel).setOnClickListener { dialog.dismiss() }
+        inputs.findViewById<View>(R.id.dialog_save).setOnClickListener {
+            val phaseLabel = label.text.toString().trim()
+            val phaseHours = hours.text.toString().toIntOrNull() ?: 0
+            val phaseMinutes = minutes.text.toString().toIntOrNull() ?: 0
+            if (phaseLabel.isEmpty()) {
+                label.error = getString(R.string.event_details_required)
+            } else if (phaseHours > 99 || phaseMinutes >= 60 || (phaseHours == 0 && phaseMinutes == 0)) {
+                minutes.error = getString(R.string.phase_duration_invalid)
+            } else {
+                val phase = Phase(phaseLabel, phaseHours, phaseMinutes)
+                if (index == null) phases.add(phase) else phases[index] = phase
+                findViewById<View>(R.id.phases_list_error).visibility = View.GONE
+                renderPhases()
+                dialog.dismiss()
             }
         }
         dialog.show()
@@ -605,21 +601,19 @@ class CreateEventActivity : AppCompatActivity() {
         val inputs = layoutInflater.inflate(R.layout.dialog_channel_input, null)
         val name = inputs.findViewById<EditText>(R.id.channel_input_name)
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setCustomTitle(dialogTitle(R.string.channel_add_title))
+            .setCustomTitle(uiDialogTitle(this, R.string.channel_add_title))
             .setView(inputs)
-            .setNegativeButton(R.string.cancel, null)
-            .setPositiveButton(R.string.save, null)
             .create()
-        dialog.setOnShowListener {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                val channelName = name.text.toString().trim()
-                if (channelName.isEmpty()) {
-                    name.error = getString(R.string.event_details_required)
-                } else {
-                    channels.add(channelName)
-                    renderChannels()
-                    dialog.dismiss()
-                }
+        // Ref 13: Cancel/Save live in the dialog view, not the platform frame.
+        inputs.findViewById<View>(R.id.dialog_cancel).setOnClickListener { dialog.dismiss() }
+        inputs.findViewById<View>(R.id.dialog_save).setOnClickListener {
+            val channelName = name.text.toString().trim()
+            if (channelName.isEmpty()) {
+                name.error = getString(R.string.event_details_required)
+            } else {
+                channels.add(channelName)
+                renderChannels()
+                dialog.dismiss()
             }
         }
         dialog.show()
@@ -645,11 +639,3 @@ class CreateEventActivity : AppCompatActivity() {
 
 }
 
-private fun android.content.Context.dialogTitle(resId: Int): android.view.View {
-    // Revision dialogs use condensed 24sp headings on the surface color.
-    val title = android.widget.TextView(this)
-    title.setText(resId)
-    title.setTextAppearance(R.style.TextAppearance_Ui_DialogTitle)
-    title.setTextColor(getColor(R.color.ui_ink))
-    return title
-}

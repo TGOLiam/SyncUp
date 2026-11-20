@@ -14,4 +14,5 @@
         android:id="@+id/zone_input_name"
         style="@style/CreateEventField"
         android:inputType="textCapWords" />
+    <include layout="@layout/view_dialog_footer" android:layout_marginTop="24dp" />
 </LinearLayout>

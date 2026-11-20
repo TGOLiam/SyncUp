@@ -755,22 +755,38 @@ class WorkspaceActivity : AppCompatActivity() {
             return
         }
         val client = SupabaseClientFactory.get(applicationContext) ?: return
-        // Ref 18: revised dialog surface over the dimmed Event Area.
-        AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
+        // Ref 18: revised dialog surface over the dimmed Event Area with a Cancel row.
+        val content = layoutInflater.inflate(R.layout.dialog_report_zone, null)
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
             .setCustomTitle(uiDialogTitle(this, R.string.location_choose_zone))
-            .setItems(zoneIds.map { it.second }.toTypedArray()) { _, index ->
-                lifecycleScope.launch {
-                    try {
-                        SupabaseEventService(client).reportLocation(current.previewId, zoneIds[index].first)
-                        Toast.makeText(this@WorkspaceActivity, R.string.location_report_sent, Toast.LENGTH_SHORT).show()
-                    } catch (error: CancellationException) {
-                        throw error
-                    } catch (_: Exception) {
-                        Toast.makeText(this@WorkspaceActivity, R.string.location_report_failed, Toast.LENGTH_LONG).show()
+            .setView(content)
+            .create()
+        val list = content.findViewById<LinearLayout>(R.id.report_zone_list)
+        for (zone in zoneIds) {
+            val row = TextView(this).apply {
+                text = zone.second
+                textSize = 14f
+                setPadding(0, dp(10), 0, dp(10))
+                setBackgroundResource(R.drawable.bg_ui_row_divider)
+                setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_ink))
+                setOnClickListener {
+                    lifecycleScope.launch {
+                        try {
+                            SupabaseEventService(client).reportLocation(current.previewId, zone.first)
+                            Toast.makeText(this@WorkspaceActivity, R.string.location_report_sent, Toast.LENGTH_SHORT).show()
+                        } catch (error: CancellationException) {
+                            throw error
+                        } catch (_: Exception) {
+                            Toast.makeText(this@WorkspaceActivity, R.string.location_report_failed, Toast.LENGTH_LONG).show()
+                        }
+                        dialog.dismiss()
                     }
                 }
             }
-            .show()
+            list.addView(row)
+        }
+        content.findViewById<View>(R.id.report_zone_cancel).setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     private fun reportTimestampDetail(location: com.example.sync_up.data.remote.WorkspaceLocation): String? {

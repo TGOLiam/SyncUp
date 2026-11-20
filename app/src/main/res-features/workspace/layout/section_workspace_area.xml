@@ -46,8 +46,8 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/dm_sans_600"
                     android:text="@string/event_no_phase"
-                    android:textColor="@color/ui_outgoing_text"
-                    android:textSize="14sp" />
+                        android:textColor="@color/ui_outgoing_text"
+                        android:textSize="17sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -57,8 +57,8 @@
                 android:background="@drawable/bg_ui_row_divider"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
-                android:paddingTop="12dp"
-                android:paddingBottom="12dp">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -66,21 +66,31 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <!-- Ref 16: heading on the entry row is a step larger
+                         than the generic label. -->
                     <TextView
-                        style="@style/TextAppearance.Ui.Label"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/workspace_organizers" />
+                        android:fontFamily="@font/dm_sans_600"
+                        android:text="@string/workspace_organizers"
+                        android:textColor="@color/ui_ink"
+                        android:textSize="16sp" />
 
                     <TextView
                         android:id="@+id/workspace_organizer_count"
-                        style="@style/TextAppearance.Ui.Mono.Caption"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
                         android:fontFamily="@font/noto_sans_mono_600"
-                        android:textColor="@color/ui_orange" />
+                        android:textColor="@color/ui_orange"
+                        android:textSize="15sp" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="2dp"
+                        android:contentDescription="@string/workspace_organizers"
+                        android:src="@drawable/ic_ui_chevron_right" />
                 </LinearLayout>
 
                 <TextView
@@ -94,7 +104,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_ui_wash">
+                android:background="@drawable/bg_ui_venue_panel">
                 <com.example.sync_up.WorkspaceLayoutView
                     android:id="@+id/workspace_layout"
                     android:layout_width="match_parent"
@@ -112,12 +122,15 @@
                     android:visibility="gone" />
             </FrameLayout>
 
+            <!-- Ref 16: REPORT LOG eyebrow uses the mono caption face. -->
             <TextView
-                style="@style/TextAppearance.Ui.Label"
+                style="@style/TextAppearance.Ui.Mono.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/workspace_report_log" />
+                android:text="@string/workspace_report_log"
+                android:textAllCaps="true"
+                android:textColor="@color/ui_secondary_text" />
 
             <LinearLayout
                 android:id="@+id/workspace_reports"

@@ -909,7 +909,8 @@ class WorkspaceActivity : AppCompatActivity() {
             }
             row.addView(TextView(this).apply {
                 text = location.name ?: getString(R.string.message_member)
-                textSize = 14f
+                // Ref 16: the reporter name is a step above the meta line.
+                textSize = 16f
                 setTypeface(null, android.graphics.Typeface.BOLD)
                 setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_ink))
             })

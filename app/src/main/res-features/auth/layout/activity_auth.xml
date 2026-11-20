@@ -1,91 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    UI revision examples 02/03: shared auth shell. Wordmark toolbar, condensed
+    headline with narrow measure, supporting copy, stacked fields, orange
+    primary action and a text-only switch to the other mode. Validation and
+    submission behavior remain in AuthActivity.
+-->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/auth_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/ui_surface"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/auth_title"
+        <!-- Wordmark toolbar: brand marks the top bar on both modes. -->
+        <LinearLayout
+            android:id="@+id/auth_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/auth_sign_in"
-            android:textColor="@color/event_text"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/auth_wordmark"
+                layout="@layout/ui_wordmark" />
+        </LinearLayout>
+
+        <!-- 36sp Barlow Condensed headline; measure capped near the reference. -->
+        <TextView
+            android:id="@+id/auth_title"
+            style="@style/TextAppearance.Ui.Headline.Auth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:maxWidth="230dp" />
+
+        <TextView
+            android:id="@+id/auth_support"
+            style="@style/TextAppearance.Ui.AuthCopy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:id="@+id/auth_name_label"
-            style="@style/CreateEventFieldLabel"
+            style="@style/TextAppearance.Ui.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:labelFor="@id/auth_name"
             android:text="@string/auth_name"
             android:visibility="gone" />
         <EditText
             android:id="@+id/auth_name"
-            style="@style/CreateEventField"
+            style="@style/Widget.Ui.Field"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
             android:autofillHints="name"
             android:inputType="textPersonName"
+            android:textAppearance="@style/TextAppearance.Ui.Body"
             android:visibility="gone" />
 
         <TextView
-            style="@style/CreateEventFieldLabel"
+            style="@style/TextAppearance.Ui.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:labelFor="@id/auth_email"
             android:text="@string/auth_email" />
         <EditText
             android:id="@+id/auth_email"
-            style="@style/CreateEventField"
+            style="@style/Widget.Ui.Field"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
             android:autofillHints="emailAddress"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:textAppearance="@style/TextAppearance.Ui.Body" />
 
         <TextView
-            style="@style/CreateEventFieldLabel"
+            style="@style/TextAppearance.Ui.Label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:labelFor="@id/auth_password"
             android:text="@string/auth_password" />
         <EditText
             android:id="@+id/auth_password"
-            style="@style/CreateEventField"
+            style="@style/Widget.Ui.Field"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
             android:autofillHints="password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textAppearance="@style/TextAppearance.Ui.Body" />
 
         <TextView
             android:id="@+id/auth_error"
+            style="@style/TextAppearance.Ui.Supporting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:textColor="@color/event_text"
+            android:textColor="@color/ui_orange"
             android:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/auth_submit"
+            style="@style/Widget.Ui.Button.Orange"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
+            android:layout_height="48dp"
             android:layout_marginTop="24dp"
-            android:text="@string/auth_sign_in"
-            android:textAllCaps="false"
-            app:backgroundTint="@color/event_navy"
-            app:cornerRadius="12dp" />
+            android:minHeight="48dp" />
 
-        <com.google.android.material.button.MaterialButton
+        <TextView
             android:id="@+id/auth_toggle"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/auth_switch_sign_up"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/event_navy" />
+            style="@style/TextAppearance.Ui.AuthCopy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:contentDescription="@null"
+            android:minHeight="48dp"
+            android:gravity="center_vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
     </LinearLayout>
 </ScrollView>

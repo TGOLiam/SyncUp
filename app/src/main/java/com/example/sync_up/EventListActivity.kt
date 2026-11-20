@@ -27,6 +27,7 @@ class EventListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_event_list)
         events = emptyList()
         findViewById<ListView>(R.id.event_list).apply {
+            emptyView = findViewById(android.R.id.empty)
             adapter = EventListAdapter(this@EventListActivity, events)
             setOnItemClickListener { _, _, position, _ ->
                 val event = events[position]

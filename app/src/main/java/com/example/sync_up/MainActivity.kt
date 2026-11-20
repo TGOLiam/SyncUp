@@ -1,6 +1,8 @@
 package com.example.sync_up
 
 import android.content.Intent
+import android.view.View
+import android.widget.TextView
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +19,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        // Loading screen (revision example 01): 40sp wordmark variant.
+        findViewById<View>(R.id.loading_wordmark).apply {
+            contentDescription = getString(R.string.wordmark_syncup)
+        }
+        for (id in listOf(R.id.ui_wordmark_sync, R.id.ui_wordmark_up)) {
+            val half = findViewById<TextView>(id)
+            half.textSize = 40f
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

@@ -12,7 +12,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.sync_up.data.remote.SupabaseClientFactory
-import com.google.android.material.button.MaterialButton
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlinx.coroutines.CancellationException
@@ -27,6 +26,8 @@ class AuthActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
+        // Screen-reader reads the full brand once, not the two color halves.
+        findViewById<View>(R.id.auth_wordmark).contentDescription = getString(R.string.wordmark_syncup)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.auth_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
@@ -49,9 +50,19 @@ class AuthActivity : AppCompatActivity() {
     private fun renderMode() {
         findViewById<View>(R.id.auth_name).visibility = if (signingUp) View.VISIBLE else View.GONE
         findViewById<View>(R.id.auth_name_label).visibility = if (signingUp) View.VISIBLE else View.GONE
-        findViewById<TextView>(R.id.auth_title).setText(if (signingUp) R.string.auth_sign_up else R.string.auth_sign_in)
-        findViewById<MaterialButton>(R.id.auth_submit).setText(if (signingUp) R.string.auth_sign_up else R.string.auth_sign_in)
-        findViewById<MaterialButton>(R.id.auth_toggle).setText(if (signingUp) R.string.auth_switch_sign_in else R.string.auth_switch_sign_up)
+        // Revision examples 02/03: headline and supporting copy follow the mode.
+        findViewById<TextView>(R.id.auth_title).setText(
+            if (signingUp) R.string.auth_headline_sign_up else R.string.auth_headline_sign_in
+        )
+        findViewById<TextView>(R.id.auth_support).setText(
+            if (signingUp) R.string.auth_support_sign_up else R.string.auth_support_sign_in
+        )
+        findViewById<TextView>(R.id.auth_submit).setText(
+            if (signingUp) R.string.auth_sign_up else R.string.auth_sign_in
+        )
+        findViewById<TextView>(R.id.auth_toggle).setText(
+            if (signingUp) R.string.auth_switch_sign_in else R.string.auth_switch_sign_up
+        )
         findViewById<View>(R.id.auth_error).visibility = View.GONE
     }
 

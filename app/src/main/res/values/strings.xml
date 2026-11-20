@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">SYNC-UP</string>
     <string name="loading_title">SyncUp</string>
+    <string name="loading_caption">Loading…</string>
+    <string name="wordmark_syncup">syncup</string>
+    <string name="auth_headline_sign_in">Welcome back.</string>
+    <string name="auth_headline_sign_up">Your team starts here.</string>
+    <string name="auth_support_sign_in">Sign in to coordinate your day as planned.</string>
+    <string name="auth_support_sign_up">Set up the team, draw the venue and keep everyone in phase.</string>
+    <string name="event_list_section">Your Events</string>
+    <string name="event_list_greeting">Let’s get to work.</string>
+    <string name="event_list_empty">Nothing scheduled yet. Create an event or join one with a code.</string>
     <string name="loading">Loading</string>
     <string name="home_placeholder">Events</string>
     <string name="settings">Settings</string>

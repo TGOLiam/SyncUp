@@ -1,62 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+    UI revision event card: outlined flat card, 16dp padding, 4dp corners.
+    The adapter labels event_role as Draft / Event Lead / Organizer and tints
+    draft rows with the pale wash background like the reference. The orange
+    leading rule was dropped by decision (PHASE_DECISIONS.md).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    app:strokeColor="@color/event_border"
-    app:strokeWidth="1dp">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/event_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="14dp">
+        app:cardBackgroundColor="@color/ui_surface"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="0dp"
+        app:strokeColor="@color/ui_divider"
+        app:strokeWidth="1dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/event_name"
+                    style="@style/TextAppearance.Ui.EventTitle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:scrollHorizontally="false" />
+
+                <TextView
+                    android:id="@+id/event_role"
+                    style="@style/TextAppearance.Ui.Mono.Badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_ui_chip"
+                    android:paddingStart="7dp"
+                    android:paddingTop="5dp"
+                    android:paddingEnd="7dp"
+                    android:paddingBottom="5dp" />
+            </LinearLayout>
 
             <TextView
-                android:layout_width="0dp"
+                android:id="@+id/event_detail"
+                style="@style/TextAppearance.Ui.Supporting"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:id="@+id/event_name"
-                android:textColor="@color/event_text"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="4dp" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/event_phase"
+                style="@style/TextAppearance.Ui.Supporting"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/event_role_chip"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="2dp"
-                android:id="@+id/event_role"
-                android:textColor="@color/event_navy"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="6dp"
+                android:fontFamily="@font/dm_sans_600"
+                android:textColor="@color/ui_ink" />
         </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:id="@+id/event_detail"
-            android:textColor="@color/event_muted"
-            android:textSize="13sp" />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:id="@+id/event_phase"
-            android:textStyle="bold"
-            android:textColor="@color/event_text"
-            android:textSize="13sp" />
-    </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

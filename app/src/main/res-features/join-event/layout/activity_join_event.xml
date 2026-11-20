@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 
+    UI revision example 06: shared toolbar and revised join form. Validation,
+    progress and error handling remain in JoinEventActivity.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/join_event_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
+        android:layout_height="60dp"
+        android:background="@color/ui_surface"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
+        android:paddingStart="6dp"
         android:paddingEnd="16dp">
 
         <ImageButton
@@ -22,16 +25,14 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:padding="12dp"
-            android:src="@drawable/ic_back" />
+            android:padding="13dp"
+            android:src="@drawable/ic_ui_back" />
 
         <TextView
+            style="@style/TextAppearance.Ui.ToolbarTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/join_event_title"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:text="@string/join_event_title" />
     </LinearLayout>
 
     <ScrollView
@@ -47,54 +48,50 @@
             android:padding="16dp">
 
             <TextView
+                style="@style/TextAppearance.Ui.Headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/enter_event_code" />
+
+            <TextView
+                style="@style/TextAppearance.Ui.Supporting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/enter_event_code"
-                android:textColor="@color/event_text"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/join_code_help"
-                android:textColor="@color/event_muted"
-                android:textSize="14sp" />
+                android:text="@string/join_code_help" />
 
             <EditText
                 android:id="@+id/join_code"
+                style="@style/Widget.Ui.Field"
                 android:layout_width="match_parent"
                 android:layout_height="62dp"
-                android:layout_marginTop="20dp"
-                android:background="@drawable/join_code_field"
+                android:layout_marginTop="16dp"
                 android:contentDescription="@string/join_code_description"
+                android:digits="0123456789"
+                android:fontFamily="@font/noto_sans_mono_600"
                 android:gravity="center"
                 android:inputType="number"
-                android:letterSpacing="0.5"
+                android:letterSpacing="0.125"
                 android:maxLength="6"
+                android:minHeight="48dp"
                 android:paddingHorizontal="12dp"
                 android:singleLine="true"
-                android:textColor="@color/event_text"
-                android:textSize="26sp"
-                android:textStyle="bold" />
+                android:textSize="26sp" />
 
             <Space
                 android:layout_width="1dp"
                 android:layout_height="0dp"
                 android:layout_weight="1" />
 
-            <com.google.android.material.button.MaterialButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/submit_join_button"
+                style="@style/Widget.Ui.Button.Orange"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="16dp"
-                android:text="@string/join"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                app:backgroundTint="@color/event_navy"
-                app:cornerRadius="12dp" />
+                android:minHeight="48dp"
+                android:text="@string/join" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -1,28 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    UI revision example 04: wordmark header/settings, "Your Events" eyebrow,
+    greeting, scrollable event cards, and a fixed Join/Create action pair.
+    The settings overlay (example 05) dims this same layout; no separate screen.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/home_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/event_background"
+    android:background="@color/ui_surface"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="@color/white"
+        android:layout_height="60dp"
+        android:background="@color/ui_surface"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
-        android:paddingEnd="8dp">
+        android:paddingEnd="6dp">
 
-        <TextView
+        <include
+            android:id="@+id/event_list_wordmark"
+            layout="@layout/ui_wordmark" />
+
+        <Space
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/my_events"
-            android:textColor="@color/event_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_height="1dp"
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/settings_button"
@@ -30,10 +36,28 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/settings"
-            android:padding="12dp"
-            android:src="@drawable/ic_settings"
-            app:tint="@color/event_text" />
+            android:padding="14dp"
+            android:src="@drawable/ic_ui_settings"
+            android:scaleType="fitCenter" />
     </LinearLayout>
+
+    <TextView
+        style="@style/TextAppearance.Ui.Eyebrow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/event_list_section" />
+
+    <TextView
+        style="@style/TextAppearance.Ui.Headline.EventList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="start"
+        android:text="@string/event_list_greeting" />
 
     <ListView
         android:id="@+id/event_list"
@@ -43,39 +67,46 @@
         android:clipToPadding="false"
         android:divider="@android:color/transparent"
         android:dividerHeight="12dp"
-        android:padding="16dp" />
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp" />
+
+    <TextView
+        android:id="@android:id/empty"
+        style="@style/TextAppearance.Ui.Supporting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/event_list_empty"
+        android:visibility="gone" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/ui_surface"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/join_event_button"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/Widget.Ui.Button.Outline"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginEnd="6dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
             android:layout_weight="1"
-            android:text="@string/join_event"
-            android:textAllCaps="false"
-            android:textColor="@color/event_navy"
-            app:cornerRadius="12dp"
-            app:strokeColor="@color/event_navy" />
+            android:text="@string/join_event" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/create_event_button"
+            style="@style/Widget.Ui.Button.Orange"
             android:layout_width="0dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
             android:layout_weight="1"
-            android:text="@string/create_event"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/event_navy"
-            app:cornerRadius="12dp" />
+            android:text="@string/create_event" />
     </LinearLayout>
 </LinearLayout>

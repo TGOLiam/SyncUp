@@ -1,7 +1,6 @@
 package com.example.sync_up
 
 import android.content.Context
-import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,25 +46,27 @@ class EventListAdapter(context: Context, events: List<EventListItem>) :
                 event.isLead -> R.string.event_lead
                 else -> R.string.event_organizer
             }
-            val roleBackground = if (event.isLead) {
-                R.drawable.event_role_chip
-            } else {
-                R.drawable.event_organizer_chip
-            }
-            val roleColor = if (event.isLead) R.color.event_navy else R.color.event_muted
+            val roleColor = if (event.isLead) R.color.ui_orange else R.color.ui_chip_text
 
             setText(roleText)
-            setBackgroundResource(roleBackground)
+            setBackgroundResource(R.drawable.bg_ui_chip)
             setTextColor(ContextCompat.getColor(context, roleColor))
         }
 
+        // Draft rows use the pale wash surface like the reference example 04.
+        row.findViewById<com.google.android.material.card.MaterialCardView>(R.id.event_card)
+            .setCardBackgroundColor(
+                ContextCompat.getColor(
+                    context,
+                    if (event.draftId != null) R.color.ui_tabs_track else R.color.ui_surface
+                )
+            )
+
         row.findViewById<TextView>(R.id.event_phase).apply {
-            val phaseColor = if (event.activePhase) R.color.event_text else R.color.event_muted
-            val phaseStyle = if (event.activePhase) Typeface.BOLD else Typeface.NORMAL
+            val phaseColor = if (event.activePhase) R.color.ui_ink else R.color.ui_secondary_text
 
             text = event.phase
             visibility = if (event.phase == null) View.GONE else View.VISIBLE
-            setTypeface(null, phaseStyle)
             setTextColor(ContextCompat.getColor(context, phaseColor))
         }
 

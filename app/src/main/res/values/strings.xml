@@ -194,6 +194,9 @@
     <string name="text_send_failed">Could not send message. Try again.</string>
     <string name="text_notification_channel">Text messages</string>
     <string name="text_notification_title">New message</string>
+    <string name="message_you">You</string>
+    <string name="message_member">Member</string>
+    <string name="message_metadata">%1$s · %2$s</string>
     <string name="phase_activate_failed">Could not activate this phase. Try again.</string>
     <string name="location_choose_zone">Choose your current zone</string>
     <string name="location_report_failed">Could not report your location. Try again.</string>

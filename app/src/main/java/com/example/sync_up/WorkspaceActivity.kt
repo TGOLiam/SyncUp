@@ -41,6 +41,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import java.time.OffsetDateTime
+import java.util.Date
 import com.example.sync_up.data.remote.SupabaseClientFactory
 import com.example.sync_up.data.remote.SupabaseEventService
 import com.example.sync_up.data.TextMessageCache
@@ -62,6 +64,7 @@ class WorkspaceActivity : AppCompatActivity() {
     private var speechTimeout: Job? = null
     private var speakingLive = false
     private var messageRetry: Triple<String, String, String>? = null
+    private var ownMemberId: String? = null
     private var messageLoad: Job? = null
     private var retryAfter = 0L
     private var pendingAudioAction: (() -> Unit)? = null
@@ -661,6 +664,7 @@ class WorkspaceActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val message = SupabaseEventService(client).sendTextMessage(messageId, channelId, text)
+                ownMemberId = message.senderMemberId
                 withContext(Dispatchers.IO) {
                     TextMessageCache(applicationContext).use { it.save(userId, listOf(message)) }
                 }
@@ -722,11 +726,51 @@ class WorkspaceActivity : AppCompatActivity() {
             val list = findViewById<LinearLayout>(R.id.comms_messages)
             list.removeAllViews()
             findViewById<View>(R.id.comms_empty_history).visibility = if (messages.isEmpty()) View.VISIBLE else View.GONE
+            val update = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
+            val members = update?.snapshot?.locations.orEmpty()
+            val ownId = members.firstOrNull { it.userId == userId }?.memberId ?: ownMemberId
             for (message in messages) {
-                list.addView(TextView(this@WorkspaceActivity).apply {
+                val isOwn = message.senderMemberId == ownId
+                val sender = if (isOwn) {
+                    getString(R.string.message_you)
+                } else {
+                    members.firstOrNull { it.memberId == message.senderMemberId }?.name
+                        ?: getString(R.string.message_member)
+                }
+                val time = try {
+                    val instant = OffsetDateTime.parse(message.sentAt).toInstant()
+                    android.text.format.DateFormat.getTimeFormat(this@WorkspaceActivity).format(Date.from(instant))
+                } catch (_: Exception) {
+                    ""
+                }
+                val row = LinearLayout(this@WorkspaceActivity).apply {
+                    gravity = if (isOwn) android.view.Gravity.END else android.view.Gravity.START
+                }
+                val bubble = LinearLayout(this@WorkspaceActivity).apply {
+                    orientation = LinearLayout.VERTICAL
+                    setPadding(dp(12), dp(8), dp(12), dp(8))
+                    setBackgroundResource(if (isOwn) R.drawable.comms_message_outgoing else R.drawable.comms_message_incoming)
+                }
+                bubble.addView(TextView(this@WorkspaceActivity).apply {
+                    text = if (time.isEmpty()) sender else getString(R.string.message_metadata, sender, time)
+                    textSize = 12f
+                    maxWidth = dp(256)
+                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, if (isOwn) R.color.comms_outgoing_metadata else R.color.event_muted))
+                })
+                bubble.addView(TextView(this@WorkspaceActivity).apply {
                     text = message.text
-                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.event_text))
-                    setPadding(0, dp(8), 0, dp(8))
+                    textSize = 14f
+                    maxWidth = dp(256)
+                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, if (isOwn) R.color.white else R.color.event_text))
+                })
+                val bubbleWidth = if (isOwn) {
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                } else {
+                    minOf(dp(280), resources.displayMetrics.widthPixels - dp(32))
+                }
+                row.addView(bubble, LinearLayout.LayoutParams(bubbleWidth, LinearLayout.LayoutParams.WRAP_CONTENT))
+                list.addView(row, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                    topMargin = dp(8)
                 })
             }
         }

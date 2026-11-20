@@ -41,6 +41,8 @@
             android:scaleType="fitCenter" />
     </LinearLayout>
 
+    <View style="@style/UiBarDivider" />
+
     <TextView
         style="@style/TextAppearance.Ui.Eyebrow"
         android:layout_width="match_parent"

@@ -35,6 +35,8 @@
             android:text="@string/join_event_title" />
     </LinearLayout>
 
+    <View style="@style/UiBarDivider" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"

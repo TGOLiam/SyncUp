@@ -232,6 +232,17 @@
         <item name="android:textColor">@color/ui_muted</item>
     </style>
     <!-- Connection panel row divider (handoff §7). -->
+    <!--
+        Hairline under every screen's top bar (prototype .bar
+        border-bottom): renders on the event list, auth, create flow,
+        workspace, and join screens.
+    -->
+    <style name="UiBarDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@drawable/ui_divider</item>
+    </style>
+
     <style name="UiPanelDivider">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>

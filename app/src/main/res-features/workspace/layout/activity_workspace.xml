@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:minWidth="72dp" />
     </LinearLayout>
+    <View style="@style/UiBarDivider" />
 
     <FrameLayout
         android:layout_width="match_parent"

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- UI revision: two-color lowercase wordmark. Replaces "My Events" in the
+     event-list toolbar; per handoff §2 decisions 1–2. The two halves share
+     one baseline and style; no logo mark, slash, or gap between words.
+     Usage: <include layout="@layout/ui_wordmark" /> and set an accessible
+     contentDescription on the include so TalkBack reads "syncup" once;
+     the individual halves are hidden from accessibility. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ui_wordmark"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:baselineAligned="true">
+
+    <TextView
+        android:id="@+id/ui_wordmark_sync"
+        style="@style/TextAppearance.Ui.Wordmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        android:text="sync"
+        android:textColor="@color/ui_green"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/ui_wordmark_up"
+        style="@style/TextAppearance.Ui.Wordmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        android:text="up"
+        android:textColor="@color/ui_orange"
+        tools:ignore="HardcodedText" />
+</LinearLayout>

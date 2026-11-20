@@ -183,6 +183,16 @@
     <string name="comms_hold_to_talk">Hold to talk · %1$s</string>
     <string name="comms_connected_description">%1$s connected (preview)</string>
     <string name="comms_disconnected_description">%1$s disconnected (preview)</string>
+    <!-- Refs 19-20: connection panel actions and channel picker sheet. -->
+    <string name="comms_connect">Connect</string>
+    <string name="comms_disconnect">Disconnect</string>
+    <string name="comms_picker_open">Choose a custom channel</string>
+    <string name="comms_picker_title">Choose a channel</string>
+    <string name="comms_picker_close">Close channel picker</string>
+    <string name="comms_picker_guidance">Choose one custom channel to listen to alongside Global.</string>
+    <string name="comms_picker_search_hint">Search channels</string>
+    <string name="comms_picker_empty">No channels match your search.</string>
+    <string name="comms_picker_selected">Selected ✔</string>
     <string name="comms_feature_pending">Communication is not available yet.</string>
     <string name="workspace_no_phases">No phases configured yet.</string>
     <string name="workspace_phases_help">Only Event Leads can change the active phase.</string>

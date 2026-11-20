@@ -318,7 +318,7 @@ class WorkspaceActivity : AppCompatActivity() {
                     return@launch
                 }
                 speakingLive = true
-                findViewById<MaterialButton>(R.id.comms_push_to_talk).setText(R.string.voice_live_speaking)
+                findViewById<TextView>(R.id.comms_push_to_talk).text = getString(R.string.voice_live_speaking)
                 speechTimeout = lifecycleScope.launch {
                     delay(10000)
                     if (lease == active) finishPushToTalk()
@@ -574,75 +574,67 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
+    /** Rows rendered in the connection panel: Global plus the chosen custom channel. */
+    private fun channelRows(): List<String> {
+        val connected = connectedChannel?.takeIf { it != globalChannel }
+        val chosen = connected
+            ?: selectedChannel.takeIf { it != globalChannel && it.isNotEmpty() }
+            ?: draft.channels.firstOrNull()
+        return if (chosen == null) listOf(globalChannel) else listOf(globalChannel, chosen)
+    }
+
+    private fun channelStatus(name: String): LiveAudioSession.Status {
+        val state = LiveAudioSession.state.value
+        val shared = event?.isPreview == false
+        return when {
+            shared && state.eventId != event?.previewId -> LiveAudioSession.Status.DISCONNECTED
+            name == globalChannel -> if (shared) state.global else LiveAudioSession.Status.CONNECTED
+            shared -> if (state.selectedId != null && name == connectedChannel) state.selected
+                      else LiveAudioSession.Status.DISCONNECTED
+            name == connectedChannel -> LiveAudioSession.Status.CONNECTED
+            else -> LiveAudioSession.Status.DISCONNECTED
+        }
+    }
+
     private fun renderChannels() {
         val list = findViewById<LinearLayout>(R.id.comms_channel_list)
         list.removeAllViews()
-        val channels = listOf(globalChannel) + draft.channels
-        for ((index, name) in channels.withIndex()) {
-            if (index > 0) {
-                val divider = View(this)
-                divider.layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    resources.displayMetrics.density.toInt().coerceAtLeast(1)
-                )
-                divider.setBackgroundColor(ContextCompat.getColor(this, R.color.event_border))
-                list.addView(divider)
+        val state = LiveAudioSession.state.value
+        for ((index, name) in channelRows().withIndex()) {
+            val row = LayoutInflater.from(this).inflate(
+                if (index == 0) R.layout.item_comms_global else R.layout.item_comms_picker,
+                list,
+                false
+            )
+            row.findViewById<TextView>(R.id.comms_channel_name).text = name
+            row.findViewById<View>(R.id.comms_picker_trigger)?.apply {
+                contentDescription = getString(R.string.comms_picker_open)
+                setOnClickListener { openChannelSheet(name) }
             }
-            val row = LayoutInflater.from(this).inflate(R.layout.item_comms_channel, list, false)
-            row.findViewById<TextView>(R.id.comms_channel_name).apply {
-                text = name
-                setTypeface(null, if (name == selectedChannel) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
-            }
-            val state = LiveAudioSession.state.value
-            val isShared = event?.isPreview == false
-            val id = channelIds[if (index == 0) "" else name]
-            val sameEvent = state.eventId == event?.previewId
-            val status = if (!isShared) {
-                if (index == 0 || name == connectedChannel) LiveAudioSession.Status.CONNECTED
-                else LiveAudioSession.Status.DISCONNECTED
-            } else if (!sameEvent) {
-                LiveAudioSession.Status.DISCONNECTED
-            } else if (index == 0) {
-                state.global
-            } else if (id == state.selectedId) {
-                state.selected
-            } else {
-                LiveAudioSession.Status.DISCONNECTED
-            }
+            val toggle = row.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.comms_channel_toggle)
+            val status = channelStatus(name)
             val connected = status == LiveAudioSession.Status.CONNECTED
-            row.findViewById<ImageButton>(R.id.comms_channel_call).apply {
-                imageTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(this@WorkspaceActivity,
-                        if (connected) R.color.comms_connected else R.color.comms_disconnected)
-                )
-                contentDescription = getString(
-                    if (connected) R.string.comms_connected_description else R.string.comms_disconnected_description,
-                    name
-                )
-                setOnClickListener {
-                    if (!isShared) {
-                        if (index != 0) {
-                            connectedChannel = if (connectedChannel == name) null else name
-                            selectedChannel = connectedChannel ?: globalChannel
-                            renderChannels()
-                            renderConversation()
-                        }
-                        return@setOnClickListener
-                    }
+            toggle.visibility = View.VISIBLE
+            toggle.setText(if (connected) R.string.comms_disconnect else R.string.comms_connect)
+            toggle.contentDescription = getString(
+                if (connected) R.string.comms_connected_description else R.string.comms_disconnected_description,
+                name
+            )
+            toggle.setOnClickListener {
+                if (index != 0) {
+                    val id = channelIds[name]
                     val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
                     val eventId = event?.previewId
                     val globalId = channelIds[""]
-                    if (user == null || eventId == null || globalId == null || id == null) {
+                    if (event?.isPreview != false) {
+                        connectedChannel = if (connected) null else name
+                        selectedChannel = connectedChannel ?: globalChannel
+                        renderChannels()
+                        renderConversation()
+                    } else if (user == null || eventId == null || globalId == null || id == null) {
                         Toast.makeText(this@WorkspaceActivity, R.string.voice_channel_unavailable, Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                    if (index == 0) {
-                        val enabled = if (sameEvent) state.global != LiveAudioSession.Status.DISCONNECTED else false
-                        withNotificationPermission {
-                            LiveAudioService.setGlobal(applicationContext, user, eventId, globalId, !enabled)
-                        }
                     } else {
-                        val selected = if (sameEvent && state.selectedId == id) null else id
+                        val selected = if (connected) null else id
                         withNotificationPermission {
                             LiveAudioService.select(applicationContext, user, eventId, globalId, selected)
                             selectedChannel = if (selected == null) globalChannel else name
@@ -650,58 +642,160 @@ class WorkspaceActivity : AppCompatActivity() {
                     }
                 }
             }
-            row.setOnClickListener {
-                if (name == globalChannel || name == connectedChannel) {
-                    selectedChannel = name
-                    renderChannels()
-                    renderConversation()
-                }
-            }
             list.addView(row)
         }
     }
-
     private fun renderConversation() {
         findViewById<TextView>(R.id.comms_history_title).text = selectedChannel
         findViewById<EditText>(R.id.comms_message).hint = getString(R.string.comms_message_hint, selectedChannel)
-        findViewById<MaterialButton>(R.id.comms_push_to_talk).text = if (speakingLive) {
-            getString(R.string.voice_live_speaking)
-        } else {
-            getString(R.string.comms_hold_to_talk, selectedChannel)
+        findViewById<TextView>(R.id.comms_push_to_talk).apply {
+            text = if (speakingLive) {
+                getString(R.string.voice_live_speaking)
+            } else {
+                getString(R.string.comms_hold_to_talk, selectedChannel)
+            }
         }
+        // Refs 19-20: segment tabs are Global and the row's custom channel
+        // (shows Not connected until that channel connects).
         val tabs = findViewById<LinearLayout>(R.id.comms_history_tabs)
         tabs.removeAllViews()
-        val visibleTabs = listOf(globalChannel, connectedChannel)
+        val customTab = connectedChannel?.takeIf { it != globalChannel }
+            ?: selectedChannel.takeIf { it != globalChannel && it.isNotEmpty() }
+            ?: draft.channels.firstOrNull()
+        val visibleTabs = listOf(
+            globalChannel,
+            customTab ?: ""
+        )
         for ((index, name) in visibleTabs.withIndex()) {
+            val isCustomRow = index == 1
             val tab = TextView(this)
-            tab.text = name ?: getString(R.string.comms_not_connected)
-            tab.gravity = android.view.Gravity.CENTER
-            tab.setTypeface(null, android.graphics.Typeface.BOLD)
-            tab.setTextColor(
-                ContextCompat.getColor(this, if (name == selectedChannel) R.color.white else R.color.event_navy)
-            )
-            val background = if (index == 0) {
-                R.drawable.comms_segment_left
+            tab.text = if (isCustomRow && name.isEmpty()) {
+                getString(R.string.comms_not_connected)
             } else {
-                R.drawable.comms_segment_right
+                name
             }
-            tab.setBackgroundResource(background)
-            tab.backgroundTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(this, if (name == selectedChannel) R.color.event_navy else R.color.white)
+            tab.gravity = android.view.Gravity.CENTER
+            val selected = name.isNotEmpty() && name == selectedChannel
+            tab.setTypeface(null, if (selected) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
+            tab.setTextColor(
+                ContextCompat.getColor(this, if (selected) R.color.ui_ink else R.color.ui_nav_text)
             )
-            tab.isSelected = name == selectedChannel
-            if (name != null) {
+            if (selected) tab.setBackgroundResource(R.drawable.bg_ui_tab_selected)
+            tab.isSelected = selected
+            val connectable = name.isNotEmpty() &&
+                channelStatus(name) == LiveAudioSession.Status.CONNECTED
+            if (connectable) {
                 tab.setOnClickListener {
                     selectedChannel = name
                     renderChannels()
                     renderConversation()
                 }
             }
-            tabs.addView(tab, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f))
+            val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f)
+            if (index > 0) params.marginStart = dp(4)
+            // Not-connected tabs stay inert without consuming space.
+            tab.visibility = if (index == 1 && name.isEmpty()) View.GONE else if (index == 0) View.VISIBLE else View.VISIBLE
+            tabs.addView(tab, params)
         }
         loadMessages()
     }
 
+    /** Ref §7: bottom sheet picker bound to one event custom channel selection. */
+    private fun openChannelSheet(current: String) {
+        val channels = draft.channels
+        if (channels.isEmpty()) {
+            Toast.makeText(this, R.string.comms_feature_pending, Toast.LENGTH_SHORT).show()
+            return
+        }
+        val sheet = com.google.android.material.bottomsheet.BottomSheetDialog(this, R.style.Theme_SYNCUP_BottomSheet)
+        val content = layoutInflater.inflate(R.layout.sheet_channel_picker, null)
+        sheet.setContentView(content)
+        content.findViewById<View>(R.id.picker_close).setOnClickListener { sheet.dismiss() }
+        val rows = content.findViewById<LinearLayout>(R.id.picker_rows)
+        val empty = content.findViewById<TextView>(R.id.picker_empty)
+        val search = content.findViewById<EditText>(R.id.picker_search)
+        fun render(query: String) {
+            rows.removeAllViews()
+            val matches = channels.filter { it.lowercase().contains(query.trim().lowercase()) }
+            empty.visibility = if (matches.isEmpty()) View.VISIBLE else View.GONE
+            for (name in matches) {
+                val selectedHere = name == selectedChannel
+                val row = LinearLayout(this).apply {
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    orientation = LinearLayout.HORIZONTAL
+                    if (selectedHere) {
+                        setBackgroundResource(R.drawable.bg_ui_wash)
+                    } else {
+                        setBackgroundResource(R.drawable.bg_ui_row_divider)
+                    }
+                    setOnClickListener {
+                        sheet.dismiss()
+                        chooseChannel(name)
+                    }
+                }
+                row.addView(TextView(this).apply {
+                    text = name
+                    textSize = 14f
+                    maxLines = 1
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_ink))
+                }, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                    setMargins(dp(14), dp(14), dp(8), dp(14))
+                })
+                if (selectedHere) {
+                    row.addView(TextView(this).apply {
+                        text = getString(R.string.comms_picker_selected)
+                        textSize = 12f
+                        setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_chip_text))
+                        setPadding(dp(8), dp(14), dp(14), dp(14))
+                    })
+                }
+                rows.addView(row)
+            }
+        }
+        render("")
+        search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                render(s?.toString().orEmpty())
+            }
+        })
+        sheet.show()
+    }
+
+    /** Handles picker selection with the existing transfer rules. */
+    private fun chooseChannel(name: String) {
+        val selectedChannelId = channelIds[name]
+        val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+        val eventId = event?.previewId
+        val globalId = channelIds[""]
+        if (event?.isPreview == true || user == null || eventId == null || globalId == null) {
+            selectedChannel = name
+            renderChannels()
+            renderConversation()
+            return
+        }
+        val state = LiveAudioSession.state.value
+        val wasSelected = state.selectedId != null
+        val sameEvent = state.eventId == eventId
+        if (selectedChannelId == null || !sameEvent) {
+            selectedChannel = name
+            renderChannels()
+            renderConversation()
+            return
+        }
+        selectedChannel = name
+        if (wasSelected) {
+            // Connected custom channel: the service transfers the selection.
+            withNotificationPermission {
+                LiveAudioService.select(applicationContext, user, eventId, globalId, selectedChannelId)
+            }
+        } else {
+            renderChannels()
+            renderConversation()
+        }
+    }
     private fun sendTextMessage() {
         val input = findViewById<EditText>(R.id.comms_message)
         val text = input.text.toString()
@@ -910,6 +1004,8 @@ class WorkspaceActivity : AppCompatActivity() {
             val update = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
             val members = update?.snapshot?.locations.orEmpty()
             val ownId = members.firstOrNull { it.userId == userId }?.memberId ?: ownMemberId
+            val screenPadding = dp(32)
+            val maxBubble = (resources.displayMetrics.widthPixels - screenPadding) * 88 / 100
             for (message in messages) {
                 val isOwn = message.senderMemberId == ownId
                 val sender = if (isOwn) {
@@ -927,32 +1023,41 @@ class WorkspaceActivity : AppCompatActivity() {
                 val row = LinearLayout(this@WorkspaceActivity).apply {
                     gravity = if (isOwn) android.view.Gravity.END else android.view.Gravity.START
                 }
+                // Handoff §7: pale incoming bubbles hug the left edge; green
+                // outgoing bubbles size to their content on the right.
                 val bubble = LinearLayout(this@WorkspaceActivity).apply {
                     orientation = LinearLayout.VERTICAL
-                    setPadding(dp(12), dp(8), dp(12), dp(8))
-                    setBackgroundResource(if (isOwn) R.drawable.comms_message_outgoing else R.drawable.comms_message_incoming)
+                    setPadding(dp(12), dp(12), dp(12), dp(12))
+                    setBackgroundResource(if (isOwn) R.drawable.bg_ui_bubble_outgoing else R.drawable.bg_ui_bubble_incoming)
                 }
                 bubble.addView(TextView(this@WorkspaceActivity).apply {
                     text = if (time.isEmpty()) sender else getString(R.string.message_metadata, sender, time)
                     textSize = 12f
-                    maxWidth = dp(256)
-                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, if (isOwn) R.color.comms_outgoing_metadata else R.color.event_muted))
+                    setTextColor(
+                        ContextCompat.getColor(
+                            this@WorkspaceActivity,
+                            if (isOwn) R.color.ui_outgoing_meta else R.color.ui_incoming_meta
+                        )
+                    )
                 })
                 bubble.addView(TextView(this@WorkspaceActivity).apply {
                     text = message.text
                     textSize = 14f
-                    maxWidth = dp(256)
-                    setTextColor(ContextCompat.getColor(this@WorkspaceActivity, if (isOwn) R.color.white else R.color.event_text))
+                    setTextColor(
+                        ContextCompat.getColor(
+                            this@WorkspaceActivity,
+                            if (isOwn) R.color.ui_outgoing_text else R.color.ui_ink
+                        )
+                    )
                 })
-                val bubbleWidth = if (isOwn) {
+                row.addView(bubble, LinearLayout.LayoutParams(
+                    if (isOwn) LinearLayout.LayoutParams.WRAP_CONTENT else maxBubble,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                } else {
-                    minOf(dp(280), resources.displayMetrics.widthPixels - dp(32))
-                }
-                row.addView(bubble, LinearLayout.LayoutParams(bubbleWidth, LinearLayout.LayoutParams.WRAP_CONTENT))
-                list.addView(row, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                    topMargin = dp(8)
-                })
+                ))
+                list.addView(row, LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(8) })
             }
         }
     }

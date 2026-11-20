@@ -231,4 +231,18 @@
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/ui_muted</item>
     </style>
+    <!-- Connection panel row divider (handoff §7). -->
+    <style name="UiPanelDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/ui_divider</item>
+    </style>
+
+    <!-- Bottom sheet surface for the channel picker (dim scrim from Material). -->
+    <style name="Theme.SYNCUP.BottomSheet" parent="Theme.Material3.Light.BottomSheetDialog">
+        <item name="android:colorBackground">@color/ui_surface</item>
+        <item name="colorSurface">@color/ui_surface</item>
+    </style>
+
 </resources>

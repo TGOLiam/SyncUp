@@ -1,0 +1,5 @@
+<!-- UI revision: avatars are 4dp-radius squares in the pale green token. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/ui_avatar" />
+    <corners android:radius="4dp" />
+</shape>

@@ -1,0 +1,5 @@
+<!-- UI revision: top hairline used above the workspace navigation row. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="top" android:height="1dp"
+        android:drawable="@drawable/ui_divider" />
+</layer-list>

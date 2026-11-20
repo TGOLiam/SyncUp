@@ -190,6 +190,17 @@
     <string name="workspace_phase_active">Active now</string>
     <string name="workspace_phase_upcoming">Upcoming</string>
     <string name="workspace_phase_activate">Activate</string>
+    <!-- Ref 16: happening-now banner and organizers entry. -->
+    <string name="workspace_happening_now">HAPPENING NOW</string>
+    <string name="workspace_organizers">Organizers</string>
+    <string name="workspace_organizers_hint">View everyone who joined</string>
+    <string name="workspace_organizers_heading">Joined organizers</string>
+    <string name="workspace_organizer_members">%1$d members</string>
+    <string name="workspace_organizer_no_location">Location not reported yet</string>
+    <string name="workspace_organizer_reported">%1$s · reported %2$s</string>
+    <string name="workspace_location_caveat">Locations are manually reported and may not be current.</string>
+    <string name="workspace_organizer_badge_lead">Event Lead</string>
+    <string name="workspace_organizer_badge_you">You · Event Lead</string>
     <string name="code_share_ready_message">Share this code with people joining your event.</string>
     <string name="creation_submit_failed">Could not confirm event creation. Your draft is saved; retry with the same details.</string>
     <string name="creation_cache_failed">Event created, but it could not be saved locally. Return to My Events to refresh.</string>

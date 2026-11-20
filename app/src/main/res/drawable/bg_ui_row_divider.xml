@@ -1,0 +1,5 @@
+<!-- UI revision: bottom hairline used by borderless workspace rows. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="bottom" android:height="1dp"
+        android:drawable="@drawable/ui_divider" />
+</layer-list>

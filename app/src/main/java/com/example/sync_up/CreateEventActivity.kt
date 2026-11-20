@@ -459,7 +459,7 @@ class CreateEventActivity : AppCompatActivity() {
         val inputs = layoutInflater.inflate(R.layout.dialog_zone_input, null)
         val name = inputs.findViewById<EditText>(R.id.zone_input_name)
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setTitle(R.string.venue_add_zone_title)
+            .setCustomTitle(dialogTitle(R.string.venue_add_zone_title))
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.save, null)
@@ -559,7 +559,7 @@ class CreateEventActivity : AppCompatActivity() {
             minutes.setText(phase.minutes.toString())
         }
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setTitle(if (index == null) R.string.phase_add_title else R.string.phase_edit_title)
+            .setCustomTitle(dialogTitle(if (index == null) R.string.phase_add_title else R.string.phase_edit_title))
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.save, null)
@@ -605,7 +605,7 @@ class CreateEventActivity : AppCompatActivity() {
         val inputs = layoutInflater.inflate(R.layout.dialog_channel_input, null)
         val name = inputs.findViewById<EditText>(R.id.channel_input_name)
         val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
-            .setTitle(R.string.channel_add_title)
+            .setCustomTitle(dialogTitle(R.string.channel_add_title))
             .setView(inputs)
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.save, null)
@@ -643,4 +643,13 @@ class CreateEventActivity : AppCompatActivity() {
     }
 
 
+}
+
+private fun android.content.Context.dialogTitle(resId: Int): android.view.View {
+    // Revision dialogs use condensed 24sp headings on the surface color.
+    val title = android.widget.TextView(this)
+    title.setText(resId)
+    title.setTextAppearance(R.style.TextAppearance_Ui_DialogTitle)
+    title.setTextColor(getColor(R.color.ui_ink))
+    return title
 }

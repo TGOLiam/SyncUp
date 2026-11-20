@@ -1,0 +1,2238 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <title>
+   SyncUp — Field Notes / Design 02
+  </title>
+  <style>
+   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--paper:#f2f0e9;--ink:#222a28;--muted:#717974;--line:#d5d8ce;--orange:#b63e20;--wash:#e8ebe3;--white:#fffefa;--dark:#213b35}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.45 'DM Sans','Cantarell',sans-serif}button,a,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--orange);outline-offset:3px}header{padding:28px 40px 0;background:var(--paper)}.masthead{display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--ink)}.wordmark{font-weight:700;font-size:30px;letter-spacing:-2px;text-decoration:none;color:var(--ink);display:flex;align-items:baseline}.wordmark span{color:var(--orange)}.wordmark i{width:7px;height:7px;background:var(--orange);margin-left:5px}.edition{font:11px/1.5 'Adwaita Mono',monospace;text-align:right;letter-spacing:.08em}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;padding:48px 0 40px}.kicker,.chapter{font:11px 'Adwaita Mono',monospace;letter-spacing:.1em;color:var(--orange)}h1{font:600 clamp(42px,5vw,76px)/.98 'Barlow Condensed','Cantarell',sans-serif;letter-spacing:-.035em;margin:16px 0 0}.hero p{max-width:310px;color:#56635b;line-height:1.65;margin:0 0 4px}.board-controls{border-top:1px solid var(--line);border-bottom:1px solid var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}.board-controls>div{display:flex;gap:4px;flex-wrap:wrap}.board-controls button{border:0;background:transparent;color:#66716a;padding:10px 14px;border-radius:3px;font-size:12px}.board-controls button[aria-pressed=true]{background:var(--ink);color:var(--white)}.board-controls button span{margin-left:8px;opacity:.7}.board-controls>span{font:10px 'Adwaita Mono',monospace;letter-spacing:.05em;color:var(--muted)}main{padding:48px 40px 80px}.group{margin-bottom:64px}.group[hidden]{display:none}.group h2{font:600 36px 'Barlow Condensed','Cantarell',sans-serif;letter-spacing:-.025em;margin:8px 0 4px}.group-desc{color:var(--muted);margin:0 0 28px}.grid{display:flex;gap:28px;overflow-x:auto;padding:0 0 24px;align-items:flex-start;scrollbar-color:#a9b3a8 transparent;scroll-snap-type:x proximity}.sample{flex:0 0 350px;scroll-snap-align:start}.screen-number{font:11px 'Adwaita Mono',monospace;color:var(--orange);margin-bottom:4px}.sample h3{font-size:12px;font-weight:500;color:#616e65;margin:0 0 12px;min-height:18px}.phone{width:350px;height:748px;border:1px solid #bdc7bb;border-radius:18px;background:var(--white);display:flex;flex-direction:column;overflow:hidden;position:relative;box-shadow:0 8px 14px #253b2e08}.status{height:28px;padding:7px 16px;font:10px 'Adwaita Mono',monospace;background:var(--white);flex:none}.status span{float:right}.bar{height:60px;padding:16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;font-size:16px;font-weight:700;background:var(--white);flex:none}.bar small{font:9px 'Adwaita Mono',monospace;letter-spacing:.1em;margin-bottom:3px}.bar .back{font-size:28px;font-weight:400}.body{padding:16px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;overflow:auto}.heading{font:600 28px/1.1 'Barlow Condensed','Cantarell',sans-serif;letter-spacing:-.02em}small,.muted{display:block;color:#65756a;font-size:12px}b,strong{font-weight:600}label{display:flex;flex-direction:column;gap:8px;font-size:12px;font-weight:600}.input{min-height:48px;border:1px solid #cbd3c7;border-radius:4px;padding:12px;background:#fcfdf9;color:#68786d;font-size:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.row>div{min-width:0}.row label{flex:1;min-width:0}.grow{flex:1}.card{padding:14px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent}.card p{font-size:12px;margin:8px 0 0;color:#516a5c}.badge{font:10px 'Adwaita Mono',monospace;white-space:nowrap;background:#e7ece1;color:#345241;border-radius:3px;padding:5px 7px}.button,.primary{padding:10px 12px;min-height:44px;border-radius:4px;border:1px solid #b7c5b5;background:transparent;color:var(--dark);font-size:12px;font-weight:600}.primary{background:var(--dark);border-color:var(--dark);color:var(--white)}.button:hover{background:#e8eee3}.primary:hover{background:#132d25}.foot{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:var(--white);flex:none}.foot>*{flex:1;min-width:0}.foot .primary{background:var(--orange);border-color:var(--orange)}nav{display:flex;min-height:64px;background:var(--white);border-top:1px solid var(--line);flex:none}nav>div{flex:1;text-align:center;font-size:10px;color:#758176;padding:8px 0}nav span{display:block;font-size:20px;margin-bottom:2px}nav .selected{color:var(--dark);font-weight:700;border-top:3px solid var(--orange);padding-top:5px;background:#f0f3eb}.progress-label{display:flex;justify-content:space-between;font:10px 'Adwaita Mono',monospace;color:#68796c}.progress-label b{color:var(--dark)}.progress{display:flex;gap:4px;margin-bottom:8px}.progress i{height:4px;background:#e0e7d9;flex:1}.progress .done{background:var(--orange)}.map{background:#f1f3e9;border:1px solid #c8d2bf;border-radius:4px;padding:8px;min-height:200px}.map svg{display:block;width:100%;height:200px}.map svg>rect:first-child{fill:#fcfdf8;stroke:#364c3b}.map svg>rect:not(:first-child){fill:#dce7d2;stroke:#72876a;stroke-dasharray:4 3}.map text{fill:#3e5c3e;font:10px 'DM Sans','Cantarell',sans-serif}.workspace-map .map{padding:0;aspect-ratio:1.3;min-height:0;flex:none}.workspace-map .map svg{height:100%}.venue-editor .map{min-height:340px;flex:1;display:flex;align-items:center}.venue-editor .map svg{height:auto;max-height:100%}.compact>*{flex:1;font-size:11px;padding:8px}.team-link{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--dark)}.team-link>span:last-child{font-family:'Adwaita Mono',monospace;color:var(--orange)}.phase-banner{padding:14px;background:var(--dark);border-radius:4px;display:flex;justify-content:space-between;align-items:center}.phase-banner small{color:#c4d2bd;font:9px 'Adwaita Mono',monospace;letter-spacing:.07em}.phase-banner .badge{color:#f5f7ee;background:transparent;font-size:14px;padding:0}.area .body>b{font:10px 'Adwaita Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-top:4px}.area .body>.card{padding:0 0 12px}.avatar{display:grid;place-items:center;width:36px;height:36px;flex:none;background:#dce6d1;color:var(--dark);border-radius:4px;font:18px 'Barlow Condensed','Cantarell',sans-serif}.member{display:flex;gap:12px;align-items:flex-start}.member>div:last-child{flex:1;min-width:0}.team .body>.card{padding:14px 0}.center{display:flex;flex-direction:column;gap:16px;text-align:center;margin:auto 0}.code{font:600 40px 'Adwaita Mono',monospace;letter-spacing:5px}.success-mark{width:56px;height:56px;margin:0 auto;background:#dfe9d4;color:#294d32;border-radius:50%;display:grid;place-items:center;font-size:28px}.overlay{position:absolute;inset:0;display:grid;place-items:center;padding:20px;background:#22362a80}.dialog{width:100%;display:flex;flex-direction:column;gap:16px;background:var(--white);padding:20px;border-radius:8px;box-shadow:0 12px 32px #18332026}.dialog .row{justify-content:flex-end}.dialog>b{font:600 24px 'Barlow Condensed','Cantarell',sans-serif}.dialog p{margin:0;padding:10px 0;border-bottom:1px solid var(--line)}.dialog .row .button,.dialog .row .primary{min-width:80px}.bubble{border:0;background:#edf1e6;color:#637361;border-radius:4px 10px 10px 10px;padding:12px;width:88%;font-size:11px}.bubble b{display:inline-block;color:var(--ink);font-weight:400;font-size:14px;margin-top:4px}.mine{align-self:flex-end;width:auto;background:var(--dark);border-radius:10px 4px 10px 10px;color:#c3d2bd}.mine b{color:#f6f7ef}.tabs{display:flex;padding:4px;background:#e9eee2;border-radius:4px;gap:4px}.tabs>*{flex:1;text-align:center;padding:10px 4px;font-size:12px;color:#687966}.tabs b{background:var(--white);border-radius:2px;color:var(--dark);box-shadow:0 1px 2px #253b2e14}.comms-foot{padding:12px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);background:#fffefa}.comms-foot>.primary{min-height:56px;background:var(--orange);border-color:var(--orange)}.comms-foot .input{min-width:0}.comms .channel-line{padding:12px 0}.comms .channel-line .muted{font-size:11px}.comms .body>small{font:10px 'Adwaita Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:12px}.active{background:var(--dark);border:0;border-left:4px solid var(--orange);color:#f6f7ee;padding:16px 12px;border-radius:4px}.active small{color:#c2d4bd}.active .badge{background:#f1f4e9;color:#355440}.phase-screen .body>.card:not(.active){padding:16px 0}.auth .bar{border:0;color:var(--orange);font-size:18px;letter-spacing:-1px}.auth .body{padding-top:36px;gap:20px}.auth .heading{font-size:36px;max-width:230px}.auth-copy{color:#68776c;font-size:13px;margin:-8px 0 12px}.auth .body>.primary{margin-top:4px;background:var(--orange);border-color:var(--orange)}.auth .body>.button{border:0;min-height:44px}.section-intro{padding:8px 0 20px}.section-intro>small{font:10px 'Adwaita Mono',monospace;color:var(--orange);letter-spacing:.08em}.section-intro h4{font:600 32px 'Barlow Condensed','Cantarell',sans-serif;margin:8px 0 0;letter-spacing:-.02em}.events .body>.card{border:1px solid var(--line);padding:16px;border-radius:4px}.events .body>.card:nth-of-type(3){border-left:4px solid var(--orange)}.events .row{align-items:flex-start;flex-wrap:wrap}.events .row>b{flex-basis:100%;font-size:16px}.events .body>.card:first-of-type{background:#e9eee2}.body button{transition:background-color .15s}.group{animation:arrive .35s ease-out}@keyframes arrive{from{transform:translateY(8px)}to{transform:translateY(0)}}@media(max-width:800px){header{padding:24px 20px 0}.hero{display:block;padding:32px 0}.hero p{margin-top:24px}.board-controls{align-items:flex-start}.board-controls>span{display:none}main{padding:32px 20px}.sample{flex-basis:min(350px,calc(100vw - 40px))}.phone{width:100%}.edition{font-size:9px}.hero h1{font-size:50px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.group{animation:none}.body button{transition:none}}
+  </style>
+  <style>
+   .connection-panel{border-bottom:1px solid var(--line);padding-bottom:4px}.connection-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0}.connection-row+.connection-row{border-top:1px solid var(--line)}.connection-caption{display:block;font:9px 'Adwaita Mono',monospace;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}.connection-row b{font-size:14px}.connection-row small{font-size:11px;margin-top:4px}.connection-toggle{border:1px solid #abbca8;background:transparent;border-radius:4px;color:var(--dark);padding:10px 12px;min-height:44px;font-size:11px;font-weight:600;flex:none;min-width:90px}.connection-toggle[data-connected=false]{background:var(--dark);color:var(--white);border-color:var(--dark)}.channel-picker-trigger{display:flex;align-items:center;gap:12px;border:0;border-bottom:1px solid #b2c0ad;background:transparent;padding:0 0 3px;color:var(--dark);font-weight:600;font-size:14px;min-height:32px;text-align:left}.channel-picker-trigger span:first-child{max-width:155px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tabs button{border:0;cursor:pointer;background:transparent;min-height:40px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-radius:3px}.tabs button[aria-pressed=true]{background:var(--white);color:var(--dark);font-weight:600;box-shadow:0 1px 2px #253b2e14}.picker-backdrop{position:absolute;inset:0;z-index:5;background:#22362a80;display:flex;align-items:flex-end}.picker-backdrop[hidden]{display:none}.channel-sheet{background:var(--white);border-radius:16px 16px 0 0;width:100%;padding:8px 16px 20px;max-height:86%;display:flex;flex-direction:column;gap:12px}.sheet-handle{width:32px;height:4px;border-radius:4px;background:#b5c0b1;margin:0 auto 4px}.sheet-heading{display:flex;align-items:center;justify-content:space-between}.sheet-heading h4{font:600 26px 'Barlow Condensed','Cantarell',sans-serif;margin:0}.close-picker{width:44px;height:44px;background:transparent;border:0;font-size:24px;color:var(--dark)}.channel-sheet p{color:#65756a;font-size:12px;margin:0}.channel-search input{width:100%;min-height:44px;border:1px solid #bdc9b5;border-radius:4px;padding:10px;background:#f8faf3;color:var(--ink)}.sr-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.channel-options{overflow:auto}.channel-option{display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;padding:14px 8px;min-height:48px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px}.channel-option[aria-pressed=true]{background:#e8eee0;color:var(--dark)}.channel-option span:last-child{color:#637361;font-size:11px}[hidden]{display:none!important}
+  </style>
+  <style>
+   .connection-panel{display:flex;flex-direction:column;gap:0;padding:0 0 8px;border-bottom:1px solid var(--line)}.compact-channel{display:flex;align-items:center;gap:4px;min-height:48px}.compact-channel>b{font-size:14px}.compact-channel .connection-toggle{display:grid;place-items:center;min-width:44px;width:44px;height:44px;min-height:44px;padding:0;border:0;background:transparent;border-radius:4px;flex:none}.compact-channel .connection-toggle[data-connected=false]{background:transparent;border:0}.connection-dot{display:block;width:12px;height:12px;border-radius:50%;background:#b83b32;box-shadow:0 0 0 3px #b83b3210}.connection-toggle[data-connected=true] .connection-dot{background:#287a48;box-shadow:0 0 0 3px #287a4810}.compact-channel .channel-picker-trigger{min-height:44px;padding:0;border:0;gap:12px}.compact-channel .channel-picker-trigger:hover{color:var(--orange)}
+  </style>
+  <style>
+   .compact-channel{justify-content:space-between;gap:12px}.compact-channel>.connection-toggle{margin-left:auto}.compact-channel+.compact-channel{border-top:1px solid var(--line)}.compact-channel .channel-picker-trigger{flex:1;justify-content:flex-start}.compact-channel>b{padding-left:0}
+  </style>
+  <style>
+   .channel-name-status{display:flex;align-items:center;gap:8px;min-width:0}.channel-name-status .channel-picker-trigger{flex:initial;min-width:0}.channel-name-status .connection-dot{flex:none;width:10px;height:10px}.connection-dot[data-connected=true]{background:#287a48;box-shadow:0 0 0 3px #287a4810}.compact-channel>.connection-toggle{display:block;width:auto;min-width:90px;min-height:44px;height:auto;padding:10px 12px;border:1px solid #abbca8;border-radius:4px;color:var(--dark);background:transparent;font-size:11px;font-weight:600}.compact-channel>.connection-toggle[data-connected=false]{background:var(--dark);color:var(--white);border:1px solid var(--dark)}
+  </style>
+  <style>
+   /* Custom channel selector only; preserve connection actions and row spacing. */
+.comms .channel-name-status .channel-picker-trigger{
+ display:inline-flex;
+ align-items:center;
+ gap:8px;
+ min-height:40px;
+ max-width:100%;
+ padding:8px 10px;
+ border:1px solid #ced7c7;
+ border-radius:5px;
+ background:#f5f7f0;
+ color:var(--dark);
+ font-size:13px;
+ font-weight:600;
+}
+.comms .channel-picker-trigger [data-channel-name]{
+ max-width:115px;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+.comms .channel-picker-trigger .connection-dot{
+ width:8px;
+ height:8px;
+ flex:none;
+ box-shadow:none;
+}
+.comms .channel-picker-trigger .picker-chevron{
+ display:grid;
+ place-items:center;
+ width:16px;
+ margin-left:4px;
+ color:#6c7e67;
+ font-size:14px;
+}
+.comms .channel-name-status .channel-picker-trigger:hover{
+ background:#eaf0e3;
+ border-color:#a9bba0;
+}
+  </style>
+  <style>
+   /* Equal label and action geometry keeps Global and custom channels aligned. */
+.comms .compact-channel{min-height:52px;gap:12px;align-items:center;justify-content:space-between}
+.comms .channel-name-status{min-height:44px;display:flex;align-items:center;flex:1;min-width:0}
+.comms .channel-name-status>b{padding:0 10px;font-size:13px;font-weight:600}
+.comms .channel-name-status .channel-picker-trigger{height:40px;min-height:40px;padding:0 10px;gap:8px;font-size:13px;box-sizing:border-box}
+.comms .compact-channel>.connection-toggle{height:40px;min-height:40px;min-width:90px;padding:0 12px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;margin:0}
+  </style>
+  <style>
+   /* Balanced channel and connection columns. */
+.comms .connection-panel{
+ display:flex;
+ flex-direction:column;
+ gap:8px;
+ padding:4px 0 16px;
+ border-bottom:1px solid var(--line);
+}
+.comms .compact-channel{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 90px;
+ align-items:center;
+ gap:12px;
+ min-height:44px;
+ padding:0;
+}
+.comms .compact-channel+.compact-channel{border-top:0}
+.comms .channel-name-status{display:flex;min-width:0;min-height:44px;width:100%}
+.comms .channel-name-status>b,
+.comms .channel-name-status .channel-picker-trigger{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ width:100%;
+ max-width:100%;
+ min-height:44px;
+ height:44px;
+ margin:0;
+ padding:0 12px;
+ border:1px solid #dce2d5;
+ border-radius:5px;
+ background:#f3f6ee;
+ color:var(--dark);
+ font-size:13px;
+ font-weight:600;
+ box-sizing:border-box;
+}
+.comms .channel-picker-trigger [data-channel-name]{max-width:none;min-width:0;flex:1}
+.comms .channel-picker-trigger .picker-chevron{margin:0;flex:none}
+.comms .compact-channel>.connection-toggle,
+.comms .compact-channel>.connection-toggle[data-connected=false]{
+ width:90px;
+ min-width:90px;
+ height:44px;
+ min-height:44px;
+ margin:0;
+ padding:0 8px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ border:1px solid #b7c5b5;
+ border-radius:5px;
+ background:transparent;
+ color:var(--dark);
+ font-size:11px;
+ font-weight:600;
+ box-shadow:none;
+}
+.comms .compact-channel>.connection-toggle:hover{background:#e9eee2}
+  </style>
+  <style>
+   /* A clear dropdown affordance, separated from the channel label. */
+.comms .channel-name-status .channel-picker-trigger{padding-right:0;gap:8px}
+.comms .channel-picker-trigger .picker-chevron{
+ display:grid;
+ place-items:center;
+ align-self:stretch;
+ width:36px;
+ flex:0 0 36px;
+ margin:0;
+ border-left:1px solid #d4ddcc;
+ background:#e8eee0;
+ border-radius:0 4px 4px 0;
+}
+.comms .channel-picker-trigger .picker-chevron::after{
+ content:'';
+ display:block;
+ width:7px;
+ height:7px;
+ border-right:2px solid #36523b;
+ border-bottom:2px solid #36523b;
+ transform:translateY(-2px) rotate(45deg);
+}
+  </style>
+  <style>
+   .brand-lab{margin-bottom:56px;padding-bottom:32px;border-bottom:1px solid var(--line)}.brand-lab h2{font:600 36px 'Barlow Condensed','Cantarell',sans-serif;letter-spacing:-.025em;margin:8px 0 4px}.brand-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.brand-choice{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:8px;min-height:184px;border:1px solid #cbd3c7;border-radius:6px;background:var(--white);padding:24px 20px;color:var(--ink)}.brand-choice[aria-pressed=true]{border-color:var(--orange);box-shadow:inset 0 -3px var(--orange)}.brand-example{display:block;margin-bottom:16px}.brand-choice b{font-size:12px}.brand-choice small{font-size:11px}.brand-quiet,.brand-split{font-family:'DM Sans','Cantarell',sans-serif;font-weight:700;letter-spacing:-.065em;font-size:36px;color:var(--dark)}.brand-split span{color:var(--orange)}.brand-title{font-family:'DM Sans','Cantarell',sans-serif;font-size:34px;font-weight:600;letter-spacing:-.055em;color:var(--dark)}.brand-field{font-family:'Barlow Condensed','Cantarell',sans-serif;font-size:38px;font-weight:600;letter-spacing:.035em;color:var(--dark)}.auth .bar.brand-preview{height:60px;letter-spacing:normal}.brand-preview .brand-quiet,.brand-preview .brand-split,.brand-preview .brand-title{font-size:27px}.brand-preview .brand-field{font-size:30px}.center .brand-preview .brand-quiet,.center .brand-preview .brand-split,.center .brand-preview .brand-title{font-size:40px}.center .brand-preview .brand-field{font-size:44px}@media(max-width:900px){.brand-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:450px){.brand-choices{grid-template-columns:1fr}}
+  </style>
+  <style>
+   .events-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.events-header .brand-preview{display:flex;align-items:center}
+.events-header .settings-control{display:grid;place-items:center;flex:none;width:44px;height:44px;margin-right:-8px;border:0;background:transparent;color:var(--dark);border-radius:4px;font-size:20px;cursor:pointer}
+.events-header .settings-control:hover{background:#e9eee2}
+.section-intro>small{text-transform:none}
+  </style>
+ </head>
+ <body>
+  <header>
+   <div class="masthead">
+    <a class="wordmark" href="#">
+     sync
+     <span>
+      up
+     </span>
+     <i>
+     </i>
+    </a>
+    <span class="edition">
+     INTERFACE STUDY / 02
+     <br/>
+     FIELD OPERATIONS
+    </span>
+   </div>
+   <div class="hero">
+    <div>
+     <div class="kicker">
+      ONE TEAM. EVERY MOVING PART.
+     </div>
+     <h1>
+      Stay in sync.
+      <br/>
+      Keep things moving.
+     </h1>
+    </div>
+    <p>
+     A more purposeful interface for the people behind the event. Venue first. Team in reach. Communication that cuts through.
+    </p>
+   </div>
+   <div class="board-controls">
+    <div aria-label="Screen groups" role="group">
+     <button aria-pressed="true" data-filter="all">
+      Full collection
+      <span>
+       22
+      </span>
+     </button>
+     <button aria-pressed="false" data-filter="entry">
+      Entry &amp; events
+     </button>
+     <button aria-pressed="false" data-filter="creation">
+      Event setup
+     </button>
+     <button aria-pressed="false" data-filter="workspace">
+      Workspace
+     </button>
+    </div>
+    <span>
+     DESIGN PROPOSAL · SCROLL ROWS TO EXPLORE →
+    </span>
+   </div>
+  </header>
+  <main>
+   <section class="brand-lab">
+    <div class="chapter">
+     BRAND / TYPE STUDIES
+    </div>
+    <h2>
+     A name with its own voice.
+    </h2>
+    <p class="group-desc">
+     Choose a wordmark to preview on the loading, sign-in, and account screens below.
+    </p>
+    <div class="brand-choices">
+     <button aria-pressed="false" class="brand-choice" data-brand="quiet" type="button">
+      <span class="brand-example brand-quiet">
+       syncup
+      </span>
+      <b>
+       Quiet confidence
+      </b>
+      <small>
+       Lowercase · close spacing · one solid color
+      </small>
+     </button>
+     <button aria-pressed="true" class="brand-choice" data-brand="split" type="button">
+      <span class="brand-example brand-split">
+       sync
+       <span>
+        up
+       </span>
+      </span>
+      <b>
+       A little momentum
+      </b>
+      <small>
+       Lowercase · “up” in signal orange
+      </small>
+     </button>
+     <button aria-pressed="false" class="brand-choice" data-brand="title" type="button">
+      <span class="brand-example brand-title">
+       SyncUp
+      </span>
+      <b>
+       Clear and familiar
+      </b>
+      <small>
+       Mixed case · clean proportions
+      </small>
+     </button>
+     <button aria-pressed="false" class="brand-choice" data-brand="field" type="button">
+      <span class="brand-example brand-field">
+       SYNCUP
+      </span>
+      <b>
+       Field label
+      </b>
+      <small>
+       Condensed capitals · operational character
+      </small>
+     </button>
+    </div>
+   </section>
+   <section class="group" id="entry">
+    <div class="chapter">
+     01 / ENTRY
+    </div>
+    <h2>
+     The starting point.
+    </h2>
+    <p class="group-desc">
+     A clear way in, and a familiar place to return.
+    </p>
+    <div class="grid">
+     <article class="sample">
+      <div class="screen-number">
+       01
+      </div>
+      <h3>
+       Loading
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+       </div>
+       <div class="body">
+        <div class="center">
+         <div class="heading brand-preview">
+          <span class="brand-split">
+           sync
+           <span>
+            up
+           </span>
+          </span>
+         </div>
+         <small>
+          Loading…
+         </small>
+        </div>
+       </div>
+      </div>
+     </article>
+     <article class="sample auth">
+      <div class="screen-number">
+       02
+      </div>
+      <h3>
+       Sign in
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar brand-preview">
+        <span class="brand-split">
+         sync
+         <span>
+          up
+         </span>
+        </span>
+       </div>
+       <div class="body">
+        <div class="heading">
+         Welcome back.
+        </div>
+        <p class="auth-copy">
+         Sign in to pick up where your team left off.
+        </p>
+        <label>
+         Email
+         <div class="input">
+         </div>
+        </label>
+        <label>
+         Password
+         <div class="input">
+         </div>
+        </label>
+        <button class="primary">
+         Sign in
+        </button>
+        <button class="button">
+         Create an account
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample auth">
+      <div class="screen-number">
+       03
+      </div>
+      <h3>
+       Create account
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar brand-preview">
+        <span class="brand-split">
+         sync
+         <span>
+          up
+         </span>
+        </span>
+       </div>
+       <div class="body">
+        <div class="heading">
+         Your team starts here.
+        </div>
+        <p class="auth-copy">
+         Create your account and get things moving.
+        </p>
+        <label>
+         Name
+         <div class="input">
+         </div>
+        </label>
+        <label>
+         Email
+         <div class="input">
+         </div>
+        </label>
+        <label>
+         Password
+         <div class="input">
+         </div>
+        </label>
+        <button class="primary">
+         Create account
+        </button>
+        <button class="button">
+         Already have an account? Sign in
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample events">
+      <div class="screen-number">
+       04
+      </div>
+      <h3>
+       My Events · includes draft and previews
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar events-header">
+        <div class="brand-preview">
+         <span class="brand-split">
+          sync
+          <span>
+           up
+          </span>
+         </span>
+        </div>
+        <button aria-label="Settings" class="settings-control" type="button">
+         ⚙
+        </button>
+       </div>
+       <div class="body">
+        <div class="section-intro">
+         <small>
+          Your Events
+         </small>
+         <h4>
+          Let’s get to work.
+         </h4>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           Spring Festival
+          </b>
+          <span class="badge">
+           Draft
+          </span>
+         </div>
+         <small>
+          Tap to continue setup
+         </small>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           TechConf Manila 2026 (Preview)
+          </b>
+          <span class="badge">
+           Event Lead
+          </span>
+         </div>
+         <small>
+          SMX Convention Center, Pasay · Nov 20
+         </small>
+         <p>
+          Active phase: Registration
+         </p>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           Barangay Fun Run (Preview)
+          </b>
+          <span class="badge">
+           Organizer
+          </span>
+         </div>
+         <small>
+          Quezon Memorial Circle · Dec 3
+         </small>
+         <p>
+          No phase active yet
+         </p>
+        </div>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Join Event
+        </button>
+        <button class="primary">
+         Create Event
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       05
+      </div>
+      <h3>
+       Settings · sign out
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar events-header">
+        <div class="brand-preview">
+         <span class="brand-split">
+          sync
+          <span>
+           up
+          </span>
+         </span>
+        </div>
+        <button aria-label="Settings" class="settings-control" type="button">
+         ⚙
+        </button>
+       </div>
+       <div class="body">
+        <div class="card">
+         <div class="row">
+          <b>
+           Spring Festival
+          </b>
+          <span class="badge">
+           Draft
+          </span>
+         </div>
+         <small>
+          Tap to continue setup
+         </small>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           TechConf Manila 2026 (Preview)
+          </b>
+          <span class="badge">
+           Event Lead
+          </span>
+         </div>
+         <small>
+          SMX Convention Center, Pasay · Nov 20
+         </small>
+         <p>
+          Active phase: Registration
+         </p>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           Barangay Fun Run (Preview)
+          </b>
+          <span class="badge">
+           Organizer
+          </span>
+         </div>
+         <small>
+          Quezon Memorial Circle · Dec 3
+         </small>
+         <p>
+          No phase active yet
+         </p>
+        </div>
+        <div class="overlay">
+         <div class="dialog">
+          <b>
+           Sign out
+          </b>
+         </div>
+        </div>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       06
+      </div>
+      <h3>
+       Join event
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Join event
+       </div>
+       <div class="body">
+        <div class="heading">
+         Enter event code
+        </div>
+        <small>
+         Ask your Event Lead for the six-digit code.
+        </small>
+        <label>
+         Six-digit event code
+         <div class="input">
+          482 913
+         </div>
+        </label>
+        <button class="primary">
+         Join
+        </button>
+       </div>
+      </div>
+     </article>
+    </div>
+   </section>
+   <section class="group" id="creation">
+    <div class="chapter">
+     02 / CREATION
+    </div>
+    <h2>
+     Set the team up.
+    </h2>
+    <p class="group-desc">
+     Five focused steps. One consistent frame.
+    </p>
+    <div class="grid">
+     <article class="sample">
+      <div class="screen-number">
+       07
+      </div>
+      <h3>
+       1 · Event Details
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 1 of 5
+         <b>
+          Event Details
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <label>
+         Event name *
+         <div class="input">
+          TechConf Manila 2026
+         </div>
+        </label>
+        <label>
+         Venue *
+         <div class="input">
+          SMX Convention Center
+         </div>
+        </label>
+        <label>
+         Start *
+         <div class="input">
+          Nov 20, 2026
+         </div>
+        </label>
+        <label>
+         End *
+         <div class="input">
+          Nov 20, 2026
+         </div>
+        </label>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample venue-editor">
+      <div class="screen-number">
+       08
+      </div>
+      <h3>
+       2 · Venue Layout
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 2 of 5
+         <b>
+          Venue Layout
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <div class="map">
+         <svg aria-label="Example venue with rectangular zones" role="img" viewbox="0 0 300 230.769">
+          <rect fill="#fff" height="175" stroke="#1f3b5c" stroke-width="3" width="264" x="18" y="17">
+          </rect>
+          <rect fill="#e4ecf4" height="65" stroke="#1f3b5c" width="88" x="35" y="36">
+          </rect>
+          <rect fill="#e4ecf4" height="76" stroke="#1f3b5c" width="100" x="155" y="75">
+          </rect>
+          <text x="45" y="72">
+           Registration
+          </text>
+          <text x="181" y="117">
+           Stage
+          </text>
+         </svg>
+        </div>
+        <div class="row compact">
+         <button class="button">
+          Draw
+         </button>
+         <button class="button">
+          Edit
+         </button>
+         <button class="button">
+          Undo
+         </button>
+        </div>
+        <div class="row compact">
+         <button class="button">
+          Simplify
+         </button>
+         <button class="button">
+          Clear drawing
+         </button>
+        </div>
+        <button class="button">
+         Add Zone
+        </button>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample venue-editor">
+      <div class="screen-number">
+       09
+      </div>
+      <h3>
+       Venue · add zone dialog
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 2 of 5
+         <b>
+          Venue Layout
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <div class="map">
+         <svg aria-label="Example venue with rectangular zones" role="img" viewbox="0 0 300 230.769">
+          <rect fill="#fff" height="175" stroke="#1f3b5c" stroke-width="3" width="264" x="18" y="17">
+          </rect>
+          <rect fill="#e4ecf4" height="65" stroke="#1f3b5c" width="88" x="35" y="36">
+          </rect>
+          <rect fill="#e4ecf4" height="76" stroke="#1f3b5c" width="100" x="155" y="75">
+          </rect>
+          <text x="45" y="72">
+           Registration
+          </text>
+          <text x="181" y="117">
+           Stage
+          </text>
+         </svg>
+        </div>
+        <div class="overlay">
+         <div class="dialog">
+          <b>
+           Add zone
+          </b>
+          <label>
+           Zone name
+           <div class="input">
+            Registration
+           </div>
+          </label>
+          <div class="row">
+           <button class="button">
+            Cancel
+           </button>
+           <button class="primary">
+            Save
+           </button>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       10
+      </div>
+      <h3>
+       3 · Event Phases
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 3 of 5
+         <b>
+          Event Phases
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <label>
+         Event start date
+         <div class="input">
+          Nov 20, 2026
+         </div>
+        </label>
+        <label>
+         Event start time *
+         <div class="input">
+          8:00 AM
+         </div>
+        </label>
+        <label>
+         Event end time *
+         <div class="input">
+          6:00 PM
+         </div>
+        </label>
+        <div class="card">
+         <b>
+          Registration
+         </b>
+         <small>
+          1 hr 0 min
+         </small>
+        </div>
+        <div class="card">
+         <b>
+          Keynote
+         </b>
+         <small>
+          2 hr 0 min
+         </small>
+        </div>
+        <button class="button">
+         + Add phase
+        </button>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample phase-screen">
+      <div class="screen-number">
+       11
+      </div>
+      <h3>
+       Phases · add phase dialog
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Create Event
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 3 of 5
+         <b>
+          Event Phases
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <div class="overlay">
+         <div class="dialog">
+          <b>
+           Add phase
+          </b>
+          <label>
+           Phase label
+           <div class="input">
+            Registration
+           </div>
+          </label>
+          <div class="row">
+           <label>
+            Hours
+            <div class="input">
+             1
+            </div>
+           </label>
+           <label>
+            Minutes
+            <div class="input">
+             0
+            </div>
+           </label>
+          </div>
+          <div class="row">
+           <button class="button">
+            Cancel
+           </button>
+           <button class="primary">
+            Save
+           </button>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       12
+      </div>
+      <h3>
+       4 · Channels
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 4 of 5
+         <b>
+          Channels
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <div class="card">
+         <b>
+          Global
+         </b>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           Registration
+          </b>
+          <span>
+           ×
+          </span>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <b>
+           Operations
+          </b>
+          <span>
+           ×
+          </span>
+         </div>
+        </div>
+        <button class="button">
+         + Add custom channel
+        </button>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Review
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       13
+      </div>
+      <h3>
+       Channels · add channel dialog
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 4 of 5
+         <b>
+          Channels
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="">
+         </i>
+        </div>
+        <div class="overlay">
+         <div class="dialog">
+          <b>
+           Add channel
+          </b>
+          <label>
+           Channel name
+           <div class="input">
+            Registration
+           </div>
+          </label>
+          <div class="row">
+           <button class="button">
+            Cancel
+           </button>
+           <button class="primary">
+            Save
+           </button>
+          </div>
+         </div>
+        </div>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Next
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       14
+      </div>
+      <h3>
+       5 · Review
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="progress-label">
+         Step 5 of 5
+         <b>
+          Review
+         </b>
+        </div>
+        <div class="progress">
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+         <i class="done">
+         </i>
+        </div>
+        <div class="heading">
+         Review your event
+        </div>
+        <small>
+         Check the details before your team joins.
+        </small>
+        <div class="card">
+         <div class="row">
+          <b>
+           TechConf Manila 2026
+          </b>
+          <button class="button">
+           Edit
+          </button>
+         </div>
+         <small>
+          SMX Convention Center
+          <br/>
+          Nov 20, 2026 · 8:00 AM – 6:00 PM
+         </small>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Venue &amp; zones
+           </b>
+           <small>
+            Boundary · 2 zones
+           </small>
+          </div>
+          <button class="button">
+           Edit
+          </button>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Event phases
+           </b>
+           <small>
+            2 phases
+           </small>
+          </div>
+          <button class="button">
+           Edit
+          </button>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Channels
+           </b>
+           <small>
+            Global + 2 channels
+           </small>
+          </div>
+          <button class="button">
+           Edit
+          </button>
+         </div>
+        </div>
+        <small>
+         Your join code will be available after creation.
+        </small>
+       </div>
+       <div class="foot">
+        <button class="button">
+         Back
+        </button>
+        <button class="primary">
+         Create Event
+        </button>
+       </div>
+      </div>
+     </article>
+     <article class="sample">
+      <div class="screen-number">
+       15
+      </div>
+      <h3>
+       Event created · join code
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Create Event
+       </div>
+       <div class="body">
+        <div class="center">
+         <div class="success-mark">
+          ✓
+         </div>
+         <div class="heading">
+          TechConf Manila 2026 is ready
+         </div>
+         <small>
+          Share this code so organizers can join.
+         </small>
+         <div class="card">
+          <div class="code">
+           482 913
+          </div>
+         </div>
+         <button class="primary">
+          Copy code
+         </button>
+         <button class="button">
+          Open event workspace
+         </button>
+        </div>
+       </div>
+      </div>
+     </article>
+    </div>
+   </section>
+   <section class="group" id="workspace">
+    <div class="chapter">
+     03 / WORKSPACE
+    </div>
+    <h2>
+     Run the event.
+    </h2>
+    <p class="group-desc">
+     Venue, people, channels, and the next move.
+    </p>
+    <div class="grid">
+     <article class="sample workspace-map area" id="event-area-screen">
+      <div class="screen-number">
+       16
+      </div>
+      <h3>
+       Event Area · proposed organizer entry
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Event Area
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="phase-banner">
+         <small>
+          HAPPENING NOW
+         </small>
+         <span class="badge">
+          Registration
+         </span>
+        </div>
+        <button class="team-link" onclick="document.getElementById('organizer-screen').scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})" type="button">
+         <span>
+          <b>
+           Organizers
+          </b>
+          <small>
+           View everyone who joined
+          </small>
+         </span>
+         <span>
+          3   ›
+         </span>
+        </button>
+        <div class="map">
+         <svg aria-label="Example venue with rectangular zones" role="img" viewbox="0 0 300 230.769">
+          <rect fill="#fff" height="175" stroke="#1f3b5c" stroke-width="3" width="264" x="18" y="17">
+          </rect>
+          <rect fill="#e4ecf4" height="65" stroke="#1f3b5c" width="88" x="35" y="36">
+          </rect>
+          <rect fill="#e4ecf4" height="76" stroke="#1f3b5c" width="100" x="155" y="75">
+          </rect>
+          <text x="45" y="72">
+           Registration
+          </text>
+          <text x="181" y="117">
+           Stage
+          </text>
+         </svg>
+        </div>
+        <b>
+         Report log
+        </b>
+        <div class="card">
+         <b>
+          Mia
+         </b>
+         <small>
+          Registration · 10:41 AM
+         </small>
+        </div>
+        <div class="card">
+         <b>
+          Raj
+         </b>
+         <small>
+          Stage · 10:36 AM
+         </small>
+        </div>
+       </div>
+       <div class="foot">
+        <button class="primary">
+         Report my location
+        </button>
+       </div>
+       <nav>
+        <div class="selected">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+      </div>
+     </article>
+     <article class="sample team" id="organizer-screen">
+      <div class="screen-number">
+       17
+      </div>
+      <h3>
+       Joined organizers · proposed
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        ‹   Organizers
+       </div>
+       <div class="body">
+        <div>
+         <div class="heading">
+          Joined organizers
+         </div>
+         <small>
+          3 members
+         </small>
+        </div>
+        <div class="card">
+         <div class="member">
+          <div class="avatar">
+           L
+          </div>
+          <div>
+           <div class="row">
+            <b>
+             Liam
+            </b>
+            <span class="badge">
+             You · Event Lead
+            </span>
+           </div>
+           <small>
+            Registration · reported 10:41 AM
+           </small>
+          </div>
+         </div>
+        </div>
+        <div class="card">
+         <div class="member">
+          <div class="avatar">
+           M
+          </div>
+          <div>
+           <b>
+            Mia
+           </b>
+           <small>
+            Stage · reported 10:36 AM
+           </small>
+          </div>
+         </div>
+        </div>
+        <div class="card">
+         <div class="member">
+          <div class="avatar">
+           R
+          </div>
+          <div>
+           <b>
+            Raj
+           </b>
+           <small>
+            Location not reported yet
+           </small>
+          </div>
+         </div>
+        </div>
+        <small>
+         Locations are manually reported and may not be current.
+        </small>
+       </div>
+       <div class="foot">
+        <button class="button" onclick="document.getElementById('event-area-screen').scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})" type="button">
+         Back to Event Area
+        </button>
+       </div>
+       <nav>
+        <div class="selected">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div>
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div>
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+      </div>
+     </article>
+     <article class="sample workspace-map area">
+      <div class="screen-number">
+       18
+      </div>
+      <h3>
+       Event Area · report location
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Event Area
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="map">
+         <svg aria-label="Example venue with rectangular zones" role="img" viewbox="0 0 300 230.769">
+          <rect fill="#fff" height="175" stroke="#1f3b5c" stroke-width="3" width="264" x="18" y="17">
+          </rect>
+          <rect fill="#e4ecf4" height="65" stroke="#1f3b5c" width="88" x="35" y="36">
+          </rect>
+          <rect fill="#e4ecf4" height="76" stroke="#1f3b5c" width="100" x="155" y="75">
+          </rect>
+          <text x="45" y="72">
+           Registration
+          </text>
+          <text x="181" y="117">
+           Stage
+          </text>
+         </svg>
+        </div>
+        <div class="overlay">
+         <div class="dialog">
+          <b>
+           Report my location
+          </b>
+          <p>
+           Registration
+          </p>
+          <p>
+           Stage
+          </p>
+          <button class="button">
+           Cancel
+          </button>
+         </div>
+        </div>
+       </div>
+       <nav>
+        <div class="selected">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+      </div>
+     </article>
+     <article class="sample comms">
+      <div class="screen-number">
+       19
+      </div>
+      <h3>
+       Comms · Global selected
+      </h3>
+      <div class="phone" data-channel="Registration" data-custom-connected="false" data-global-connected="true" data-view="global">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Communications
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="connection-panel">
+         <div class="compact-channel">
+          <div class="channel-name-status">
+           <b>
+            Global
+           </b>
+          </div>
+          <button aria-label="Disconnect Global" class="connection-toggle" data-toggle="global" type="button">
+          </button>
+          <span class="sr-label" data-status="global">
+          </span>
+         </div>
+         <div class="compact-channel">
+          <div class="channel-name-status">
+           <button aria-haspopup="dialog" aria-label="Choose custom channel" class="channel-picker-trigger" type="button">
+            <span data-channel-name="">
+             Registration
+            </span>
+            <span aria-hidden="true" class="picker-chevron">
+            </span>
+           </button>
+          </div>
+          <button aria-label="Connect Registration" class="connection-toggle" data-toggle="custom" type="button">
+          </button>
+          <span class="sr-label" data-status="custom">
+          </span>
+         </div>
+        </div>
+        <small data-history-title="">
+         Global
+        </small>
+        <div class="bubble" data-global-message="">
+         Mia · 10:41
+         <br/>
+         <b>
+          Line is long at desk 2
+         </b>
+        </div>
+        <div class="bubble mine" data-global-message="">
+         You · 10:42
+         <br/>
+         <b>
+          Sending a runner
+         </b>
+        </div>
+       </div>
+       <div class="comms-foot">
+        <div class="tabs">
+         <button data-view="global" type="button">
+          Global
+         </button>
+         <button data-view="custom" type="button">
+          Registration
+         </button>
+        </div>
+        <div class="row">
+         <div class="input grow" data-compose="">
+          Message Global
+         </div>
+         <button class="button">
+          Send
+         </button>
+        </div>
+        <button class="primary" data-ptt="">
+         ♩  Hold to talk · Global
+        </button>
+       </div>
+       <nav>
+        <div class="">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="selected">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+       <div class="picker-backdrop" hidden="">
+        <section aria-label="Select a custom channel" aria-modal="true" class="channel-sheet" role="dialog">
+         <div class="sheet-handle">
+         </div>
+         <div class="sheet-heading">
+          <h4>
+           Choose a channel
+          </h4>
+          <button aria-label="Close channel picker" class="close-picker" type="button">
+           ×
+          </button>
+         </div>
+         <p>
+          Choose one custom channel to listen to alongside Global.
+         </p>
+         <label class="channel-search">
+          <span class="sr-label">
+           Search channels
+          </span>
+          <input aria-label="Search channels" placeholder="Search channels" type="search"/>
+         </label>
+         <div class="channel-options">
+         </div>
+         <p class="picker-empty" hidden="">
+          No channels match your search.
+         </p>
+        </section>
+       </div>
+      </div>
+     </article>
+     <article class="sample comms">
+      <div class="screen-number">
+       20
+      </div>
+      <h3>
+       Comms · selected channel connected
+      </h3>
+      <div class="phone" data-channel="Registration" data-custom-connected="true" data-global-connected="true" data-view="custom">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Communications
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="connection-panel">
+         <div class="compact-channel">
+          <div class="channel-name-status">
+           <b>
+            Global
+           </b>
+          </div>
+          <button aria-label="Disconnect Global" class="connection-toggle" data-toggle="global" type="button">
+          </button>
+          <span class="sr-label" data-status="global">
+          </span>
+         </div>
+         <div class="compact-channel">
+          <div class="channel-name-status">
+           <button aria-haspopup="dialog" aria-label="Choose custom channel" class="channel-picker-trigger" type="button">
+            <span data-channel-name="">
+             Registration
+            </span>
+            <span aria-hidden="true" class="picker-chevron">
+            </span>
+           </button>
+          </div>
+          <button aria-label="Connect Registration" class="connection-toggle" data-toggle="custom" type="button">
+          </button>
+          <span class="sr-label" data-status="custom">
+          </span>
+         </div>
+        </div>
+        <small data-history-title="">
+         Global
+        </small>
+        <div class="bubble" data-global-message="">
+         Mia · 10:41
+         <br/>
+         <b>
+          Line is long at desk 2
+         </b>
+        </div>
+        <div class="bubble mine" data-global-message="">
+         You · 10:42
+         <br/>
+         <b>
+          Sending a runner
+         </b>
+        </div>
+       </div>
+       <div class="comms-foot">
+        <div class="tabs">
+         <button data-view="global" type="button">
+          Global
+         </button>
+         <button data-view="custom" type="button">
+          Registration
+         </button>
+        </div>
+        <div class="row">
+         <div class="input grow" data-compose="">
+          Message Registration
+         </div>
+         <button class="button">
+          Send
+         </button>
+        </div>
+        <button class="primary" data-ptt="">
+         ♩  Hold to talk · Registration
+        </button>
+       </div>
+       <nav>
+        <div class="">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="selected">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+       <div class="picker-backdrop" hidden="">
+        <section aria-label="Select a custom channel" aria-modal="true" class="channel-sheet" role="dialog">
+         <div class="sheet-handle">
+         </div>
+         <div class="sheet-heading">
+          <h4>
+           Choose a channel
+          </h4>
+          <button aria-label="Close channel picker" class="close-picker" type="button">
+           ×
+          </button>
+         </div>
+         <p>
+          Choose one custom channel to listen to alongside Global.
+         </p>
+         <label class="channel-search">
+          <span class="sr-label">
+           Search channels
+          </span>
+          <input aria-label="Search channels" placeholder="Search channels" type="search"/>
+         </label>
+         <div class="channel-options">
+         </div>
+         <p class="picker-empty" hidden="">
+          No channels match your search.
+         </p>
+        </section>
+       </div>
+      </div>
+     </article>
+     <article class="sample phase-screen">
+      <div class="screen-number">
+       21
+      </div>
+      <h3>
+       Phases · creator
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Event Phases
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="card">
+         <b>
+          ✓   Load-in
+         </b>
+         · Completed
+        </div>
+        <div class="card active">
+         <div class="row">
+          <div>
+           <b>
+            Registration
+           </b>
+           <small>
+            Started 8:00 AM
+           </small>
+          </div>
+          <span class="badge">
+           Active now
+          </span>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Keynote
+           </b>
+           <small>
+            Upcoming
+           </small>
+          </div>
+          <button class="button">
+           Activate
+          </button>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Breakouts
+           </b>
+           <small>
+            Upcoming
+           </small>
+          </div>
+          <button class="button">
+           Activate
+          </button>
+         </div>
+        </div>
+        <div class="card">
+         <div class="row">
+          <div>
+           <b>
+            Teardown
+           </b>
+           <small>
+            Upcoming
+           </small>
+          </div>
+          <button class="button">
+           Activate
+          </button>
+         </div>
+        </div>
+        <small>
+         Only Event Leads can change the active phase.
+        </small>
+       </div>
+       <nav>
+        <div class="">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="selected">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+      </div>
+     </article>
+     <article class="sample phase-screen">
+      <div class="screen-number">
+       22
+      </div>
+      <h3>
+       Phases · organizer
+      </h3>
+      <div class="phone">
+       <div class="status">
+        9:41
+        <span>
+         ● ▰
+        </span>
+       </div>
+       <div class="bar">
+        <span class="back">
+         ‹
+        </span>
+        <div>
+         <small>
+          TECHCONF MANILA
+         </small>
+         <b>
+          Event Phases
+         </b>
+        </div>
+       </div>
+       <div class="body">
+        <div class="card">
+         <b>
+          ✓   Load-in
+         </b>
+         · Completed
+        </div>
+        <div class="card active">
+         <b>
+          Registration
+         </b>
+         <small>
+          Active now
+         </small>
+        </div>
+        <div class="card">
+         <b>
+          Keynote
+         </b>
+         <small>
+          Upcoming
+         </small>
+        </div>
+        <small>
+         Only Event Leads can change the active phase.
+        </small>
+       </div>
+       <nav>
+        <div class="">
+         <span>
+          ◇
+         </span>
+         Event Area
+        </div>
+        <div class="">
+         <span>
+          ▱
+         </span>
+         Comms
+        </div>
+        <div class="selected">
+         <span>
+          ☷
+         </span>
+         Phases
+        </div>
+       </nav>
+      </div>
+     </article>
+    </div>
+   </section>
+  </main>
+  <script>
+   document.querySelectorAll('[data-filter]').forEach(button => { button.addEventListener('click', () => { const choice = button.dataset.filter; document.querySelectorAll('[data-filter]').forEach(item => item.setAttribute('aria-pressed', String(item === button))); document.querySelectorAll('section.group').forEach(group => { group.hidden = choice !== 'all' && group.id !== choice; }); }); });
+  </script>
+  <script>
+   (() => {
+const channels = ['Registration','Operations','Stage crew','Logistics','Security','Hospitality','Technical','Volunteers'];
+document.querySelectorAll('.comms .phone').forEach(phone => {
+ const panel=phone.querySelector('.picker-backdrop');
+ const search=phone.querySelector('input[type=search]');
+ const options=phone.querySelector('.channel-options');
+ const trigger=phone.querySelector('.channel-picker-trigger');
+ function close(){panel.hidden=true;trigger.focus();}
+ function renderOptions(){
+  options.replaceChildren();
+  const matches=channels.filter(name=>name.toLowerCase().includes(search.value.trim().toLowerCase()));
+  phone.querySelector('.picker-empty').hidden=matches.length>0;
+  matches.forEach(name=>{
+   const button=document.createElement('button');button.type='button';button.className='channel-option';button.setAttribute('aria-pressed',String(name===phone.dataset.channel));
+   const label=document.createElement('span');label.textContent=name;
+   const state=document.createElement('span');state.textContent=name===phone.dataset.channel?'Selected ✓':'';
+   button.append(label,state);button.onclick=()=>{phone.dataset.channel=name;render();close();};options.append(button);
+  });
+ }
+ function render(){
+  for(const type of ['global','custom']){
+   const connected=phone.dataset[type+'Connected']==='true';
+   phone.querySelector('[data-status="'+type+'"]').textContent=(connected?'● Connected':'○ Disconnected');
+   const button=phone.querySelector('[data-toggle="'+type+'"]');button.textContent=connected?'Disconnect':'Connect';button.setAttribute('aria-label',(connected?'Disconnect ':'Connect ')+(type==='global'?'Global':phone.dataset.channel));button.title=(connected?'Disconnect ':'Connect ')+(type==='global'?'Global':phone.dataset.channel);button.setAttribute('aria-pressed',String(connected));button.dataset.connected=String(connected);
+  }
+  phone.querySelector('[data-channel-name]').textContent=phone.dataset.channel;
+  phone.querySelector('.tabs [data-view=custom]').textContent=phone.dataset.channel;
+  phone.querySelectorAll('.tabs button').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.view===phone.dataset.view)));
+  const name=phone.dataset.view==='global'?'Global':phone.dataset.channel;
+  phone.querySelector('[data-history-title]').textContent=name;
+  phone.querySelector('[data-compose]').textContent='Message '+name;
+  phone.querySelector('[data-ptt]').textContent='♩  Hold to talk · '+name;
+  phone.querySelectorAll('[data-global-message]').forEach(message=>message.hidden=phone.dataset.view!=='global');
+  let empty=phone.querySelector('.custom-history-empty');
+  if(!empty){empty=document.createElement('p');empty.className='custom-history-empty';empty.style.color='var(--muted)';empty.textContent='No messages yet.';phone.querySelector('.body').append(empty);}
+  empty.hidden=phone.dataset.view!=='custom';
+ }
+ phone.querySelectorAll('[data-toggle]').forEach(button=>button.onclick=()=>{const key=button.dataset.toggle+'Connected';phone.dataset[key]=String(phone.dataset[key]!=='true');render();});
+ phone.querySelectorAll('.tabs button').forEach(button=>button.onclick=()=>{phone.dataset.view=button.dataset.view;render();});
+ trigger.onclick=()=>{search.value='';renderOptions();panel.hidden=false;search.focus();};
+ phone.querySelector('.close-picker').onclick=close;
+ panel.onclick=event=>{if(event.target===panel)close();};
+ panel.onkeydown=event=>{if(event.key==='Escape')close();};
+ search.oninput=renderOptions;render();
+});
+})();
+  </script>
+  <script>
+   (() => {
+ const variants={quiet:'<span class="brand-quiet">syncup</span>',split:'<span class="brand-split">sync<span>up</span></span>',title:'<span class="brand-title">SyncUp</span>',field:'<span class="brand-field">SYNCUP</span>'};
+ function applyBrand(choice){document.querySelectorAll('.brand-preview').forEach(preview=>{preview.innerHTML=variants[choice];});document.querySelectorAll('[data-brand]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.brand===choice)));}
+ document.querySelectorAll('[data-brand]').forEach(button=>button.addEventListener('click',()=>applyBrand(button.dataset.brand)));
+ applyBrand('split');
+})();
+  </script>
+ </body>
+</html>

@@ -13,4 +13,71 @@
     <color name="comms_connected">#237A44</color>
     <color name="comms_disconnected">#B3261E</color>
     <color name="comms_outgoing_metadata">#CBD7E3</color>
+
+    <!--
+       UI revision (docs/ui-design/UI_REVISION_HANDOFF.md §4) semantic tokens.
+       Legacy navy/blue colors above stay only while screens migrate; they are
+       removed once every revised screen no longer references them.
+       Restored by commit after an accidental working-tree clobber during
+       Phase B staging; the original token commit 1316d89 predates this.
+    -->
+
+    <!-- Core surfaces and text -->
+    <color name="ui_ink">#FF222A28</color>
+    <color name="ui_surface">#FFFFFEFA</color>
+    <color name="ui_green">#FF213B35</color>
+    <color name="ui_orange">#FFB63E20</color>
+    <color name="ui_muted">#FF717974</color>
+    <color name="ui_secondary_text">#FF65756A</color>
+    <color name="ui_divider">#FFD5D8CE</color>
+    <color name="ui_paper">#FFF2F0E9</color>
+
+    <!-- Forms -->
+    <color name="ui_wash">#FFE8EBE3</color>
+    <color name="ui_input">#FFFCFDF9</color>
+    <color name="ui_input_border">#FFCBD3C7</color>
+    <color name="ui_input_text">#FF68786D</color>
+    <color name="ui_action_outline">#FFB7C5B5</color>
+
+    <!-- Chips and badges -->
+    <color name="ui_chip">#FFE7ECE1</color>
+    <color name="ui_chip_text">#FF345241</color>
+
+    <!-- Channel connection surfaces -->
+    <color name="ui_channel_surface">#FFF3F6EE</color>
+    <color name="ui_channel_border">#FFDCE2D5</color>
+    <color name="ui_chevron_surface">#FFE8EEE0</color>
+    <color name="ui_chevron_divider">#FFD4DDCC</color>
+    <color name="ui_chevron">#FF36523B</color>
+
+    <!-- Composer and messages -->
+    <color name="ui_tabs_track">#FFE9EEE2</color>
+    <color name="ui_incoming">#FFEDF1E6</color>
+    <color name="ui_incoming_meta">#FF637361</color>
+    <color name="ui_outgoing_meta">#FFC3D2BD</color>
+    <color name="ui_outgoing_text">#FFF6F7EF</color>
+
+    <!-- Navigation -->
+    <color name="ui_selected_nav">#FFF0F3EB</color>
+    <color name="ui_nav_text">#FF758176</color>
+
+    <!-- Phases -->
+    <color name="ui_phase_caption">#FFC4D2BD</color>
+    <color name="ui_phase_secondary">#FFC2D4BD</color>
+
+    <!-- Organizers and success -->
+    <color name="ui_avatar">#FFDCE6D1</color>
+    <color name="ui_success">#FFDFE9D4</color>
+    <color name="ui_success_text">#FF294D32</color>
+
+    <color name="ui_scrim">#8022362A</color>
+
+    <!-- Venue rendering palette -->
+    <color name="venue_canvas">#FFF1F3E9</color>
+    <color name="venue_canvas_outline">#FFC8D2BF</color>
+    <color name="venue_boundary_fill">#FFFCFDF8</color>
+    <color name="venue_boundary_stroke">#FF364C3B</color>
+    <color name="venue_zone_fill">#FFDCE7D2</color>
+    <color name="venue_zone_stroke">#FF72876A</color>
+    <color name="venue_zone_text">#FF3E5C3E</color>
 </resources>

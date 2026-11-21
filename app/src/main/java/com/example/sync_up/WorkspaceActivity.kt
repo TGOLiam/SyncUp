@@ -1,10 +1,13 @@
 package com.example.sync_up
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.os.Build
 import android.view.MotionEvent
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -66,6 +69,14 @@ class WorkspaceActivity : AppCompatActivity() {
     private var lease: Pair<String, String>? = null
     private var speechTimeout: Job? = null
     private var speakingLive = false
+    // User-initiated connection changes; cleared once the session reports the
+    // requested state, so the UI never assumes a connection before it exists.
+    private val pendingConnections = mutableMapOf<String, Boolean>()
+    private val pendingConnectionJobs = mutableMapOf<String, Job>()
+    private var previewGlobalConnected = true
+    private var pttNote: String? = null
+    private var pttNoteJob: Job? = null
+    private var pttPulse: ObjectAnimator? = null
     private var messageRetry: Triple<String, String, String>? = null
     private var ownMemberId: String? = null
     private var messageLoad: Job? = null
@@ -86,6 +97,7 @@ class WorkspaceActivity : AppCompatActivity() {
     }
     private val microphonePermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         Toast.makeText(this, if (granted) R.string.voice_hold_again else R.string.voice_permission_denied, Toast.LENGTH_LONG).show()
+        updatePttButton()
     }
     private var selectedChannel = ""
     private var connectedChannel: String? = null
@@ -148,6 +160,7 @@ class WorkspaceActivity : AppCompatActivity() {
                         if (selectedChannel != globalChannel && selectedChannel != connectedChannel) {
                             selectedChannel = globalChannel
                         }
+                        reconcilePendingConnections()
                         val active = lease
                         if (active != null) {
                             val channelStatus = when (active.first) {
@@ -287,6 +300,8 @@ class WorkspaceActivity : AppCompatActivity() {
         val speech = LiveSpeechClient(client)
         pressHeld = true
         requestPending = true
+        // Show the permission state before the controller answers.
+        updatePttButton()
         lifecycleScope.launch {
             try {
                 if (!speech.request(channelId, requestId)) {
@@ -328,7 +343,7 @@ class WorkspaceActivity : AppCompatActivity() {
                     return@launch
                 }
                 speakingLive = true
-                findViewById<TextView>(R.id.comms_push_to_talk).text = getString(R.string.voice_live_speaking)
+                updatePttButton()
                 speechTimeout = lifecycleScope.launch {
                     delay(10000)
                     if (lease == active) finishPushToTalk()
@@ -341,18 +356,26 @@ class WorkspaceActivity : AppCompatActivity() {
                 Toast.makeText(this@WorkspaceActivity, R.string.voice_connection_failed, Toast.LENGTH_LONG).show()
             } finally {
                 requestPending = false
+                updatePttButton()
             }
         }
     }
 
     private fun finishPushToTalk() {
+        val wasTalking = speakingLive
+        val wasWaiting = pressHeld && requestPending && !wasTalking
         pressHeld = false
-        val active = lease ?: return
+        val active = lease
         lease = null
         speechTimeout?.cancel()
         speechTimeout = null
         speakingLive = false
-        renderConversation()
+        when {
+            wasTalking -> showPttNote(getString(R.string.voice_transmission_ended))
+            wasWaiting -> showPttNote(getString(R.string.voice_released_before_permission))
+            else -> updatePttButton()
+        }
+        if (active == null) return
         val client = SupabaseClientFactory.get(applicationContext) ?: return
         val room = LiveAudioSession.room(active.first)
         lifecycleScope.launch {
@@ -660,7 +683,10 @@ class WorkspaceActivity : AppCompatActivity() {
     /** Rows rendered in the connection panel: Global plus the chosen custom channel. */
     private fun channelRows(): List<String> {
         val connected = connectedChannel?.takeIf { it != globalChannel }
+        // A channel keeps its row while its connection change is in flight.
+        val pending = pendingConnections.keys.firstOrNull { it != globalChannel }
         val chosen = connected
+            ?: pending
             ?: selectedChannel.takeIf { it != globalChannel && it.isNotEmpty() }
             ?: draft.channels.firstOrNull()
         return if (chosen == null) listOf(globalChannel) else listOf(globalChannel, chosen)
@@ -671,7 +697,7 @@ class WorkspaceActivity : AppCompatActivity() {
         val shared = event?.isPreview == false
         return when {
             shared && state.eventId != event?.previewId -> LiveAudioSession.Status.DISCONNECTED
-            name == globalChannel -> if (shared) state.global else LiveAudioSession.Status.CONNECTED
+            name == globalChannel -> if (shared) state.global else previewGlobalStatus()
             shared -> if (state.selectedId != null && name == connectedChannel) state.selected
                       else LiveAudioSession.Status.DISCONNECTED
             name == connectedChannel -> LiveAudioSession.Status.CONNECTED
@@ -679,10 +705,46 @@ class WorkspaceActivity : AppCompatActivity() {
         }
     }
 
+    private fun previewGlobalStatus(): LiveAudioSession.Status =
+        if (previewGlobalConnected) LiveAudioSession.Status.CONNECTED else LiveAudioSession.Status.DISCONNECTED
+
+    /** Clears a pending change once the session reports the requested state. */
+    private fun reconcilePendingConnections() {
+        if (pendingConnections.isEmpty()) return
+        val iterator = pendingConnections.entries.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            val connected = channelStatus(entry.key) == LiveAudioSession.Status.CONNECTED
+            if (connected == entry.value) {
+                iterator.remove()
+                pendingConnectionJobs.remove(entry.key)?.cancel()
+            }
+        }
+    }
+
+    private fun markConnectionPending(name: String, target: Boolean) {
+        pendingConnections[name] = target
+        pendingConnectionJobs.remove(name)?.cancel()
+        // The session retries in the background; stop showing the transition
+        // once a request has clearly not completed.
+        pendingConnectionJobs[name] = lifecycleScope.launch {
+            delay(20000)
+            val connected = channelStatus(name) == LiveAudioSession.Status.CONNECTED
+            if (pendingConnections[name] == target && connected != target) {
+                pendingConnections.remove(name)
+                renderChannels()
+                Toast.makeText(
+                    this@WorkspaceActivity,
+                    getString(R.string.comms_connection_failed, name),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     private fun renderChannels() {
         val list = findViewById<LinearLayout>(R.id.comms_channel_list)
         list.removeAllViews()
-        val state = LiveAudioSession.state.value
         for ((index, name) in channelRows().withIndex()) {
             val row = LayoutInflater.from(this).inflate(
                 if (index == 0) R.layout.item_comms_global else R.layout.item_comms_picker,
@@ -690,54 +752,131 @@ class WorkspaceActivity : AppCompatActivity() {
                 false
             )
             row.findViewById<TextView>(R.id.comms_channel_name).text = name
+            // Selection stays locked while a custom channel change is in flight.
+            val channelTransitioning = pendingConnections.keys.any { it != globalChannel }
             row.findViewById<View>(R.id.comms_picker_trigger)?.apply {
                 contentDescription = getString(R.string.comms_picker_open)
-                setOnClickListener { openChannelSheet(name) }
+                isEnabled = !channelTransitioning
+                if (!channelTransitioning) setOnClickListener { openChannelSheet(name) }
             }
-            val toggle = row.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.comms_channel_toggle)
             val status = channelStatus(name)
+            val target = pendingConnections[name]
+            val pending = target != null && (status == LiveAudioSession.Status.CONNECTED) != target
             val connected = status == LiveAudioSession.Status.CONNECTED
-            toggle.visibility = View.VISIBLE
-            toggle.setText(if (connected) R.string.comms_disconnect else R.string.comms_connect)
-            toggle.contentDescription = getString(
-                if (connected) R.string.comms_connected_description else R.string.comms_disconnected_description,
-                name
-            )
-            toggle.setOnClickListener {
-                if (index != 0) {
-                    val id = channelIds[name]
-                    val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
-                    val eventId = event?.previewId
-                    val globalId = channelIds[""]
-                    if (event?.isPreview != false) {
-                        connectedChannel = if (connected) null else name
-                        selectedChannel = connectedChannel ?: globalChannel
-                        renderChannels()
-                        renderConversation()
-                    } else if (user == null || eventId == null || globalId == null || id == null) {
-                        Toast.makeText(this@WorkspaceActivity, R.string.voice_channel_unavailable, Toast.LENGTH_SHORT).show()
-                    } else {
-                        val selected = if (connected) null else id
-                        withNotificationPermission {
-                            LiveAudioService.select(applicationContext, user, eventId, globalId, selected)
-                            selectedChannel = if (selected == null) globalChannel else name
-                        }
-                    }
+            val connecting = status == LiveAudioSession.Status.CONNECTING ||
+                status == LiveAudioSession.Status.RECONNECTING
+            val dot = row.findViewById<View>(R.id.comms_status_dot)
+            val statusText = row.findViewById<TextView>(R.id.comms_status_text)
+            val toggle = row.findViewById<androidx.appcompat.widget.AppCompatButton>(R.id.comms_channel_toggle)
+            val progress = row.findViewById<View>(R.id.comms_channel_progress)
+            when {
+                pending -> {
+                    // The requested state is not confirmed yet.
+                    tintStatusDot(dot, R.color.ui_status_pending)
+                    statusText.setText(if (target == true) R.string.comms_connecting else R.string.comms_disconnecting)
+                    statusText.setTextColor(ContextCompat.getColor(this, R.color.ui_disconnect_text))
+                    startDotPulse(dot)
+                }
+                connected -> {
+                    tintStatusDot(dot, R.color.ui_status_on)
+                    statusText.setText(R.string.comms_connected)
+                    statusText.setTextColor(ContextCompat.getColor(this, R.color.ui_status_on_text))
+                    dot.clearAnimation()
+                }
+                connecting -> {
+                    tintStatusDot(dot, R.color.ui_status_pending)
+                    statusText.setText(R.string.comms_connecting)
+                    statusText.setTextColor(ContextCompat.getColor(this, R.color.ui_disconnect_text))
+                    startDotPulse(dot)
+                }
+                else -> {
+                    tintStatusDot(dot, R.color.ui_status_off)
+                    statusText.setText(R.string.comms_not_connected)
+                    statusText.setTextColor(ContextCompat.getColor(this, R.color.ui_secondary_text))
+                    dot.clearAnimation()
                 }
             }
+            val showSpinner = pending || connecting
+            progress.visibility = if (showSpinner) View.VISIBLE else View.GONE
+            // Repeated actions are blocked until the transition settles.
+            toggle.isEnabled = !pending
+            toggle.setText(
+                when {
+                    pending -> if (target == true) R.string.comms_connecting else R.string.comms_disconnecting
+                    connected || connecting -> R.string.comms_disconnect
+                    else -> R.string.comms_connect
+                }
+            )
+            val quiet = connected || connecting || pending
+            toggle.setTextColor(
+                ContextCompat.getColor(this, if (quiet) R.color.ui_disconnect_text else R.color.ui_outgoing_text)
+            )
+            toggle.setBackgroundResource(
+                if (quiet) R.drawable.bg_ui_connection_disconnect else R.drawable.bg_ui_connection_connect
+            )
+            // Keep the label clear of the spinner while it is visible.
+            if (showSpinner) toggle.setPadding(dp(20), 0, dp(2), 0) else toggle.setPadding(dp(2), 0, dp(2), 0)
+            toggle.contentDescription = getString(
+                if (connected || connecting) R.string.comms_connected_description else R.string.comms_disconnected_description,
+                name
+            )
+            toggle.setOnClickListener { onConnectionToggle(name, connected || connecting, index == 0) }
             list.addView(row)
         }
     }
+
+    private fun tintStatusDot(dot: View, colorRes: Int) {
+        dot.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, colorRes))
+    }
+
+    private fun startDotPulse(dot: View) {
+        if (dot.animation != null) return
+        dot.startAnimation(AlphaAnimation(0.35f, 1f).apply {
+            duration = 700
+            repeatMode = Animation.REVERSE
+            repeatCount = Animation.INFINITE
+        })
+    }
+
+    private fun onConnectionToggle(name: String, connected: Boolean, isGlobal: Boolean) {
+        if (pendingConnections[name] != null) return
+        val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+        val eventId = event?.previewId
+        val globalId = channelIds[""]
+        val channelId = if (isGlobal) globalId else channelIds[name]
+        if (event?.isPreview != false) {
+            // Previews have no backend session; the toggle is local and immediate.
+            if (isGlobal) {
+                previewGlobalConnected = !connected
+            } else {
+                connectedChannel = if (connected) null else name
+                selectedChannel = connectedChannel ?: globalChannel
+            }
+            renderChannels()
+            renderConversation()
+            return
+        }
+        if (user == null || eventId == null || globalId == null || channelId == null) {
+            Toast.makeText(this, R.string.voice_channel_unavailable, Toast.LENGTH_SHORT).show()
+            return
+        }
+        withNotificationPermission {
+            markConnectionPending(name, !connected)
+            if (isGlobal) {
+                LiveAudioService.setGlobal(applicationContext, user, eventId, globalId, !connected)
+            } else {
+                val selected = if (connected) null else channelId
+                LiveAudioService.select(applicationContext, user, eventId, globalId, selected)
+                selectedChannel = if (selected == null) globalChannel else name
+            }
+            renderChannels()
+            renderConversation()
+        }
+    }
+
     private fun renderConversation() {
         findViewById<TextView>(R.id.comms_history_title).text = selectedChannel
         findViewById<EditText>(R.id.comms_message).hint = getString(R.string.comms_message_hint, selectedChannel)
-        findViewById<TextView>(R.id.comms_push_to_talk).apply {
-            text = if (speakingLive) {
-                getString(R.string.voice_live_speaking)
-            } else {
-                getString(R.string.comms_hold_to_talk, selectedChannel)
-            }
-        }
         // Refs 19-20: segment tabs are Global and the row's custom channel
         // (shows Not connected until that channel connects).
         val tabs = findViewById<LinearLayout>(R.id.comms_history_tabs)
@@ -780,7 +919,64 @@ class WorkspaceActivity : AppCompatActivity() {
             tab.visibility = if (index == 1 && name.isEmpty()) View.GONE else if (index == 0) View.VISIBLE else View.VISIBLE
             tabs.addView(tab, params)
         }
+        updatePttButton()
         loadMessages()
+    }
+
+    /** Reflects the real live-audio state on the push-to-talk action. */
+    private fun updatePttButton() {
+        val button = findViewById<MaterialButton>(R.id.comms_push_to_talk) ?: return
+        val note = findViewById<TextView>(R.id.comms_ptt_note) ?: return
+        val available = channelStatus(selectedChannel) == LiveAudioSession.Status.CONNECTED
+        val waiting = pressHeld && requestPending
+        val talking = speakingLive
+        button.isEnabled = available
+        button.text = when {
+            talking -> getString(R.string.voice_transmitting, selectedChannel)
+            waiting -> getString(R.string.voice_requesting_permission)
+            !available -> getString(R.string.comms_ptt_unavailable, selectedChannel)
+            else -> getString(R.string.comms_hold_to_talk, selectedChannel)
+        }
+        val tint = when {
+            talking -> R.color.ui_ptt_talking
+            waiting -> R.color.ui_ptt_waiting
+            !available -> R.color.ui_ptt_disabled
+            else -> R.color.ui_orange
+        }
+        button.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, tint))
+        note.text = pttNote ?: when {
+            waiting -> getString(R.string.voice_requesting_note)
+            talking -> getString(R.string.voice_transmitting_note)
+            else -> ""
+        }
+        if (waiting) startPttPulse(button) else stopPttPulse(button)
+    }
+
+    private fun showPttNote(text: String) {
+        pttNote = text
+        pttNoteJob?.cancel()
+        pttNoteJob = lifecycleScope.launch {
+            delay(1700)
+            pttNote = null
+            updatePttButton()
+        }
+        updatePttButton()
+    }
+
+    private fun startPttPulse(button: View) {
+        if (pttPulse?.isStarted == true) return
+        pttPulse = ObjectAnimator.ofFloat(button, View.ALPHA, 1f, 0.72f).apply {
+            duration = 650
+            repeatCount = ObjectAnimator.INFINITE
+            repeatMode = ObjectAnimator.REVERSE
+            start()
+        }
+    }
+
+    private fun stopPttPulse(button: View) {
+        pttPulse?.cancel()
+        pttPulse = null
+        button.alpha = 1f
     }
 
     /** Ref §7: bottom sheet picker bound to one event custom channel selection. */

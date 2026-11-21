@@ -25,9 +25,19 @@
         <TextView
             android:id="@+id/creation_title"
             style="@style/TextAppearance.Ui.ToolbarTitle"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/create_event" />
+        <ImageButton
+            android:id="@+id/creation_delete"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/delete_draft"
+            android:padding="10dp"
+            android:src="@drawable/ic_ui_delete"
+            android:visibility="gone" />
     </LinearLayout>
     <View style="@style/UiBarDivider" />
     <FrameLayout

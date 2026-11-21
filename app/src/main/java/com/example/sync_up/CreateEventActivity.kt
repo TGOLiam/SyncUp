@@ -61,6 +61,8 @@ class CreateEventActivity : AppCompatActivity() {
     private var joinCode: String? = null
     // Set when the activity is opened only to show an existing event's code.
     private var codeEventName: String? = null
+    // Blocks the onPause draft save once the user has deleted the draft.
+    private var draftDiscarded = false
     private val sections = intArrayOf(
         R.id.creation_details, R.id.creation_venue, R.id.creation_phases,
         R.id.creation_channels, R.id.creation_review, R.id.creation_code
@@ -149,6 +151,7 @@ class CreateEventActivity : AppCompatActivity() {
 
     private fun bindActions(drawing: VenueDrawingView) {
         findViewById<View>(R.id.creation_back).setOnClickListener { goBack() }
+        findViewById<View>(R.id.creation_delete).setOnClickListener { confirmDeleteDraft() }
         for (id in listOf(R.id.venue_footer_back_button, R.id.phases_footer_back_button, R.id.channels_footer_back_button, R.id.review_footer_back_button)) {
             findViewById<View>(id).setOnClickListener { goBack() }
         }
@@ -209,6 +212,9 @@ class CreateEventActivity : AppCompatActivity() {
         if (save) persistDraft()
         for (index in sections.indices) findViewById<View>(sections[index]).visibility = if (index == step) View.VISIBLE else View.GONE
         findViewById<TextView>(R.id.creation_title).setText(if (step == 5) R.string.code_share_title else R.string.create_event)
+        // The draft can only be deleted before the event exists.
+        findViewById<View>(R.id.creation_delete).visibility =
+            if (createdEventId == null && codeEventName == null) View.VISIBLE else View.GONE
         findViewById<TextView>(R.id.phases_event_date).text = EventCreationSession.draft.startDate
         if (step == 4) updateReview()
         if (step == 5) {
@@ -227,8 +233,34 @@ class CreateEventActivity : AppCompatActivity() {
         if (step == 0 || createdEventId != null) finish() else showStep(step - 1)
     }
 
+    private fun confirmDeleteDraft() {
+        if (submitting || draftDiscarded) return
+        val dialog = AlertDialog.Builder(this, R.style.Theme_SYNCUP_UiDialog)
+            .setCustomTitle(uiDialogTitle(this, R.string.delete_draft_title))
+            .setMessage(R.string.delete_draft_message)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.delete_draft_confirm) { _, _ -> deleteDraft() }
+            .create()
+        dialog.show()
+    }
+
+    private fun deleteDraft() {
+        // Stop onPause from re-saving the draft we are about to remove.
+        draftDiscarded = true
+        DraftSaveQueue.read(applicationContext, { store -> store.delete(draftId) }) { result ->
+            if (isFinishing || isDestroyed) return@read
+            result.onSuccess {
+                EventCreationSession.start()
+                finish()
+            }.onFailure {
+                draftDiscarded = false
+                Toast.makeText(this, R.string.delete_draft_failed, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     override fun onPause() {
-        if (!submitting && createdEventId == null) {
+        if (!submitting && createdEventId == null && !draftDiscarded) {
             saveDraft()
             persistDraft()
         }

@@ -161,6 +161,7 @@
     <string name="code_share_unavailable_description">Code unavailable</string>
     <string name="code_share_copy">Copy code</string>
     <string name="code_share_open_workspace">Open workspace</string>
+    <string name="code_share_fetch_failed">Could not load the event code. Try again.</string>
     <string name="workspace_edit_layout">Edit layout</string>
     <string name="workspace_edit_pending">Layout editing is not available yet.</string>
     <string name="workspace_report_pending">Location reporting is not available yet.</string>

@@ -53,8 +53,15 @@ internal class SupabaseEventService(private val client: SupabaseClient) {
         return client.postgrest.rpc("poll_workspace", arguments).decodeAs()
     }
 
-    suspend fun activatePhase(eventId: String, phaseId: String) {
-        val arguments = buildJsonObject {
+    /** Creator-only join code lookup; returns null once the event has ended. */
+    suspend fun getEventJoinCode(eventId: String): String? {
+        val arguments = buildJsonObject { put("p_event_id", eventId) }
+        val body = client.postgrest.rpc("get_event_join_code", arguments).data.trim()
+        if (body.isEmpty() || body == "null") return null
+        return body.removeSurrounding("\"")
+    }
+
+    suspend fun activatePhase(eventId: String, phaseId: String) {        val arguments = buildJsonObject {
             put("p_event_id", eventId)
             put("p_phase_id", phaseId)
         }

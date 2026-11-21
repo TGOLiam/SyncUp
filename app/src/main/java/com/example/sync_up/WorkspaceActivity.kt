@@ -2,6 +2,7 @@ package com.example.sync_up
 
 import android.Manifest
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.os.Build
@@ -139,6 +140,8 @@ class WorkspaceActivity : AppCompatActivity() {
         findViewById<View>(R.id.workspace_last_report_update).setOnClickListener { reportLocation() }
         findViewById<View>(R.id.workspace_activity_toggle).setOnClickListener { toggleRecentActivity() }
         findViewById<View>(R.id.workspace_report_location).setOnClickListener { reportLocation() }
+        // Creators can reopen the share screen for this event's join code.
+        findViewById<View>(R.id.workspace_code).setOnClickListener { openEventCode() }
         findViewById<View>(R.id.comms_send).setOnClickListener { sendTextMessage() }
         findViewById<View>(R.id.comms_push_to_talk).setOnTouchListener { _, motion ->
             when (motion.actionMasked) {
@@ -412,6 +415,7 @@ class WorkspaceActivity : AppCompatActivity() {
         // Ref 16: the organizers entry needs a real joined event; previews have no member data.
         findViewById<View>(R.id.workspace_organizers_entry).visibility =
             if (event?.isPreview == false) View.VISIBLE else View.GONE
+        updateCodeAction()
         val snapshot = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
         renderOrganizationSummary(snapshot?.snapshot?.locations.orEmpty())
         findViewById<WorkspaceLayoutView>(R.id.workspace_layout).layout = draft.layout
@@ -427,6 +431,46 @@ class WorkspaceActivity : AppCompatActivity() {
         renderConversation()
         renderPhases()
         showSection(selectedSection)
+    }
+
+    /** The join-code shortcut belongs to the event creator only. */
+    private fun updateCodeAction() {
+        val current = event
+        val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+        val isCreator = current != null && !current.isPreview &&
+            creatorId != null && creatorId == userId
+        findViewById<View>(R.id.workspace_code).visibility =
+            if (isCreator) View.VISIBLE else View.GONE
+    }
+
+    /** Fetches the creator-only join code and reopens the share screen. */
+    private fun openEventCode() {
+        val current = event ?: return
+        val client = SupabaseClientFactory.get(applicationContext) ?: return
+        val button = findViewById<View>(R.id.workspace_code)
+        if (!button.isEnabled) return
+        button.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                val code = SupabaseEventService(client).getEventJoinCode(current.previewId)
+                if (code.isNullOrEmpty()) {
+                    Toast.makeText(this@WorkspaceActivity, R.string.code_share_fetch_failed, Toast.LENGTH_LONG).show()
+                    return@launch
+                }
+                startActivity(
+                    Intent(this@WorkspaceActivity, CreateEventActivity::class.java)
+                        .putExtra(CreateEventActivity.EXTRA_CODE_EVENT_ID, current.previewId)
+                        .putExtra(CreateEventActivity.EXTRA_CODE_VALUE, code)
+                        .putExtra(CreateEventActivity.EXTRA_CODE_EVENT_NAME, current.name)
+                )
+            } catch (error: CancellationException) {
+                throw error
+            } catch (_: Exception) {
+                Toast.makeText(this@WorkspaceActivity, R.string.code_share_fetch_failed, Toast.LENGTH_LONG).show()
+            } finally {
+                button.isEnabled = true
+            }
+        }
     }
 
     /** The venue card label: draft venue first, then the stored detail text. */

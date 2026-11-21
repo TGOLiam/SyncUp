@@ -46,6 +46,10 @@ class CreateEventActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_DRAFT_ID = "draft_id"
         const val EXTRA_DRAFT_STEP = "draft_step"
+        // Reopens the share screen for an event that already exists.
+        const val EXTRA_CODE_EVENT_ID = "code_event_id"
+        const val EXTRA_CODE_VALUE = "code_value"
+        const val EXTRA_CODE_EVENT_NAME = "code_event_name"
     }
     private data class Phase(val label: String, val hours: Int, val minutes: Int)
     private val phases = mutableListOf<Phase>()
@@ -55,6 +59,8 @@ class CreateEventActivity : AppCompatActivity() {
     private var submitting = false
     private var createdEventId: String? = null
     private var joinCode: String? = null
+    // Set when the activity is opened only to show an existing event's code.
+    private var codeEventName: String? = null
     private val sections = intArrayOf(
         R.id.creation_details, R.id.creation_venue, R.id.creation_phases,
         R.id.creation_channels, R.id.creation_review, R.id.creation_code
@@ -67,6 +73,15 @@ class CreateEventActivity : AppCompatActivity() {
             ?: UUID.randomUUID().toString()
         createdEventId = savedInstanceState?.getString("created_event_id")
         joinCode = savedInstanceState?.getString("join_code")
+        codeEventName = savedInstanceState?.getString("code_event_name")
+        if (savedInstanceState == null) {
+            val codeEventId = intent.getStringExtra(EXTRA_CODE_EVENT_ID)
+            if (codeEventId != null) {
+                createdEventId = codeEventId
+                joinCode = intent.getStringExtra(EXTRA_CODE_VALUE)
+                codeEventName = intent.getStringExtra(EXTRA_CODE_EVENT_NAME)
+            }
+        }
         setContentView(R.layout.activity_creation_workspace)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.creation_workspace_root)) { view, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -126,7 +141,8 @@ class CreateEventActivity : AppCompatActivity() {
             }
         })
         showStep(
-            savedInstanceState?.getInt("creation_step") ?: intent.getIntExtra(EXTRA_DRAFT_STEP, 0),
+            savedInstanceState?.getInt("creation_step")
+                ?: if (codeEventName != null) 5 else intent.getIntExtra(EXTRA_DRAFT_STEP, 0),
             save = false
         )
     }
@@ -196,8 +212,13 @@ class CreateEventActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.phases_event_date).text = EventCreationSession.draft.startDate
         if (step == 4) updateReview()
         if (step == 5) {
-            findViewById<TextView>(R.id.code_share_event_name).text = getString(R.string.code_share_event_ready, EventCreationSession.draft.name)
+            findViewById<TextView>(R.id.code_share_event_name).text =
+                getString(R.string.code_share_event_ready, codeEventName ?: EventCreationSession.draft.name)
             findViewById<TextView>(R.id.code_share_value).text = joinCode.orEmpty()
+            // Reopened from the workspace: the code is the destination, so the
+            // workspace shortcut would only stack another workspace.
+            findViewById<View>(R.id.code_share_open_workspace).visibility =
+                if (codeEventName != null) View.GONE else View.VISIBLE
         }
     }
 
@@ -218,6 +239,7 @@ class CreateEventActivity : AppCompatActivity() {
         outState.putString("draft_id", draftId)
         outState.putString("created_event_id", createdEventId)
         outState.putString("join_code", joinCode)
+        outState.putString("code_event_name", codeEventName)
         outState.putStringArrayList("phase_labels", ArrayList(phases.map { it.label }))
         outState.putIntegerArrayList("phase_hours", ArrayList(phases.map { it.hours }))
         outState.putIntegerArrayList("phase_minutes", ArrayList(phases.map { it.minutes }))

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Ref 19: Global row; the label is static and never opens the picker. -->
+<!-- Ref 19: Global row. The label is static and never opens the picker;
+     connection status lives inside the card, the action sits beside it. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,32 +8,80 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/comms_channel_name"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="44dp"
         android:layout_weight="1"
         android:background="@drawable/bg_ui_channel_surface"
-        android:ellipsize="end"
-        android:fontFamily="@font/dm_sans_600"
         android:gravity="center_vertical"
-        android:maxLines="1"
+        android:orientation="vertical"
         android:paddingStart="12dp"
+        android:paddingTop="4dp"
         android:paddingEnd="8dp"
-        android:textColor="@color/ui_ink"
-        android:textSize="13sp" />
+        android:paddingBottom="4dp">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/comms_channel_toggle"
-        android:layout_width="90dp"
+        <TextView
+            android:id="@+id/comms_channel_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/dm_sans_600"
+            android:maxLines="1"
+            android:textColor="@color/ui_ink"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/comms_status_dot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/bg_ui_status_dot" />
+
+            <TextView
+                android:id="@+id/comms_status_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dm_sans_400"
+                android:maxLines="1"
+                android:textColor="@color/ui_secondary_text"
+                android:textSize="10sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="96dp"
         android:layout_height="44dp"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/bg_ui_connection_toggle"
-        android:fontFamily="@font/dm_sans_600"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:textAllCaps="false"
-        android:textColor="@color/ui_green"
-        android:textSize="11sp"
-        android:visibility="gone" />
+        android:layout_marginStart="10dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/comms_channel_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_ui_connection_connect"
+            android:fontFamily="@font/dm_sans_600"
+            android:paddingStart="2dp"
+            android:paddingEnd="2dp"
+            android:textAllCaps="false"
+            android:textColor="@color/ui_outgoing_text"
+            android:textSize="11sp" />
+
+        <!-- Spinner shown while the connection state is changing. -->
+        <ProgressBar
+            android:id="@+id/comms_channel_progress"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="8dp"
+            android:indeterminateTint="@color/ui_disconnect_text"
+            android:indeterminateTintMode="src_in"
+            android:visibility="gone" />
+    </FrameLayout>
 </LinearLayout>

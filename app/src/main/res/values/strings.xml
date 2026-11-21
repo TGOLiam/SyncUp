@@ -181,11 +181,17 @@
     <string name="comms_send">Send</string>
     <string name="comms_message_hint">Message %1$s</string>
     <string name="comms_hold_to_talk">Hold to talk · %1$s</string>
-    <string name="comms_connected_description">%1$s connected (preview)</string>
-    <string name="comms_disconnected_description">%1$s disconnected (preview)</string>
+    <string name="comms_connected_description">%1$s connected</string>
+    <string name="comms_disconnected_description">%1$s disconnected</string>
     <!-- Refs 19-20: connection panel actions and channel picker sheet. -->
     <string name="comms_connect">Connect</string>
     <string name="comms_disconnect">Disconnect</string>
+    <string name="comms_connected">Connected</string>
+    <string name="comms_connecting">Connecting…</string>
+    <string name="comms_disconnecting">Disconnecting…</string>
+    <string name="comms_reconnecting">Reconnecting…</string>
+    <string name="comms_connection_failed">Could not reach %1$s. Try again.</string>
+    <string name="comms_ptt_unavailable">Connect to %1$s to talk</string>
     <string name="comms_picker_open">Choose a custom channel</string>
     <string name="comms_picker_title">Choose a channel</string>
     <string name="comms_picker_close">Close channel picker</string>
@@ -254,6 +260,12 @@
     <string name="voice_channel_busy">Someone is speaking. Try again in 3 seconds.</string>
     <string name="voice_recording">Recording… release to send</string>
     <string name="voice_live_speaking">Speaking live… release to stop</string>
+    <string name="voice_requesting_permission">Requesting permission…</string>
+    <string name="voice_requesting_note">Requesting permission to speak</string>
+    <string name="voice_transmitting">Transmitting · %1$s</string>
+    <string name="voice_transmitting_note">Release to stop speaking</string>
+    <string name="voice_transmission_ended">Transmission ended</string>
+    <string name="voice_released_before_permission">Released before permission was granted</string>
     <string name="voice_recording_failed">Could not record audio. Try again.</string>
     <string name="voice_connection_failed">Could not request permission to speak.</string>
     <string name="voice_sent">Voice message sent.</string>

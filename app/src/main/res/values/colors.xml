@@ -51,6 +51,20 @@
     <color name="ui_chevron_divider">#FFD4DDCC</color>
     <color name="ui_chevron">#FF36523B</color>
 
+    <!-- Connection controls and live audio states -->
+    <color name="ui_connect">#FF203D33</color>
+    <color name="ui_connect_pressed">#FF315649</color>
+    <color name="ui_disconnect_surface">#FFEDF0ED</color>
+    <color name="ui_disconnect_text">#FF596A60</color>
+    <color name="ui_disconnect_outline">#FFCBD3CC</color>
+    <color name="ui_status_on">#FF438460</color>
+    <color name="ui_status_on_text">#FF315D43</color>
+    <color name="ui_status_off">#FFA0AAA1</color>
+    <color name="ui_status_pending">#FFB48A3A</color>
+    <color name="ui_ptt_waiting">#FFA77D36</color>
+    <color name="ui_ptt_talking">#FF26734F</color>
+    <color name="ui_ptt_disabled">#FFA8AAA4</color>
+
     <!-- Composer and messages -->
     <color name="ui_tabs_track">#FFE9EEE2</color>
     <color name="ui_incoming">#FFEDF1E6</color>

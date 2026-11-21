@@ -31,6 +31,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.google.android.material.button.MaterialButton
 import com.example.sync_up.data.DraftSaveQueue
 import com.example.sync_up.liveaudio.LiveAudioPreferences
@@ -483,6 +485,13 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun toggleVenueBody() {
         venueBodyOpen = !venueBodyOpen
+        val card = findViewById<View>(R.id.workspace_venue_card)
+        // Animate from the card's parent so the card grows and pushes the
+        // following content instead of snapping the list height.
+        val sceneRoot = card.parent as? android.view.ViewGroup
+        if (sceneRoot != null) {
+            TransitionManager.beginDelayedTransition(sceneRoot, AutoTransition().setDuration(200))
+        }
         findViewById<View>(R.id.workspace_venue_body).visibility =
             if (venueBodyOpen) View.VISIBLE else View.GONE
     }

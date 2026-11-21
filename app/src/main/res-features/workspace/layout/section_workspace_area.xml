@@ -161,7 +161,8 @@
                 android:textColor="@color/ui_ink"
                 android:textSize="18sp" />
 
-            <!-- Venue card; the layout expands in place when tapped. -->
+            <!-- Venue card; it grows to hold the layout when tapped so the
+                 drawing sits on the same panel background. -->
             <LinearLayout
                 android:id="@+id/workspace_venue_card"
                 android:layout_width="match_parent"
@@ -170,65 +171,71 @@
                 android:background="@drawable/bg_ui_venue_panel"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:padding="12dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/workspace_venue_name"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/workspace_venue_name"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/dm_sans_600"
+                            android:textColor="@color/ui_ink"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:id="@+id/workspace_venue_hint"
+                            style="@style/TextAppearance.Ui.Supporting"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/workspace_view_layout_hint" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/workspace_venue_chevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="@string/workspace_layout_description"
+                        android:src="@drawable/ic_ui_chevron_right"
+                        app:tint="@color/ui_action_gray" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:id="@+id/workspace_venue_body"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone">
+
+                    <com.example.sync_up.WorkspaceLayoutView
+                        android:id="@+id/workspace_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/dm_sans_600"
-                        android:textColor="@color/ui_ink"
-                        android:textSize="15sp" />
+                        android:contentDescription="@string/workspace_layout_description" />
 
                     <TextView
-                        android:id="@+id/workspace_venue_hint"
+                        android:id="@+id/workspace_empty_layout"
                         style="@style/TextAppearance.Ui.Supporting"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/workspace_view_layout_hint" />
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/workspace_venue_chevron"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:contentDescription="@string/workspace_layout_description"
-                    android:src="@drawable/ic_ui_chevron_right"
-                    app:tint="@color/ui_action_gray" />
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:text="@string/workspace_no_layout"
+                        android:visibility="gone" />
+                </FrameLayout>
             </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/workspace_venue_body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-
-                <com.example.sync_up.WorkspaceLayoutView
-                    android:id="@+id/workspace_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="@string/workspace_layout_description" />
-
-                <TextView
-                    android:id="@+id/workspace_empty_layout"
-                    style="@style/TextAppearance.Ui.Supporting"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:padding="16dp"
-                    android:text="@string/workspace_no_layout"
-                    android:visibility="gone" />
-            </FrameLayout>
 
             <!-- Section divider between Event layout and Your last report. -->
             <View

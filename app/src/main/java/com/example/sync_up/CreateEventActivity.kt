@@ -6,7 +6,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ApplicationInfo
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -100,12 +99,6 @@ class CreateEventActivity : AppCompatActivity() {
             findViewById<EditText>(R.id.create_event_venue).setText(draft.venue)
             findViewById<EditText>(R.id.create_event_start).setText(draft.startDate)
             findViewById<EditText>(R.id.create_event_end).setText(draft.endDate)
-        } else if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
-            val today = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Calendar.getInstance().time)
-            findViewById<EditText>(R.id.create_event_name).setText("Test Event")
-            findViewById<EditText>(R.id.create_event_venue).setText("Test Venue")
-            findViewById<EditText>(R.id.create_event_start).setText(today)
-            findViewById<EditText>(R.id.create_event_end).setText(today)
         }
         val drawing = findViewById<VenueDrawingView>(R.id.venue_drawing)
         if (savedInstanceState == null) draft.layout?.let { drawing.restoreLayout(it) }
@@ -119,15 +112,6 @@ class CreateEventActivity : AppCompatActivity() {
             findViewById<EditText>(R.id.phases_start_time).setText(draft.startTime)
             findViewById<EditText>(R.id.phases_end_time).setText(draft.endTime)
             for (phase in draft.phases) phases.add(Phase(phase.label, phase.hours, phase.minutes))
-        } else if (savedInstanceState == null && applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0) {
-            val calendar = Calendar.getInstance()
-            calendar.set(Calendar.HOUR_OF_DAY, 9)
-            calendar.set(Calendar.MINUTE, 0)
-            val format = android.text.format.DateFormat.getTimeFormat(this)
-            findViewById<EditText>(R.id.phases_start_time).setText(format.format(calendar.time))
-            calendar.set(Calendar.HOUR_OF_DAY, 17)
-            findViewById<EditText>(R.id.phases_end_time).setText(format.format(calendar.time))
-            phases.add(Phase("Test Phase", 1, 0))
         }
         channels.addAll(savedInstanceState?.getStringArrayList("channels") ?: draft.channels)
         renderPhases()

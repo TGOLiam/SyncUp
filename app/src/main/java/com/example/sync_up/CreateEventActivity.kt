@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -449,9 +450,11 @@ class CreateEventActivity : AppCompatActivity() {
     private fun updateDrawingMode(editing: Boolean) {
         val drawColor = if (editing) R.color.white else R.color.venue_selected
         val editColor = if (editing) R.color.venue_selected else R.color.white
-        findViewById<MaterialButton>(R.id.venue_draw_button).backgroundTintList =
+        // The venue tool buttons are AppCompatButtons; background tints apply
+        // through the platform attribute, no MaterialButton cast needed.
+        findViewById<AppCompatButton>(R.id.venue_draw_button).backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(this, drawColor))
-        findViewById<MaterialButton>(R.id.venue_edit_button).backgroundTintList =
+        findViewById<AppCompatButton>(R.id.venue_edit_button).backgroundTintList =
             ColorStateList.valueOf(ContextCompat.getColor(this, editColor))
     }
 

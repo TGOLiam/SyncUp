@@ -79,7 +79,6 @@ class WorkspaceActivity : AppCompatActivity() {
     // requested state, so the UI never assumes a connection before it exists.
     private val pendingConnections = mutableMapOf<String, Boolean>()
     private val pendingConnectionJobs = mutableMapOf<String, Job>()
-    private var previewGlobalConnected = true
     private var pttNote: String? = null
     private var pttNoteJob: Job? = null
     private var pttPulse: ObjectAnimator? = null
@@ -156,8 +155,8 @@ class WorkspaceActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 LiveAudioSession.state.collect { state ->
-                    if (event?.isPreview == false) {
-                        connectedChannel = if (state.eventId == event?.previewId) {
+                    if (event != null) {
+                        connectedChannel = if (state.eventId == event?.eventId) {
                             state.selectedId?.let { id ->
                                 channelIds.entries.firstOrNull { it.key.isNotEmpty() && it.value == id }?.key
                             }
@@ -175,7 +174,7 @@ class WorkspaceActivity : AppCompatActivity() {
                                 state.selectedId -> state.selected
                                 else -> LiveAudioSession.Status.DISCONNECTED
                             }
-                            if (state.eventId != event?.previewId || channelStatus != LiveAudioSession.Status.CONNECTED) {
+                            if (state.eventId != event?.eventId || channelStatus != LiveAudioSession.Status.CONNECTED) {
                                 finishPushToTalk()
                             }
                         }
@@ -189,7 +188,7 @@ class WorkspaceActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 WorkspaceUpdates.state.collect { update ->
                     val current = event
-                    if (update != null && current != null && current.previewId == update.eventId) {
+                    if (update != null && current != null && current.eventId == update.eventId) {
                         val active = update.snapshot.phases.firstOrNull { it.id == update.snapshot.currentPhaseId }
                         event = current.copy(
                             workspacePhase = active?.name,
@@ -226,11 +225,10 @@ class WorkspaceActivity : AppCompatActivity() {
                 activePhaseId = stored.summary.activePhaseId
                 zoneIds = stored.zoneIds
                 event = EventListItem(
-                    previewId = stored.summary.id,
-                    isPreview = stored.summary.isPreview,
+                    eventId = stored.summary.id,
                     name = stored.summary.name,
                     detail = stored.summary.detail.orEmpty(),
-                    isLead = if (stored.summary.isPreview) stored.summary.isLeadPreview else stored.summary.isCreator,
+                    isLead = stored.summary.isCreator,
                     workspacePhase = stored.summary.activePhase,
                     phases = stored.phases,
                     channels = stored.channels
@@ -255,18 +253,18 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun ensureLiveListening() {
         val currentEvent = event ?: return
-        if (currentEvent.isPreview || !lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
-        if (LiveAudioSession.state.value.eventId == currentEvent.previewId) return
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) return
+        if (LiveAudioSession.state.value.eventId == currentEvent.eventId) return
         val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id ?: return
         val global = channelIds[""] ?: return
-        val selection = LiveAudioPreferences(applicationContext).load(user, currentEvent.previewId)
+        val selection = LiveAudioPreferences(applicationContext).load(user, currentEvent.eventId)
         if (!selection.globalEnabled && selection.selectedId == null) return
         val permissionMissing = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         if (permissionMissing && (automaticNotificationRequestMade || pendingAudioAction != null)) return
         if (permissionMissing) automaticNotificationRequestMade = true
         withNotificationPermission {
-            LiveAudioService.start(applicationContext, user, currentEvent.previewId, global)
+            LiveAudioService.start(applicationContext, user, currentEvent.eventId, global)
         }
     }
 
@@ -296,8 +294,8 @@ class WorkspaceActivity : AppCompatActivity() {
         val channelId = channelIds[if (selectedChannel == globalChannel) "" else selectedChannel]
         val state = LiveAudioSession.state.value
         val status = if (channelId == state.globalId) state.global else state.selected
-        if (client == null || currentEvent == null || currentEvent.isPreview || channelId == null ||
-            state.eventId != currentEvent.previewId || status != LiveAudioSession.Status.CONNECTED ||
+        if (client == null || currentEvent == null || channelId == null ||
+            state.eventId != currentEvent.eventId || status != LiveAudioSession.Status.CONNECTED ||
             LiveAudioSession.room(channelId) == null
         ) {
             Toast.makeText(this, R.string.voice_channel_unavailable, Toast.LENGTH_LONG).show()
@@ -414,11 +412,11 @@ class WorkspaceActivity : AppCompatActivity() {
     }
 
     private fun renderEvent() {
-        // Ref 16: the organizers entry needs a real joined event; previews have no member data.
+        // Ref 16: the organizers entry needs a joined event with member data.
         findViewById<View>(R.id.workspace_organizers_entry).visibility =
-            if (event?.isPreview == false) View.VISIBLE else View.GONE
+            if (event != null) View.VISIBLE else View.GONE
         updateCodeAction()
-        val snapshot = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
+        val snapshot = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.eventId }
         renderOrganizationSummary(snapshot?.snapshot?.locations.orEmpty())
         findViewById<WorkspaceLayoutView>(R.id.workspace_layout).layout = draft.layout
         findViewById<TextView>(R.id.workspace_venue_name).text = venueDisplayName()
@@ -439,8 +437,7 @@ class WorkspaceActivity : AppCompatActivity() {
     private fun updateCodeAction() {
         val current = event
         val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
-        val isCreator = current != null && !current.isPreview &&
-            creatorId != null && creatorId == userId
+        val isCreator = current != null && creatorId != null && creatorId == userId
         findViewById<View>(R.id.workspace_code).visibility =
             if (isCreator) View.VISIBLE else View.GONE
     }
@@ -454,14 +451,14 @@ class WorkspaceActivity : AppCompatActivity() {
         button.isEnabled = false
         lifecycleScope.launch {
             try {
-                val code = SupabaseEventService(client).getEventJoinCode(current.previewId)
+                val code = SupabaseEventService(client).getEventJoinCode(current.eventId)
                 if (code.isNullOrEmpty()) {
                     Toast.makeText(this@WorkspaceActivity, R.string.code_share_fetch_failed, Toast.LENGTH_LONG).show()
                     return@launch
                 }
                 startActivity(
                     Intent(this@WorkspaceActivity, CreateEventActivity::class.java)
-                        .putExtra(CreateEventActivity.EXTRA_CODE_EVENT_ID, current.previewId)
+                        .putExtra(CreateEventActivity.EXTRA_CODE_EVENT_ID, current.eventId)
                         .putExtra(CreateEventActivity.EXTRA_CODE_VALUE, code)
                         .putExtra(CreateEventActivity.EXTRA_CODE_EVENT_NAME, current.name)
                 )
@@ -614,20 +611,6 @@ class WorkspaceActivity : AppCompatActivity() {
             SECTION_ORGANIZERS -> getString(R.string.workspace_organizers)
             else -> getString(R.string.workspace_area)
         }
-        findViewById<android.widget.Button>(R.id.workspace_edit).apply {
-            visibility = if (section != 1 && section != SECTION_ORGANIZERS && (event?.isPreview != false) &&
-                (event?.isLead ?: true)
-            ) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
-            setText(if (section == SECTION_PHASES) R.string.venue_edit else R.string.workspace_edit_layout)
-            setOnClickListener {
-                val message = if (section == 2) R.string.phases_edit_placeholder else R.string.workspace_edit_pending
-                Toast.makeText(this@WorkspaceActivity, message, Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun renderPhases() {
@@ -713,15 +696,15 @@ class WorkspaceActivity : AppCompatActivity() {
     private fun activatePhase(index: Int, button: View) {
         val current = event ?: return
         val phaseId = phaseIds.getOrNull(index) ?: return
-        if (current.isPreview || !current.isLead) return
+        if (!current.isLead) return
         val client = SupabaseClientFactory.get(applicationContext) ?: return
         val userId = client.auth.currentUserOrNull()?.id ?: return
         button.isEnabled = false
         lifecycleScope.launch {
             try {
                 val service = SupabaseEventService(client)
-                service.activatePhase(current.previewId, phaseId)
-                val remote = service.loadEvent(current.previewId)
+                service.activatePhase(current.eventId, phaseId)
+                val remote = service.loadEvent(current.eventId)
                 withContext(Dispatchers.IO) {
                     com.example.sync_up.data.SharedEventCache(applicationContext).use { it.save(userId, remote) }
                 }
@@ -758,19 +741,13 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun channelStatus(name: String): LiveAudioSession.Status {
         val state = LiveAudioSession.state.value
-        val shared = event?.isPreview == false
+        if (state.eventId != event?.eventId) return LiveAudioSession.Status.DISCONNECTED
         return when {
-            shared && state.eventId != event?.previewId -> LiveAudioSession.Status.DISCONNECTED
-            name == globalChannel -> if (shared) state.global else previewGlobalStatus()
-            shared -> if (state.selectedId != null && name == connectedChannel) state.selected
-                      else LiveAudioSession.Status.DISCONNECTED
-            name == connectedChannel -> LiveAudioSession.Status.CONNECTED
+            name == globalChannel -> state.global
+            state.selectedId != null && name == connectedChannel -> state.selected
             else -> LiveAudioSession.Status.DISCONNECTED
         }
     }
-
-    private fun previewGlobalStatus(): LiveAudioSession.Status =
-        if (previewGlobalConnected) LiveAudioSession.Status.CONNECTED else LiveAudioSession.Status.DISCONNECTED
 
     /** Clears a pending change once the session reports the requested state. */
     private fun reconcilePendingConnections() {
@@ -905,21 +882,9 @@ class WorkspaceActivity : AppCompatActivity() {
     private fun onConnectionToggle(name: String, connected: Boolean, isGlobal: Boolean) {
         if (pendingConnections[name] != null) return
         val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
-        val eventId = event?.previewId
+        val eventId = event?.eventId
         val globalId = channelIds[""]
         val channelId = if (isGlobal) globalId else channelIds[name]
-        if (event?.isPreview != false) {
-            // Previews have no backend session; the toggle is local and immediate.
-            if (isGlobal) {
-                previewGlobalConnected = !connected
-            } else {
-                connectedChannel = if (connected) null else name
-                selectedChannel = connectedChannel ?: globalChannel
-            }
-            renderChannels()
-            renderConversation()
-            return
-        }
         if (user == null || eventId == null || globalId == null || channelId == null) {
             Toast.makeText(this, R.string.voice_channel_unavailable, Toast.LENGTH_SHORT).show()
             return
@@ -1111,9 +1076,9 @@ class WorkspaceActivity : AppCompatActivity() {
     private fun chooseChannel(name: String) {
         val selectedChannelId = channelIds[name]
         val user = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
-        val eventId = event?.previewId
+        val eventId = event?.eventId
         val globalId = channelIds[""]
-        if (event?.isPreview == true || user == null || eventId == null || globalId == null) {
+        if (user == null || eventId == null || globalId == null) {
             selectedChannel = name
             renderChannels()
             renderConversation()
@@ -1149,7 +1114,7 @@ class WorkspaceActivity : AppCompatActivity() {
         val channelId = channelIds[if (selectedChannel == globalChannel) "" else selectedChannel]
         val state = LiveAudioSession.state.value
         val status = if (channelId == state.globalId) state.global else state.selected
-        if (currentEvent.isPreview || channelId == null || state.eventId != currentEvent.previewId ||
+        if (channelId == null || state.eventId != currentEvent.eventId ||
             status != LiveAudioSession.Status.CONNECTED
         ) {
             Toast.makeText(this, R.string.text_channel_unavailable, Toast.LENGTH_SHORT).show()
@@ -1186,7 +1151,6 @@ class WorkspaceActivity : AppCompatActivity() {
 
     private fun reportLocation() {
         val current = event ?: return
-        if (current.isPreview) return
         if (zoneIds.isEmpty()) {
             Toast.makeText(this, R.string.location_no_zones, Toast.LENGTH_SHORT).show()
             return
@@ -1209,7 +1173,7 @@ class WorkspaceActivity : AppCompatActivity() {
                 setOnClickListener {
                     lifecycleScope.launch {
                         try {
-                            SupabaseEventService(client).reportLocation(current.previewId, zone.first)
+                            SupabaseEventService(client).reportLocation(current.eventId, zone.first)
                             Toast.makeText(this@WorkspaceActivity, R.string.location_report_sent, Toast.LENGTH_SHORT).show()
                         } catch (error: CancellationException) {
                             throw error
@@ -1416,7 +1380,7 @@ class WorkspaceActivity : AppCompatActivity() {
             val list = findViewById<LinearLayout>(R.id.comms_messages)
             list.removeAllViews()
             findViewById<View>(R.id.comms_empty_history).visibility = if (messages.isEmpty()) View.VISIBLE else View.GONE
-            val update = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
+            val update = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.eventId }
             val members = update?.snapshot?.locations.orEmpty()
             val ownId = members.firstOrNull { it.userId == userId }?.memberId ?: ownMemberId
             val screenPadding = dp(32)

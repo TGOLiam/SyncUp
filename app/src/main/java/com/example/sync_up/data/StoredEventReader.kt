@@ -18,9 +18,7 @@ internal class StoredEventReader(
         val id: String,
         val name: String,
         val detail: String?,
-        val isLeadPreview: Boolean,
         val activePhase: String?,
-        val isPreview: Boolean,
         val isCreator: Boolean,
         val creatorId: String?,
         val activePhaseId: String?
@@ -40,16 +38,14 @@ internal class StoredEventReader(
         checkWorkerThread()
         val events = mutableListOf<Summary>()
         val sql = """
-            SELECT e.event_id, e.name, COALESCE(e.preview_detail, e.venue),
-                COALESCE(m.is_lead, 0), p.name, e.is_preview, e.creator_id, e.current_phase_id
+            SELECT e.event_id, e.name, e.venue, p.name, e.creator_id, e.current_phase_id
             FROM events e
-            LEFT JOIN preview_metadata m ON m.event_id = e.event_id
             LEFT JOIN phases p ON p.phase_id = e.current_phase_id AND p.event_id = e.event_id
             WHERE e.creation_status = 'CREATED'
-              AND (e.is_preview = 1 OR EXISTS (
+              AND EXISTS (
                   SELECT 1 FROM shared_event_access a
                   WHERE a.event_id = e.event_id AND a.user_id = ?
-              ))
+              )
             ORDER BY e.rowid
         """.trimIndent()
         helper.readableDatabase.rawQuery(sql, arrayOf(userId.orEmpty())).use { cursor ->
@@ -59,12 +55,10 @@ internal class StoredEventReader(
                         id = cursor.getString(0),
                         name = cursor.getString(1),
                         detail = cursor.getString(2),
-                        isLeadPreview = cursor.getInt(3) == 1,
-                        activePhase = cursor.getString(4),
-                        isPreview = cursor.getInt(5) == 1,
-                        isCreator = userId != null && cursor.getString(6) == userId,
-                        creatorId = cursor.getString(6),
-                        activePhaseId = cursor.getString(7)
+                        activePhase = cursor.getString(3),
+                        isCreator = userId != null && cursor.getString(4) == userId,
+                        creatorId = cursor.getString(4),
+                        activePhaseId = cursor.getString(5)
                     )
                 )
             }

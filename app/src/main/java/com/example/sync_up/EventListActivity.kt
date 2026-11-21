@@ -35,7 +35,7 @@ class EventListActivity : AppCompatActivity() {
                     openDraft(event.draftId)
                 } else {
                     val intent = Intent(this@EventListActivity, WorkspaceActivity::class.java)
-                    intent.putExtra(WorkspaceActivity.EXTRA_EVENT_ID, event.previewId)
+                    intent.putExtra(WorkspaceActivity.EXTRA_EVENT_ID, event.eventId)
                     startActivity(intent)
                 }
             }
@@ -99,7 +99,7 @@ class EventListActivity : AppCompatActivity() {
             result.onSuccess { (drafts, storedEvents) ->
                 val draftCards = drafts.map { draft ->
                     EventListItem(
-                        previewId = "",
+                        eventId = "",
                         draftId = draft.id,
                         name = draft.name.ifBlank { getString(R.string.draft_untitled) },
                         detail = getString(R.string.draft_resume),
@@ -108,11 +108,10 @@ class EventListActivity : AppCompatActivity() {
                 }
                 val eventCards = storedEvents.map { event ->
                     EventListItem(
-                        previewId = event.id,
-                        isPreview = event.isPreview,
+                        eventId = event.id,
                         name = event.name,
                         detail = event.detail.orEmpty(),
-                        isLead = if (event.isPreview) event.isLeadPreview else event.isCreator,
+                        isLead = event.isCreator,
                         phase = event.activePhase?.let { getString(R.string.event_active_phase_format, it) }
                             ?: getString(R.string.event_no_phase),
                         activePhase = event.activePhase != null

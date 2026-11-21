@@ -172,7 +172,7 @@ internal class EventDraftStore(
             """
             INSERT INTO shared_event_access (event_id, user_id)
             SELECT event_id, ? FROM events
-            WHERE creation_status = 'DRAFT' AND is_preview = 0
+            WHERE creation_status = 'DRAFT'
                 AND NOT EXISTS (SELECT 1 FROM shared_event_access WHERE shared_event_access.event_id = events.event_id)
             """.trimIndent(),
             arrayOf(userId)
@@ -189,7 +189,7 @@ internal class EventDraftStore(
         }
         val arguments = userId?.let { arrayOf(it) }
         helper.readableDatabase.rawQuery(
-            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT' AND is_preview = 0" +
+            "SELECT event_id, name, setup_step FROM events WHERE creation_status = 'DRAFT'" +
                 ownershipFilter + " ORDER BY rowid DESC",
             arguments
         ).use { cursor ->

@@ -2,7 +2,7 @@ package com.example.sync_up.data
 
 import android.database.sqlite.SQLiteDatabase
 
-/** Version 2 stores incomplete local drafts as well as submitted and preview events. */
+/** Version 2 stores incomplete local drafts as well as submitted events. */
 internal object EventSetupSchema {
     fun create(db: SQLiteDatabase) {
         db.execSQL(
@@ -16,8 +16,6 @@ internal object EventSetupSchema {
                 end_at TEXT,
                 creation_status TEXT NOT NULL CHECK (creation_status IN ('DRAFT', 'CREATED')),
                 setup_step INTEGER NOT NULL DEFAULT 0 CHECK (setup_step BETWEEN 0 AND 5),
-                is_preview INTEGER NOT NULL DEFAULT 0 CHECK (is_preview IN (0, 1)),
-                preview_detail TEXT,
                 current_phase_id TEXT REFERENCES phases(phase_id) DEFERRABLE INITIALLY DEFERRED
             )
             """.trimIndent()

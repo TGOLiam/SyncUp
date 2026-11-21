@@ -10,9 +10,8 @@ import androidx.core.content.ContextCompat
 
 /** Presentation data for an event card, independent of its data source. */
 data class EventListItem(
-    val previewId: String,
+    val eventId: String,
     val draftId: String? = null,
-    val isPreview: Boolean = true,
     val name: String,
     val detail: String,
     val isLead: Boolean,
@@ -40,7 +39,7 @@ class EventListAdapter(context: Context, events: List<EventListItem>) :
 
         // Reset all role and phase properties because this row may have shown another event.
         row.findViewById<TextView>(R.id.event_role).apply {
-            visibility = if (event.draftId != null || event.isPreview) View.VISIBLE else View.GONE
+            visibility = if (event.draftId != null) View.VISIBLE else View.GONE
             val roleText = when {
                 event.draftId != null -> R.string.event_draft
                 event.isLead -> R.string.event_lead

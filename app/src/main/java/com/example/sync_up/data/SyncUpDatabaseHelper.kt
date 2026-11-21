@@ -23,35 +23,29 @@ internal class SyncUpDatabaseHelper(
     override fun onCreate(db: SQLiteDatabase) {
         EventSetupSchema.create(db)
         DraftInputSchema.create(db)
-        PreviewMetadataSchema.create(db)
         SharedEventCacheSchema.create(db)
         VoiceRecordingSchema.create(db)
         TextMessageSchema.create(db)
-        PreviewEventSeeder.seed(appContext, db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         if (oldVersion == 1 && newVersion >= 6) {
             EventSetupSchema.create(db)
             DraftInputSchema.create(db)
-            PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
-            PreviewEventSeeder.seed(appContext, db)
         } else if (oldVersion == 2 && newVersion >= 6) {
             DraftInputSchema.create(db)
-            PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
-            PreviewEventSeeder.addMissingMetadata(appContext, db)
         } else if (oldVersion == 3 && newVersion >= 6) {
-            PreviewMetadataSchema.create(db)
             SharedEventCacheSchema.create(db)
-            PreviewEventSeeder.addMissingMetadata(appContext, db)
         } else if (oldVersion == 4 && newVersion >= 6) {
             SharedEventCacheSchema.create(db)
         } else if (oldVersion == 5 && newVersion >= 6) {
             // The version 5 schema already has shared-event access.
         } else if (oldVersion == 6 && newVersion >= 7) {
             // Version 6 already has voice recording metadata.
+        } else if (oldVersion == 7 && newVersion >= 8) {
+            // Version 8 removes preview events; handled below.
         } else {
             throw IllegalStateException("No database migration from version $oldVersion to $newVersion")
         }
@@ -61,10 +55,15 @@ internal class SyncUpDatabaseHelper(
         if (oldVersion < 7) {
             TextMessageSchema.create(db)
         }
+        if (oldVersion >= 2 && oldVersion < 8) {
+            // Previews are removed; drop their rows and the metadata table.
+            db.execSQL("DELETE FROM events WHERE is_preview = 1")
+            db.execSQL("DROP TABLE IF EXISTS preview_metadata")
+        }
     }
 
     companion object {
         const val DATABASE_NAME = "syncup.db"
-        const val DATABASE_VERSION = 7
+        const val DATABASE_VERSION = 8
     }
 }

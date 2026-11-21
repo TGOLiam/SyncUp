@@ -17,9 +17,6 @@ internal class SharedEventCache(context: Context, databaseName: String = SyncUpD
         val event = remote.event
         database.beginTransaction()
         try {
-            database.rawQuery("SELECT is_preview FROM events WHERE event_id = ?", arrayOf(event.id)).use { cursor ->
-                check(!cursor.moveToFirst() || cursor.getInt(0) == 0) { "A preview cannot be replaced" }
-            }
             val values = ContentValues().apply {
                 put("creator_id", event.creatorId)
                 put("name", event.name)

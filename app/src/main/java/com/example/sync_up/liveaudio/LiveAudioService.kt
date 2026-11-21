@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.sync_up.R
 import com.example.sync_up.data.remote.SupabaseClientFactory
@@ -78,7 +79,8 @@ internal class LiveAudioService : Service() {
                     }
                 } catch (error: CancellationException) {
                     throw error
-                } catch (_: Exception) {
+                } catch (error: Exception) {
+                    Log.w(TAG, "restore failed", error)
                     stopSelf()
                 }
             }
@@ -169,8 +171,9 @@ internal class LiveAudioService : Service() {
                 WorkspaceUpdates.publish(currentEvent, snapshot)
             } catch (error: CancellationException) {
                 throw error
-            } catch (_: Exception) {
+            } catch (error: Exception) {
                 // Keep the last confirmed state and retry on the next cycle.
+                Log.w(TAG, "workspace poll failed", error)
             }
             delay(3_000)
         }
@@ -238,12 +241,14 @@ internal class LiveAudioService : Service() {
                 withTimeout(15000) { connected.await() }
                 retrySeconds = 2L
                 disconnected.await()
-            } catch (_: TimeoutCancellationException) {
+            } catch (error: TimeoutCancellationException) {
                 // An incomplete media connection is retried with a bounded delay.
+                Log.w(TAG, "connect timeout for room $channelId")
             } catch (error: CancellationException) {
                 throw error
-            } catch (_: Exception) {
+            } catch (error: Exception) {
                 // Network and authorization failures are retried with a bounded delay.
+                Log.w(TAG, "connect failed for room $channelId", error)
             } finally {
                 LiveAudioSession.detach(channelId, room)
                 listener.cancel()
@@ -299,6 +304,7 @@ internal class LiveAudioService : Service() {
     }
 
     companion object {
+        private const val TAG = "LiveAudioService"
         private const val CHANNEL_ID = "live_audio"
         private const val NOTIFICATION_ID = 102
         private const val ACTION_DISCONNECT = "com.example.sync_up.liveaudio.DISCONNECT"

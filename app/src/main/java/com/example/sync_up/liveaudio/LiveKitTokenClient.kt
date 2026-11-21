@@ -29,7 +29,10 @@ internal class LiveKitTokenClient(private val client: SupabaseClient) {
             connection.setRequestProperty("Content-Type", "application/json")
             connection.setFixedLengthStreamingMode(payload.size)
             connection.outputStream.use { it.write(payload) }
-            check(connection.responseCode == 200) { "Live audio authorization failed" }
+            check(connection.responseCode == 200) {
+                "Live audio authorization failed (${connection.responseCode}): " +
+                    connection.errorStream?.bufferedReader()?.use { it.readText() }?.take(300)
+            }
             val response = JSONObject(connection.inputStream.bufferedReader().use { it.readText() })
             Connection(response.getString("server_url"), response.getString("token"))
         } finally {

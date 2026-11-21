@@ -203,9 +203,11 @@
     <!-- Ref 16: happening-now banner and organizers entry. -->
     <string name="workspace_happening_now">HAPPENING NOW</string>
     <string name="workspace_current_phase">Current phase · %1$d of %2$d</string>
+    <string name="workspace_phases_planned">%1$d phases planned</string>
     <string name="workspace_phase_next">Next: %1$s</string>
     <string name="workspace_view_phases">View phases</string>
     <string name="workspace_venue_label">Event venue</string>
+    <string name="workspace_venue_heading">Event layout</string>
     <string name="workspace_view_layout_hint">Click to view event layout</string>
     <string name="workspace_no_layout_hint">No venue layout yet</string>
     <string name="workspace_last_report">Your last report</string>

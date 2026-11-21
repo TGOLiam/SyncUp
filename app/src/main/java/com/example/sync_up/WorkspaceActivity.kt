@@ -434,10 +434,23 @@ class WorkspaceActivity : AppCompatActivity() {
         val phases = event?.phases ?: draft.phases.map { it.label }
         val activeIndex = if (activePhaseId != null) phaseIds.indexOf(activePhaseId) else -1
         val caption = findViewById<TextView>(R.id.workspace_phase_caption)
-        caption.visibility = if (activeIndex >= 0) View.VISIBLE else View.GONE
+        caption.visibility = if (phases.isEmpty()) View.GONE else View.VISIBLE
         if (activeIndex >= 0) {
             caption.text = getString(R.string.workspace_current_phase, activeIndex + 1, phases.size)
+        } else {
+            // Nothing running yet: the card still shows the phase plan.
+            caption.text = getString(R.string.workspace_phases_planned, phases.size)
         }
+        val next = findViewById<TextView>(R.id.workspace_phase_next)
+        val nextPhase = if (activeIndex >= 0 && activeIndex + 1 < phases.size) {
+            phases[activeIndex + 1]
+        } else if (activeIndex < 0) {
+            phases.firstOrNull()
+        } else {
+            null
+        }
+        // Empty text (never gone) keeps View phases pinned right on every device.
+        next.text = nextPhase?.let { getString(R.string.workspace_phase_next, it) }.orEmpty()
         val progress = findViewById<LinearLayout>(R.id.workspace_phase_progress)
         progress.removeAllViews()
         val density = resources.displayMetrics.density
@@ -458,11 +471,6 @@ class WorkspaceActivity : AppCompatActivity() {
             })
         }
         progress.visibility = if (phases.isEmpty()) View.GONE else View.VISIBLE
-        val next = findViewById<TextView>(R.id.workspace_phase_next)
-        next.visibility = if (activeIndex >= 0 && activeIndex + 1 < phases.size) View.VISIBLE else View.GONE
-        if (next.visibility == View.VISIBLE) {
-            next.text = getString(R.string.workspace_phase_next, phases[activeIndex + 1])
-        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -61,23 +61,20 @@
                     android:textColor="@color/ui_outgoing_text"
                     android:textSize="24sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginBottom="10dp"
-                    android:background="@color/ui_phase_track" />
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <!-- Weighted Next line always anchors left; empty when
+                         there is nothing coming, so View phases stays right. -->
                     <TextView
                         android:id="@+id/workspace_phase_next"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:gravity="start|center_vertical"
                         android:textColor="@color/ui_phase_caption"
                         android:textSize="12sp" />
 
@@ -124,7 +121,7 @@
                         android:fontFamily="@font/dm_sans_600"
                         android:text="@string/workspace_organizers"
                         android:textColor="@color/ui_ink"
-                        android:textSize="14sp" />
+                        android:textSize="18sp" />
 
                     <TextView
                         android:id="@+id/workspace_organizers_subtitle"
@@ -148,6 +145,21 @@
                     android:src="@drawable/ic_ui_chevron_right"
                     app:tint="@color/ui_action_gray" />
             </LinearLayout>
+
+            <!-- Section divider between Organizers and Event layout. -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@drawable/ui_divider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/dm_sans_600"
+                android:text="@string/workspace_venue_heading"
+                android:textColor="@color/ui_ink"
+                android:textSize="18sp" />
 
             <!-- Venue card; the layout expands in place when tapped. -->
             <LinearLayout
@@ -218,6 +230,13 @@
                     android:visibility="gone" />
             </FrameLayout>
 
+            <!-- Section divider between Event layout and Your last report. -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/ui_divider" />
+
             <!-- Your last report: plain block, Update opens the report sheet. -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -233,7 +252,7 @@
                     android:fontFamily="@font/dm_sans_600"
                     android:text="@string/workspace_last_report"
                     android:textColor="@color/ui_ink"
-                    android:textSize="14sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/workspace_last_report_update"
@@ -294,7 +313,7 @@
                     android:fontFamily="@font/dm_sans_600"
                     android:text="@string/workspace_recent_activity"
                     android:textColor="@color/ui_ink"
-                    android:textSize="14sp" />
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/workspace_activity_toggle"

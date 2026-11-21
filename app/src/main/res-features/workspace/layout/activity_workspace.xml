@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Refs 16-17, 21-22: shared workspace shell. Toolbar carries the mono
-     event context above the section title; foot nav keeps a persistent
-     orange-selected indicator row. -->
+     event context above the section title; foot nav keeps Overview and
+     Comms only (phases open from the current-phase card), with the
+     persistent orange-selected indicator row. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/workspace_root"
     android:layout_width="match_parent"
@@ -124,34 +125,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="@string/workspace_comms" />
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/workspace_nav_phases"
-            style="@style/WorkspaceNavigationItem">
-            <View
-                android:id="@+id/workspace_indicator_phases"
-                android:layout_width="match_parent"
-                android:layout_height="3dp" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-                <ImageView
-                    android:id="@+id/workspace_icon_phases"
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_workspace_phases" />
-                <TextView
-                    android:id="@+id/workspace_label_phases"
-                    style="@style/TextAppearance.Ui.NavLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="@string/workspace_phases" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

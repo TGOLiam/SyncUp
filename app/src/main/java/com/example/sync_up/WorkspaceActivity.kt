@@ -69,6 +69,9 @@ class WorkspaceActivity : AppCompatActivity() {
     private var messageRetry: Triple<String, String, String>? = null
     private var ownMemberId: String? = null
     private var messageLoad: Job? = null
+    private var venueBodyOpen = false
+    private var showAllActivity = false
+    private var latestLocations: List<com.example.sync_up.data.remote.WorkspaceLocation> = emptyList()
     private var retryAfter = 0L
     private var pendingAudioAction: (() -> Unit)? = null
     private var automaticNotificationRequestMade = false
@@ -104,7 +107,7 @@ class WorkspaceActivity : AppCompatActivity() {
         connectedChannel = savedInstanceState?.getString("connected_channel")
         selectedSection = savedInstanceState?.getInt("selected_section") ?: 0
         findViewById<View>(R.id.workspace_back).setOnClickListener {
-            // Organizers is an in-shell screen; back first returns to the Event Area.
+            // Organizers is an in-shell screen; back first returns to Overview.
             if (selectedSection == SECTION_ORGANIZERS) showSection(0) else finish()
         }
         findViewById<View>(R.id.workspace_organizers_back).setOnClickListener { showSection(0) }
@@ -114,7 +117,13 @@ class WorkspaceActivity : AppCompatActivity() {
         }
         findViewById<View>(R.id.workspace_nav_area).setOnClickListener { showSection(0) }
         findViewById<View>(R.id.workspace_nav_comms).setOnClickListener { showSection(1) }
-        findViewById<View>(R.id.workspace_nav_phases).setOnClickListener { showSection(2) }
+        // Overview: the current-phase card is the way into event phases.
+        findViewById<View>(R.id.workspace_banner).setOnClickListener { showSection(2) }
+        findViewById<View>(R.id.workspace_phase_open).setOnClickListener { showSection(2) }
+        // Clicking the venue card expands the layout in place.
+        findViewById<View>(R.id.workspace_venue_card).setOnClickListener { toggleVenueBody() }
+        findViewById<View>(R.id.workspace_last_report_update).setOnClickListener { reportLocation() }
+        findViewById<View>(R.id.workspace_activity_toggle).setOnClickListener { toggleRecentActivity() }
         findViewById<View>(R.id.workspace_report_location).setOnClickListener { reportLocation() }
         findViewById<View>(R.id.comms_send).setOnClickListener { sendTextMessage() }
         findViewById<View>(R.id.comms_push_to_talk).setOnTouchListener { _, motion ->
@@ -169,6 +178,7 @@ class WorkspaceActivity : AppCompatActivity() {
                         phaseIds = update.snapshot.phases.map { it.id }
                         activePhaseId = update.snapshot.currentPhaseId
                         findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
+                        renderPhaseCard()
                         renderPhases()
                         renderLocations(update.snapshot.locations)
                         renderOrganizers(update.snapshot.locations)
@@ -377,18 +387,82 @@ class WorkspaceActivity : AppCompatActivity() {
         // Ref 16: the organizers entry needs a real joined event; previews have no member data.
         findViewById<View>(R.id.workspace_organizers_entry).visibility =
             if (event?.isPreview == false) View.VISIBLE else View.GONE
-        findViewById<TextView>(R.id.workspace_organizer_count).text =
-            WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
-                ?.snapshot?.locations?.size?.toString().orEmpty()
+        val snapshot = WorkspaceUpdates.state.value?.takeIf { it.eventId == event?.previewId }
+        renderOrganizationSummary(snapshot?.snapshot?.locations.orEmpty())
         findViewById<WorkspaceLayoutView>(R.id.workspace_layout).layout = draft.layout
+        findViewById<TextView>(R.id.workspace_venue_name).text = venueDisplayName()
+        findViewById<TextView>(R.id.workspace_venue_hint).text =
+            getString(if (draft.layout == null) R.string.workspace_no_layout_hint else R.string.workspace_view_layout_hint)
         findViewById<View>(R.id.workspace_empty_layout).visibility =
             if (draft.layout == null) View.VISIBLE else View.GONE
         findViewById<TextView>(R.id.workspace_phase).text =
             event?.workspacePhase ?: getString(R.string.event_no_phase)
+        renderPhaseCard()
         renderChannels()
         renderConversation()
         renderPhases()
         showSection(selectedSection)
+    }
+
+    /** The venue card label: draft venue first, then the stored detail text. */
+    private fun venueDisplayName(): String {
+        draft.venue.takeIf { it.isNotBlank() }?.let { return it }
+        val detail = event?.detail.orEmpty()
+        // Preview details read "venue, city · date"; keep the venue part only.
+        return detail.substringBefore(" · ").substringBefore(",").trim()
+    }
+
+    private fun toggleVenueBody() {
+        venueBodyOpen = !venueBodyOpen
+        findViewById<View>(R.id.workspace_venue_body).visibility =
+            if (venueBodyOpen) View.VISIBLE else View.GONE
+    }
+
+    private fun toggleRecentActivity() {
+        showAllActivity = !showAllActivity
+        findViewById<TextView>(R.id.workspace_activity_toggle).text =
+            getString(if (showAllActivity) R.string.workspace_show_less else R.string.workspace_view_all)
+        renderLocations(latestLocations)
+    }
+
+    /**
+     * Phase card helper: mono caption (Current phase · x of y), segment
+     * progress, and the next phase line feed the compact current-phase card
+     * that opens the phases section.
+     */
+    private fun renderPhaseCard() {
+        val phases = event?.phases ?: draft.phases.map { it.label }
+        val activeIndex = if (activePhaseId != null) phaseIds.indexOf(activePhaseId) else -1
+        val caption = findViewById<TextView>(R.id.workspace_phase_caption)
+        caption.visibility = if (activeIndex >= 0) View.VISIBLE else View.GONE
+        if (activeIndex >= 0) {
+            caption.text = getString(R.string.workspace_current_phase, activeIndex + 1, phases.size)
+        }
+        val progress = findViewById<LinearLayout>(R.id.workspace_phase_progress)
+        progress.removeAllViews()
+        val density = resources.displayMetrics.density
+        for (index in phases.indices) {
+            val segment = View(this)
+            segment.setBackgroundColor(
+                ContextCompat.getColor(
+                    this,
+                    if (activeIndex >= 0 && index <= activeIndex) R.color.ui_orange else R.color.ui_phase_track
+                )
+            )
+            progress.addView(segment, LinearLayout.LayoutParams(
+                0,
+                dp(4),
+                1f
+            ).apply {
+                if (index < phases.size - 1) marginEnd = dp(4)
+            })
+        }
+        progress.visibility = if (phases.isEmpty()) View.GONE else View.VISIBLE
+        val next = findViewById<TextView>(R.id.workspace_phase_next)
+        next.visibility = if (activeIndex >= 0 && activeIndex + 1 < phases.size) View.VISIBLE else View.GONE
+        if (next.visibility == View.VISIBLE) {
+            next.text = getString(R.string.workspace_phase_next, phases[activeIndex + 1])
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -411,17 +485,17 @@ class WorkspaceActivity : AppCompatActivity() {
             R.id.workspace_section_phases,
             R.id.workspace_section_organizers
         )
-        // Navigation rows exist only for the first three sections.
-        val navigation = listOf(R.id.workspace_nav_area, R.id.workspace_nav_comms, R.id.workspace_nav_phases)
-        val indicators = listOf(R.id.workspace_indicator_area, R.id.workspace_indicator_comms, R.id.workspace_indicator_phases)
-        val icons = listOf(R.id.workspace_icon_area, R.id.workspace_icon_comms, R.id.workspace_icon_phases)
-        val labels = listOf(R.id.workspace_label_area, R.id.workspace_label_comms, R.id.workspace_label_phases)
+        // Bottom navigation keeps Overview and Comms; phases and organizers
+        // open at their entry points and leave Overview highlighted.
+        val navigation = listOf(R.id.workspace_nav_area, R.id.workspace_nav_comms)
+        val indicators = listOf(R.id.workspace_indicator_area, R.id.workspace_indicator_comms)
+        val icons = listOf(R.id.workspace_icon_area, R.id.workspace_icon_comms)
+        val labels = listOf(R.id.workspace_label_area, R.id.workspace_label_comms)
         for (index in sections.indices) {
             findViewById<View>(sections[index]).visibility = if (index == section) View.VISIBLE else View.GONE
         }
         for (index in navigation.indices) {
-            // The organizers screen keeps the Event Area entry highlighted (ref 17).
-            val selected = index == section || (section == SECTION_ORGANIZERS && index == 0)
+            val selected = index == section || (section == 2 || section == SECTION_ORGANIZERS) && index == 0
             findViewById<View>(navigation[index]).isSelected = selected
             val nav = findViewById<View>(navigation[index])
             nav.setBackgroundColor(
@@ -561,6 +635,7 @@ class WorkspaceActivity : AppCompatActivity() {
                 phaseIds = remote.phases.sortedBy { it.sequence }.map { it.id }
                 activePhaseId = remote.event.currentPhaseId
                 findViewById<TextView>(R.id.workspace_phase).text = active?.name ?: getString(R.string.event_no_phase)
+                renderPhaseCard()
                 renderPhases()
             } catch (error: CancellationException) {
                 throw error
@@ -897,40 +972,111 @@ class WorkspaceActivity : AppCompatActivity() {
     }
 
     private fun renderLocations(locations: List<com.example.sync_up.data.remote.WorkspaceLocation>) {
+        latestLocations = locations
         val list = findViewById<LinearLayout>(R.id.workspace_reports)
         list.removeAllViews()
-        // Ref 16: report rows are borderless entries with a bottom hairline.
-        for (location in locations) {
+        // Ref 16: report rows are borderless entries with a bottom hairline;
+        // the feed collapses to the latest three until expanded.
+        val visible = if (showAllActivity) locations else locations.take(3)
+        for (location in visible) {
             val detail = reportTimestampDetail(location) ?: continue
             val row = LinearLayout(this).apply {
-                orientation = LinearLayout.VERTICAL
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
                 setBackgroundResource(R.drawable.bg_ui_row_divider)
-                setPadding(0, dp(12), 0, dp(12))
+                setPadding(0, dp(10), 0, dp(10))
             }
-            row.addView(TextView(this).apply {
-                text = location.name ?: getString(R.string.message_member)
-                // Ref 16: the reporter name is a step above the meta line.
-                textSize = 16f
+            row.addView(initialBadge(location.name, 28))
+            val column = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            column.addView(TextView(this).apply {
+                text = getString(
+                    R.string.workspace_activity_reported,
+                    location.name ?: getString(R.string.message_member)
+                )
+                textSize = 14f
                 setTypeface(null, android.graphics.Typeface.BOLD)
                 setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_ink))
             })
-            row.addView(TextView(this).apply {
+            column.addView(TextView(this).apply {
                 text = detail
                 textSize = 13f
-                setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_secondary_text))
+                setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_action_gray))
+            }, LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(2) })
+            row.addView(column, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginStart = dp(12)
             })
             list.addView(row)
         }
         findViewById<TextView>(R.id.workspace_reports_empty).visibility =
             if (list.childCount == 0) View.VISIBLE else View.GONE
+        renderLastReport(locations)
+    }
+
+    /** Initial chip used by the organizer stack and the activity rows. */
+    private fun initialBadge(name: String?, sizeDp: Int): TextView {
+        return TextView(this).apply {
+            text = (name ?: getString(R.string.message_member)).trim().take(1).uppercase()
+            textSize = 12f
+            gravity = android.view.Gravity.CENTER
+            setBackgroundResource(R.drawable.bg_ui_avatar_overlap)
+            setTextColor(ContextCompat.getColor(this@WorkspaceActivity, R.color.ui_ink))
+            minHeight = dp(sizeDp)
+            minWidth = dp(sizeDp)
+        }
+    }
+
+    /** Own report recap under Your last report, with the Update entry point. */
+    private fun renderLastReport(locations: List<com.example.sync_up.data.remote.WorkspaceLocation>) {
+        val userId = SupabaseClientFactory.get(applicationContext)?.auth?.currentUserOrNull()?.id
+        val own = locations.firstOrNull { it.userId == userId }
+        val zoneText = findViewById<TextView>(R.id.workspace_last_report_zone)
+        val timeText = findViewById<TextView>(R.id.workspace_last_report_time)
+        // A member row can exist before any report; without a zone there is
+        // nothing to recap yet.
+        if (own == null || own.zoneId == null) {
+            zoneText.setTextColor(ContextCompat.getColor(this, R.color.ui_muted))
+            zoneText.text = getString(R.string.workspace_last_report_none)
+            timeText.text = getString(R.string.workspace_not_reported)
+            return
+        }
+        val zone = zoneIds.firstOrNull { it.first == own.zoneId }?.second
+        val time = own.reportedAt?.let { reportedAt ->
+            try {
+                val instant = OffsetDateTime.parse(reportedAt).toInstant()
+                android.text.format.DateFormat.getTimeFormat(this).format(Date.from(instant))
+            } catch (_: Exception) {
+                null
+            }
+        }
+        zoneText.setTextColor(ContextCompat.getColor(this, R.color.ui_ink))
+        zoneText.text = zone ?: getString(R.string.workspace_not_reported)
+        timeText.text = if (time == null) {
+            getString(R.string.workspace_not_reported)
+        } else {
+            getString(R.string.workspace_reported_time, time)
+        }
+    }
+
+    /** Entry-row subtitle plus the overlapping avatar stack. */
+    private fun renderOrganizationSummary(locations: List<com.example.sync_up.data.remote.WorkspaceLocation>) {
+        findViewById<TextView>(R.id.workspace_organizers_subtitle).text =
+            getString(R.string.workspace_organizers_subtitle, locations.size)
+        val stack = findViewById<LinearLayout>(R.id.workspace_organizer_avatars)
+        stack.removeAllViews()
+        for (location in locations.take(3)) {
+            stack.addView(initialBadge(location.name, 25), LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { if (stack.childCount > 0) marginStart = dp(-7) })
+        }
+        stack.visibility = if (locations.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun renderOrganizers(locations: List<com.example.sync_up.data.remote.WorkspaceLocation>) {
-        if (selectedSection != SECTION_ORGANIZERS) {
-            // Row rebuild can happen while the organizer list is still visible later;
-            // the count on the Event Area entry stays fresh.
-            findViewById<TextView>(R.id.workspace_organizer_count).text = locations.size.toString()
-        }
+        renderOrganizationSummary(locations)
         findViewById<TextView>(R.id.workspace_organizer_subtitle).text =
             getString(R.string.workspace_organizer_members, locations.size)
         val list = findViewById<LinearLayout>(R.id.workspace_organizer_list)

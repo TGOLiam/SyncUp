@@ -28,6 +28,7 @@
     <color name="ui_green">#FF213B35</color>
     <color name="ui_orange">#FFB63E20</color>
     <color name="ui_muted">#FF717974</color>
+    <color name="ui_action_gray">#FF7C8B81</color>
     <color name="ui_secondary_text">#FF65756A</color>
     <color name="ui_divider">#FFD5D8CE</color>
     <color name="ui_paper">#FFF2F0E9</color>
@@ -64,6 +65,8 @@
     <!-- Phases -->
     <color name="ui_phase_caption">#FFC4D2BD</color>
     <color name="ui_phase_secondary">#FFC2D4BD</color>
+    <color name="ui_phase_track">#33FFFFFF</color>
+
 
     <!-- Organizers and success -->
     <color name="ui_avatar">#FFDCE6D1</color>

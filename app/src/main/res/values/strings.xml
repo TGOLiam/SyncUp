@@ -172,7 +172,7 @@
     <string name="workspace_manual_location">Manual, not GPS</string>
     <string name="workspace_no_reports">No location reports yet.</string>
     <string name="workspace_report_location">Report my location</string>
-    <string name="workspace_area">Event Area</string>
+    <string name="workspace_area">Overview</string>
     <string name="workspace_comms">Comms</string>
     <string name="workspace_phases">Phases</string>
     <string name="workspace_communications">Communications</string>
@@ -202,8 +202,24 @@
     <string name="workspace_phase_activate">Activate</string>
     <!-- Ref 16: happening-now banner and organizers entry. -->
     <string name="workspace_happening_now">HAPPENING NOW</string>
+    <string name="workspace_current_phase">Current phase · %1$d of %2$d</string>
+    <string name="workspace_phase_next">Next: %1$s</string>
+    <string name="workspace_view_phases">View phases</string>
+    <string name="workspace_venue_label">Event venue</string>
+    <string name="workspace_view_layout_hint">Click to view event layout</string>
+    <string name="workspace_no_layout_hint">No venue layout yet</string>
+    <string name="workspace_last_report">Your last report</string>
+    <string name="workspace_last_report_none">No location reported yet.</string>
+    <string name="workspace_not_reported">Not reported</string>
+    <string name="workspace_reported_time">Reported %1$s</string>
+    <string name="workspace_last_report_update">Update ›</string>
+    <string name="workspace_recent_activity">Recent activity</string>
+    <string name="workspace_view_all">View all ›</string>
+    <string name="workspace_show_less">Show less</string>
+    <string name="workspace_activity_reported">%1$s reported a location</string>
     <string name="workspace_organizers">Organizers</string>
     <string name="workspace_organizers_hint">View everyone who joined</string>
+    <string name="workspace_organizers_subtitle">%1$d people coordinating this event</string>
     <string name="workspace_organizers_heading">Joined organizers</string>
     <string name="workspace_organizer_members">%1$d members</string>
     <string name="workspace_organizer_no_location">Location not reported yet</string>

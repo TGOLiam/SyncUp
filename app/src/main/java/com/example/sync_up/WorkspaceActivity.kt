@@ -20,6 +20,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
@@ -56,7 +57,9 @@ class WorkspaceActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_EVENT_ID = "event_id"
 
-        // Organizers (ref 17) lives in the shell but has no navigation row.
+        // Phases and organizers open inside the shell from the Overview card
+        // and have no navigation row of their own.
+        const val SECTION_PHASES = 2
         const val SECTION_ORGANIZERS = 3
     }
 
@@ -118,11 +121,10 @@ class WorkspaceActivity : AppCompatActivity() {
         selectedChannel = savedInstanceState?.getString("selected_channel") ?: globalChannel
         connectedChannel = savedInstanceState?.getString("connected_channel")
         selectedSection = savedInstanceState?.getInt("selected_section") ?: 0
-        findViewById<View>(R.id.workspace_back).setOnClickListener {
-            // Organizers is an in-shell screen; back first returns to Overview.
-            if (selectedSection == SECTION_ORGANIZERS) showSection(0) else finish()
-        }
-        findViewById<View>(R.id.workspace_organizers_back).setOnClickListener { showSection(0) }
+        findViewById<View>(R.id.workspace_back).setOnClickListener { handleWorkspaceBack() }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = handleWorkspaceBack()
+        })
         findViewById<View>(R.id.workspace_organizers_entry).setOnClickListener {
             // Ref 16: the organizer entry opens the in-shell organizers screen.
             showSection(SECTION_ORGANIZERS)
@@ -130,8 +132,8 @@ class WorkspaceActivity : AppCompatActivity() {
         findViewById<View>(R.id.workspace_nav_area).setOnClickListener { showSection(0) }
         findViewById<View>(R.id.workspace_nav_comms).setOnClickListener { showSection(1) }
         // Overview: the current-phase card is the way into event phases.
-        findViewById<View>(R.id.workspace_banner).setOnClickListener { showSection(2) }
-        findViewById<View>(R.id.workspace_phase_open).setOnClickListener { showSection(2) }
+        findViewById<View>(R.id.workspace_banner).setOnClickListener { showSection(SECTION_PHASES) }
+        findViewById<View>(R.id.workspace_phase_open).setOnClickListener { showSection(SECTION_PHASES) }
         // Clicking the venue card expands the layout in place.
         findViewById<View>(R.id.workspace_venue_card).setOnClickListener { toggleVenueBody() }
         findViewById<View>(R.id.workspace_last_report_update).setOnClickListener { reportLocation() }
@@ -503,6 +505,15 @@ class WorkspaceActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    /** In-shell screens (phases, organizers) return to Overview; nav sections exit. */
+    private fun handleWorkspaceBack() {
+        if (selectedSection == SECTION_PHASES || selectedSection == SECTION_ORGANIZERS) {
+            showSection(0)
+        } else {
+            finish()
+        }
+    }
+
     private fun showSection(section: Int) {
         if (section != 1) {
             val input = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -526,7 +537,7 @@ class WorkspaceActivity : AppCompatActivity() {
             findViewById<View>(sections[index]).visibility = if (index == section) View.VISIBLE else View.GONE
         }
         for (index in navigation.indices) {
-            val selected = index == section || (section == 2 || section == SECTION_ORGANIZERS) && index == 0
+            val selected = index == section || (section == SECTION_PHASES || section == SECTION_ORGANIZERS) && index == 0
             findViewById<View>(navigation[index]).isSelected = selected
             val nav = findViewById<View>(navigation[index])
             nav.setBackgroundColor(
@@ -546,7 +557,7 @@ class WorkspaceActivity : AppCompatActivity() {
             (event?.name ?: draft.name).uppercase()
         findViewById<TextView>(R.id.workspace_title).text = when (section) {
             1 -> getString(R.string.workspace_communications)
-            2 -> getString(R.string.event_phases)
+            SECTION_PHASES -> getString(R.string.event_phases)
             SECTION_ORGANIZERS -> getString(R.string.workspace_organizers)
             else -> getString(R.string.workspace_area)
         }
@@ -558,7 +569,7 @@ class WorkspaceActivity : AppCompatActivity() {
             } else {
                 View.GONE
             }
-            setText(if (section == 2) R.string.venue_edit else R.string.workspace_edit_layout)
+            setText(if (section == SECTION_PHASES) R.string.venue_edit else R.string.workspace_edit_layout)
             setOnClickListener {
                 val message = if (section == 2) R.string.phases_edit_placeholder else R.string.workspace_edit_pending
                 Toast.makeText(this@WorkspaceActivity, message, Toast.LENGTH_SHORT).show()

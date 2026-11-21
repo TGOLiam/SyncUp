@@ -48,15 +48,4 @@
                 android:text="@string/workspace_location_caveat" />
         </LinearLayout>
     </ScrollView>
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/workspace_organizers_back"
-        style="@style/Widget.Ui.Button.Outline"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
-        android:minHeight="48dp"
-        android:text="@string/workspace_area" />
 </LinearLayout>

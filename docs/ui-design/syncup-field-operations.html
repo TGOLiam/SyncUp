@@ -167,8 +167,57 @@
 .events-header .settings-control:hover{background:#e9eee2}
 .section-intro>small{text-transform:none}
   </style>
- </head>
- <body>
+  <style>
+   /* Revised Event Area (screens 16 & 18). Phase-progress banner, organizer
+      stack, venue card, last-report card, activity feed, and the report
+      bottom sheet; built on the shared paper / ink / orange tokens. */
+.area-revised .body{gap:7px;padding:12px 16px}
+.area .phase-card{padding:11px;background:var(--dark);color:var(--white);border-radius:5px;display:flex;flex-direction:column;gap:5px}
+.phase-card>small{color:#bcd0bd;font:9px 'Adwaita Mono',monospace;letter-spacing:.09em;text-transform:uppercase}
+.phase-progress{display:flex;gap:4px}
+.phase-progress i{height:4px;flex:1;border-radius:3px;background:#ffffff26}
+.phase-progress i.done{background:var(--orange)}
+.phase-card-title{font:600 24px/1 'Barlow Condensed','Cantarell',sans-serif;letter-spacing:-.02em;color:#f4f7ee}
+.phase-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;border-top:1px solid #ffffff2b}
+.phase-card-foot small{color:#c6d6c6;font-size:11px}
+.phase-card-foot button{border:0;background:none;color:var(--white);font-size:12px;font-weight:600;padding:4px 0}
+.phase-card-foot button:hover{color:#f0b79f}
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.section-head b{font-size:14px;line-height:1.35}
+.section-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:0;background:none;padding:0;text-align:left;color:var(--ink)}
+.section-row .row-text{min-width:0}
+.section-row b{font-size:14px;font-weight:600;line-height:1.35}
+.section-row:hover .organizer-stack{opacity:.7}
+.chevron{color:var(--muted);line-height:1}
+.text-action{display:inline-flex;align-items:center;gap:5px;border:0;background:none;color:var(--muted);font-size:12px;font-weight:600;padding:4px 0}
+.text-action:hover{color:#52675b}
+.venue-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:12px;border:1px solid #cdd6c2;border-radius:6px;background:#f6f9f1;color:var(--ink);text-align:left;transition:background .15s,border-color .15s}
+.venue-row:hover{background:#eaf1e6;border-color:#a9bba0}
+.venue-row .venue-row-label{font:9px 'Adwaita Mono',monospace;letter-spacing:.09em;text-transform:uppercase;margin-bottom:5px}
+.venue-row b{display:block;font-size:15px;line-height:1.35}
+.venue-row small:last-of-type{margin-top:5px;color:var(--muted)}
+.venue-row .chevron,.organizer-stack .chevron{font-size:20px}
+.organizer-stack{display:flex;align-items:center;border:0;background:none;padding:0}
+.organizer-stack .avatar{width:30px;height:30px;font-size:14px;border-radius:50%;border:2px solid var(--white)}
+.organizer-stack .avatar+.avatar{margin-left:-10px}
+.report-card{border-bottom:1px solid var(--line);padding-bottom:10px}
+.report-card b{font-size:13px;color:var(--muted)}
+.activity-list{display:flex;flex-direction:column}
+.activity-row{display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--line)}
+.activity-row .avatar{width:28px;height:28px;font-size:13px;border-radius:50%}
+.activity-row b{font-weight:600}
+.activity-row small{margin-top:3px}
+.sheet-option{width:100%;text-align:left;border:1px solid #cdd6c2;background:var(--white);border-radius:5px;padding:13px 12px;font-size:13px;font-weight:600;color:var(--ink)}
+.sheet-option[aria-pressed=true]{background:#e8eee0;border-color:#8ea687;color:var(--dark)}
+.report-confirm{margin-top:4px;background:var(--orange);border-color:var(--orange)}
+.report-confirm:disabled{opacity:.45}
+.area-revised .phase-card,.area-revised .activity-row{animation:rise .4s both}
+.area-revised .activity-row:nth-child(2){animation-delay:.07s}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.area-revised .phase-card,.area-revised .activity-row{animation:none}}
+  </style>
+  </head>
+  <body>
   <header>
    <div class="masthead">
     <a class="wordmark" href="#">
@@ -1384,12 +1433,12 @@
      Venue, people, channels, and the next move.
     </p>
     <div class="grid">
-     <article class="sample workspace-map area" id="event-area-screen">
+     <article class="sample workspace-map area area-revised" id="event-area-screen">
       <div class="screen-number">
        16
       </div>
       <h3>
-       Event Area · proposed organizer entry
+       Overview · organizer home
       </h3>
       <div class="phone">
        <div class="status">
@@ -1407,66 +1456,138 @@
           TECHCONF MANILA
          </small>
          <b>
-          Event Area
+          Overview
          </b>
         </div>
        </div>
        <div class="body">
-        <div class="phase-banner">
+        <section class="phase-card">
          <small>
-          HAPPENING NOW
+          Current phase · 1 of 4
          </small>
-         <span class="badge">
+         <div aria-hidden="true" class="phase-progress">
+          <i class="done">
+          </i>
+          <i>
+          </i>
+          <i>
+          </i>
+          <i>
+          </i>
+         </div>
+         <div class="phase-card-title">
           Registration
-         </span>
-        </div>
-        <button class="team-link" onclick="document.getElementById('organizer-screen').scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})" type="button">
-         <span>
+         </div>
+         <div class="phase-card-foot">
+          <small>
+           Next: Opening Remarks
+          </small>
+          <button type="button">
+           View phases ›
+          </button>
+         </div>
+        </section>
+        <button class="section-row" onclick="document.getElementById('organizer-screen').scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})" type="button">
+         <span class="row-text">
           <b>
            Organizers
           </b>
           <small>
-           View everyone who joined
+           3 people coordinating this event
           </small>
          </span>
-         <span>
-          3   ›
+         <span class="organizer-stack" aria-hidden="true">
+          <span class="avatar">
+           M
+          </span>
+          <span class="avatar">
+           R
+          </span>
+          <span class="avatar">
+           A
+          </span>
+          <span class="chevron">
+           ›
+          </span>
          </span>
         </button>
-        <div class="map">
-         <svg aria-label="Example venue with rectangular zones" role="img" viewbox="0 0 300 230.769">
-          <rect fill="#fff" height="175" stroke="#1f3b5c" stroke-width="3" width="264" x="18" y="17">
-          </rect>
-          <rect fill="#e4ecf4" height="65" stroke="#1f3b5c" width="88" x="35" y="36">
-          </rect>
-          <rect fill="#e4ecf4" height="76" stroke="#1f3b5c" width="100" x="155" y="75">
-          </rect>
-          <text x="45" y="72">
-           Registration
-          </text>
-          <text x="181" y="117">
-           Stage
-          </text>
-         </svg>
-        </div>
-        <b>
-         Report log
-        </b>
-        <div class="card">
+        <button class="venue-row" type="button">
+         <span class="grow">
+          <small class="venue-row-label">
+           Event venue
+          </small>
+          <b>
+           Grand Convention Hall
+          </b>
+          <small>
+           Click to view event layout
+          </small>
+         </span>
+         <span aria-hidden="true" class="chevron">
+          ›
+         </span>
+        </button>
+        <div class="section-head">
          <b>
-          Mia
+          Your last report
          </b>
-         <small>
-          Registration · 10:41 AM
-         </small>
+         <button class="text-action" type="button">
+          Update
+          <span aria-hidden="true" class="chevron">
+           ›
+          </span>
+         </button>
         </div>
-        <div class="card">
+        <div class="report-card">
+         <div>
+          <b>
+           No location reported yet.
+          </b>
+          <small>
+           Not reported
+          </small>
+         </div>
+        </div>
+        <div class="section-head">
          <b>
-          Raj
+          Recent activity
          </b>
-         <small>
-          Stage · 10:36 AM
-         </small>
+         <button class="text-action" type="button">
+          View all
+          <span aria-hidden="true" class="chevron">
+           ›
+          </span>
+         </button>
+        </div>
+        <div class="activity-list">
+         <div class="activity-row">
+          <div class="avatar">
+           M
+          </div>
+          <div>
+           <b>
+            Mia
+           </b>
+           reported a location
+           <small>
+            Registration · 10:41 AM
+           </small>
+          </div>
+         </div>
+         <div class="activity-row">
+          <div class="avatar">
+           R
+          </div>
+          <div>
+           <b>
+            Raj
+           </b>
+           reported a location
+           <small>
+            Stage · 10:36 AM
+           </small>
+          </div>
+         </div>
         </div>
        </div>
        <div class="foot">
@@ -1479,19 +1600,13 @@
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
-        <div class="">
+        <div>
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div class="">
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
       </div>
@@ -1578,7 +1693,7 @@
        </div>
        <div class="foot">
         <button class="button" onclick="document.getElementById('event-area-screen').scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'})" type="button">
-         Back to Event Area
+         Back to Overview
         </button>
        </div>
        <nav>
@@ -1586,19 +1701,13 @@
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
         <div>
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div>
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
       </div>
@@ -1608,7 +1717,7 @@
        18
       </div>
       <h3>
-       Event Area · report location
+       Overview · report my location
       </h3>
       <div class="phone">
        <div class="status">
@@ -1626,7 +1735,7 @@
           TECHCONF MANILA
          </small>
          <b>
-          Event Area
+          Overview
          </b>
         </div>
        </div>
@@ -1647,43 +1756,50 @@
           </text>
          </svg>
         </div>
-        <div class="overlay">
-         <div class="dialog">
-          <b>
-           Report my location
-          </b>
-          <p>
-           Registration
-          </p>
-          <p>
-           Stage
-          </p>
-          <button class="button">
-           Cancel
-          </button>
-         </div>
-        </div>
        </div>
        <nav>
         <div class="selected">
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
-        <div class="">
+        <div>
          <span>
           ▱
          </span>
          Comms
         </div>
-        <div class="">
-         <span>
-          ☷
-         </span>
-         Phases
-        </div>
        </nav>
+       <div class="picker-backdrop">
+        <section aria-label="Report my location" aria-modal="true" class="channel-sheet report-sheet" role="dialog">
+         <div class="sheet-handle">
+         </div>
+         <div class="sheet-heading">
+          <h4>
+           Report my location
+          </h4>
+          <button aria-label="Close" class="close-picker" type="button">
+           ×
+          </button>
+         </div>
+         <p>
+          Select your venue zone. This is a manual report, not GPS tracking.
+         </p>
+         <button aria-pressed="true" class="sheet-option" type="button">
+          ◈ &nbsp; Registration Area
+         </button>
+         <button aria-pressed="false" class="sheet-option" type="button">
+          ▣ &nbsp; Stage Area
+         </button>
+         <button aria-pressed="false" class="sheet-option" type="button">
+          ⌖ &nbsp; Other / Outside
+         </button>
+         <button class="primary report-confirm" type="button">
+          Confirm location
+         </button>
+        </section>
+       </div>
       </div>
      </article>
      <article class="sample comms">
@@ -1786,19 +1902,13 @@
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
         <div class="selected">
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div class="">
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
        <div class="picker-backdrop" hidden="">
@@ -1931,19 +2041,13 @@
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
         <div class="selected">
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div class="">
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
        <div class="picker-backdrop" hidden="">
@@ -2075,23 +2179,17 @@
         </small>
        </div>
        <nav>
-        <div class="">
+        <div class="selected">
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
-        <div class="">
+        <div>
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div class="selected">
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
       </div>
@@ -2151,23 +2249,17 @@
         </small>
        </div>
        <nav>
-        <div class="">
+        <div class="selected">
          <span>
           ◇
          </span>
-         Event Area
+         Overview
         </div>
-        <div class="">
+        <div>
          <span>
           ▱
          </span>
          Comms
-        </div>
-        <div class="selected">
-         <span>
-          ☷
-         </span>
-         Phases
         </div>
        </nav>
       </div>

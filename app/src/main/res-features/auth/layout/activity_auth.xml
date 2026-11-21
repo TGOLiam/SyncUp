@@ -33,11 +33,6 @@
                 layout="@layout/ui_wordmark" />
         </LinearLayout>
 
-        <View
-            style="@style/UiBarDivider"
-            android:layout_marginStart="-16dp"
-            android:layout_marginEnd="-16dp" />
-
         <!-- 36sp Barlow Condensed headline; measure capped near the reference. -->
         <TextView
             android:id="@+id/auth_title"
